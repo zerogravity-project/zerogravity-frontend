@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <h1>HomeView</h1>
+  <h1>RecordView</h1>
 </template>
 
 <style lang="scss" scoped>
