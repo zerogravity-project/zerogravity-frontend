@@ -16,7 +16,7 @@ module.exports = {
   rules: {
     'semi': ['error', 'never'],
     'quotes': ['error', 'single'],
-    'max-len': ['error', { 'code': 100 }],
+    'max-len': ['error', { 'code': 150 }],
     'comma-dangle': ['error', 'always-multiline'],
     'no-tabs': 'error',
     'no-multiple-empty-lines': ['error', { 'max': 1, 'maxEOF': 1, 'maxBOF': 0 }],

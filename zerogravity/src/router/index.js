@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import StartView from '@/views/Spaceout/StartView.vue'
-import MainView from '@/views/Spaceout/MainView.vue'
-import ResultView from '@/views/Spaceout/ResultView.vue'
+import StartView from '@/views/spaceout/StartView.vue'
+import MainView from '@/views/spaceout/MainView.vue'
+import ResultView from '@/views/spaceout/ResultView.vue'
 import RecordView from '@/views/RecordView.vue'
-import CalendarView from '@/views/Profile/CalendarView.vue'
-import ChartView from '@/views/Profile/ChartView.vue'
-import SettingView from '@/views/Profile/SettingView.vue'
-import CustomizeView from '@/views/Profile/Setting/CustomizeView.vue'
+import CalendarView from '@/views/profile/CalendarView.vue'
+import ChartView from '@/views/profile/ChartView.vue'
+import SettingView from '@/views/profile/SettingView.vue'
+import CustomizeView from '@/views/profile/setting/CustomizeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

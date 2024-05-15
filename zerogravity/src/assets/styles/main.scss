@@ -1,0 +1,21 @@
+@import './reset.css';
+
+/* 기본 폰트 Pretendard 지정 */
+body {
+    font-family: 'Pretendard', sans-serif;
+}
+
+/* 영문 폰트 Helvetica 지정 */
+.en-font {
+    font-family: 'Helvetica', 'Pretendard', sans-serif;
+}
+
+/* 기본 아이콘 설정  */
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24
+}
