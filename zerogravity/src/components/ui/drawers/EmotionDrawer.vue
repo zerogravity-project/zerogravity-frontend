@@ -59,6 +59,7 @@
       <DrawerHeader
         :title-text="'Main Emotion'"
         :button-text="'수정하기'"
+        :style="'gray'"
       />
       <div class="main-emotion-area">
         <EmotionContainer
@@ -74,12 +75,14 @@
       <DrawerHeader
         :title-text="'Daily Note'"
         :button-text="'수정하기'"
+        :style="'gray'"
       />
       <TextContainer />
 
       <!-- Moment Emotion -->
       <DrawerHeader
         :title-text="'Moment Emotion'"
+        :style="'gray'"
       />
     </div>
 
@@ -108,6 +111,7 @@
   height: 100vh;
   border-left: 1px solid $lightgray300;
   background: $white900;
+  z-index: 5;
   transition: 0.5s;
 }
 

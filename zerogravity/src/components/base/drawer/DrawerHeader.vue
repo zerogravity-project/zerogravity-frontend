@@ -2,7 +2,7 @@
   const props = defineProps({
     titleText: {
       type: String,
-      default: '',
+      required: true,
     },
     buttonText: {
       type: String,
@@ -12,11 +12,15 @@
       type: String,
       default: '',
     },
+    style: {
+      type: String,
+      default: '',
+    },
   })
 </script>
 
 <template>
-  <div class="drawer-header-container">
+  <div :class="['drawer-header-container', props.style]">
     <h3 class="title-text en-font">
       {{ props.titleText }}
     </h3>
@@ -45,12 +49,27 @@
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid $lightgray300;
-    border-bottom: 1px solid $lightgray300;
-    background: $lightgray100;
+
+    &.gray{
+      border-bottom: 1px solid $lightgray300;
+      background-color: $lightgray100;
+
+      .title-text{
+        color: $gray700;
+      }
+    }
+
+    &.white{
+      border-bottom: 1px solid $lightgray300;
+      background-color: $white900;
+
+      .title-text{
+        color: $black900;
+      }
+    }
 }
 
 .title-text {
-    color: $gray700;
     font-size: $btn-font-size-s;
     line-height: 15px;
 }
