@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <h1>Zero Gravity</h1>
+  <div />
 </template>
 
 <style lang="scss" scoped>
