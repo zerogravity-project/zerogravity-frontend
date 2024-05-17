@@ -65,9 +65,9 @@ button {
 
   // main
   &.main {
+    justify-content: center;
     width: 100%;
     padding: $padding-btn-rem 0px;
-    justify-content: center;
     gap: 8px;
 
     &.primary {
@@ -84,8 +84,8 @@ button {
         }
 
         &:disabled {
-          color: $grayopacity30;
           border: solid 1px $grayopacity10;
+          color: $grayopacity30;
           background-color: $grayopacity10;
         }
       }
@@ -99,26 +99,26 @@ button {
     }
 
     &.secondary {
-      color: $orange900;
       border: solid 1px $orange900;
       border-radius: $border-radius-l-rem;
+      color: $orange900;
       background-color: transparent;
 
       &:hover {
-        color: $darkorange900;
         border: solid 1px $darkorange900;
+        color: $darkorange900;
       }
 
       &:disabled {
-        color: $grayopacity30;
         border: solid 1px $grayopacity30;
+        color: $grayopacity30;
       }
     }
 
     &.tertiary {
-      color: $gray700;
       border: solid 1px $white900;
       border-radius: $border-radius-l-rem;
+      color: $gray700;
       background-color: $white900;
     }
 
@@ -128,6 +128,7 @@ button {
   &.sub {
     padding: $padding-xxxs-rem;
     border: 1px solid $lightgray300;
+    background-color: $white900;
     gap: 2px;
 
     &:hover {
@@ -137,9 +138,9 @@ button {
 
     &.primary {
       padding: $padding-xxxs-rem $padding-s-rem $padding-xxxs-rem $padding-xs-rem;
-      color: $white900;
-      background-color: $orange900;
       border-radius: $border-radius-xs-rem;
+      background-color: $orange900;
+      color: $white900;
       border-color: $darkorange900;
 
       .text-area {
@@ -159,10 +160,10 @@ button {
 
     &.secondary {
       padding: $padding-xxxs-rem $padding-s-rem $padding-xxxs-rem $padding-xs-rem;
-      color: $black900;
-      background-color: $white900;
       border-radius: $border-radius-xs-rem;
       border-color: $lightgray300;
+      color: $black900;
+      background-color: $white900;
 
       .text-area {
         display: block;
@@ -194,6 +195,7 @@ button {
         align-content: center;
         height: $padding-xl-rem;
         margin-right: $margin-xxxs-rem;
+        color: $white900;
       }
 
       &.gray {
@@ -212,8 +214,8 @@ button {
       color: $orange900;
 
       &.gray {
-        color: $gray700;
         border: solid 1px $gray700;
+        color: $gray700;
       }
 
       &:disabled {
