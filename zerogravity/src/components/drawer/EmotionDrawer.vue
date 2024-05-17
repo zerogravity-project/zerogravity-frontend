@@ -3,7 +3,7 @@
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
-  import TextContainer from '@/components/text/TextContainer.vue'
+  import ContentText from '@/components/text/ContentText.vue'
 
   const props = defineProps({
     drawerStyle: {
@@ -77,7 +77,7 @@
         :button-text="'수정하기'"
         :style="'gray'"
       />
-      <TextContainer />
+      <ContentText />
 
       <!-- Moment Emotion -->
       <DrawerHeader
