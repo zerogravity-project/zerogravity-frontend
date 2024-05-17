@@ -2,13 +2,13 @@
   import { computed } from 'vue'
 
   const props = defineProps({
+    variant: {
+      type: String,
+      default: '',
+    },
     style: {
       type: String,
-      default: 'default',
-    },
-    state: {
-      type: String,
-      default: 'default',
+      default: '',
     },
     text: {
       type: String,
@@ -21,56 +21,103 @@
   })
 
   const buttonClass = computed(() => {
-    return `button ${props.style} ${props.state} ${props.text} ${props.icon}`
-  })
-
-  const isDisabled = computed(() => {
-    return props.style === 'disabled'
+    return `${props.variant} ${props.style} ${props.icon} ${props.text}`
   })
 
 </script>
 
 <template>
-  <button
-    :class="buttonClass"
-    :disabled="isDisabled"
-    :aria-disabled="isDisabled.toString()"
-  >
-    <p class="label">
-      <slot />
-    </p>
+  <button :class="buttonClass">
+    <span
+      v-if="props.icon"
+      class="material-symbols-outlined"
+    >{{ props.icon }}</span>
+    <span
+      v-if="props.text"
+      class="text-area"
+    >{{ props.text }}</span>
   </button>
 </template>
 
 <style lang="scss" scoped>
-.button {
-  align-items: flex-start;
+body,
+button {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 
-  // style: square, circle, login, today
-  &.squre {
-    display: flex;
-    border-radius: $border-radius-xs;
-    padding: 32px;
+  /* variant: main, sub, circle */
+  /* style: primary, secondary */
+  /* icon: iconName */
+  /* test: content */
+
+  // main
+  &.main {
+    width: 342px;
+    padding: 14px 90px;
+    justify-content: center;
+    gap: 8px;
+
+    &.primary {
+      color: $white900;
+      border: solid 1px $orange900;
+      border-radius: $border-radius-l;
+      background-color: $orange900;
+    }
+
   }
 
-  &.circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 100px;
-    padding: $padding-xs;
-    gap: $padding-xxxs;
-  }
+  // sub
+  &.sub {
+    padding: $padding-xxxs;
+    border: 1px solid $lightgray300;
+    gap: 2px;
 
-  &.today {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: $border-radius-xs;
-    padding: $padding-xxxs $padding-s $padding-xxxs $padding-xs;
-    gap: $padding-xxs;
+    &:hover {
+      border: solid 1px $lightgray300;
+      background-color: $lightgray200;
+    }
+
+    &.primary {
+      padding: 4px 12px 4px 8px;
+      color: $white900;
+      background-color: $orange900;
+      border-radius: $border-radius-xs;
+      border-color: $darkorange900;
+
+      .text-area {
+        display: block;
+        align-content: center;
+        height: 24px;
+        margin-left: 4px;
+      }
+
+      &:hover {
+        border: solid 1px $darkorange900;
+        background-color: $darkorange900;
+      }
+    }
+
+    &.secondary {
+      padding: 4px 12px 4px 8px;
+      color: $black900;
+      background-color: $white900;
+      border-radius: $border-radius-xs;
+      border-color: $lightgray300;
+
+      .text-area {
+        display: block;
+        align-content: center;
+        height: 24px;
+        margin-left: 4px;
+      }
+
+      &:hover {
+        background-color: $lightgray200;
+      }
+    }
+
   }
 
 }
-
 </style>
