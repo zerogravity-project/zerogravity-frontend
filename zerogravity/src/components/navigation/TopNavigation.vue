@@ -6,10 +6,11 @@
 
   const mainMenuList = ref([
     { text: 'Home', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: '' },
-    { text: 'About', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: '/about' },
+    { text: 'About', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: 'about' },
   ])
 
   const emit = defineEmits(['toggle-drawer'])
+
   const showDrawer = () => {
     emit('toggle-drawer')
   }
