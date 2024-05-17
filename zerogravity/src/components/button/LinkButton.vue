@@ -1,4 +1,5 @@
 <script setup>
+  import router from '@/router'
   const props = defineProps({
     text: {
       type: String,
@@ -12,6 +13,10 @@
       type: String,
       default: '#ff2e00',
     },
+    fontSize: {
+      type: Number,
+      default: 15,
+    },
     isActive: Boolean,
     linkPath: {
       type: String,
@@ -19,10 +24,8 @@
     },
   })
 
-  const emit = defineEmits(['goToLink'])
-
   const onClick = () => {
-    emit('goToLink', props.linkPath)
+    router.push(`/${props.linkPath}`)
   }
 </script>
 
@@ -30,7 +33,7 @@
   <a
     @click="onClick"
     :class="['link-button', 'en-font', { 'active-link': props.isActive }]"
-    :style="{ color: isActive ? activeColor : defaultColor }"
+    :style="{ color: isActive ? activeColor : defaultColor, fontSize: `${props.fontSize}px` }"
   >
     {{ props.text }}
   </a>
@@ -41,8 +44,6 @@
   padding: $padding-xxxs-rem;
   color: $gray700;
   text-align: center;
-  font-size: $text-font-size-m-rem;
-  line-height: $text-font-size-m-rem;
   cursor: pointer;
 
   .active-link {

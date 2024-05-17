@@ -14,7 +14,7 @@
     { path: '', text: 'Home', icon: 'home' },
   ])
 
-  const isHidingAvailable = ref(false) // 기본 드로어 너비 설정
+  const isHidingAvailable = ref(false)
 
   const updateHidingAvailablity = () => {
     if (window.innerWidth <= 576) {

@@ -1,9 +1,10 @@
 <script setup>
+  import FooterBar from './components/others/FooterBar.vue'
 
 </script>
 
 <template>
-  <div />
+  <FooterBar />
 </template>
 
 <style lang="scss" scoped>
