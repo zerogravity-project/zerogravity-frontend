@@ -41,7 +41,7 @@
         v-for="(font, index) in fontList"
         :key="index"
         :index="index"
-        :button-type="'typeface'"
+        :variant="'typeface'"
       />
     </div>
 
@@ -55,7 +55,7 @@
         v-for="(color, index) in colorList"
         :key="index"
         :index="index"
-        :button-type="'color'"
+        :variant="'color'"
         :color="color"
       />
     </div>
@@ -70,7 +70,7 @@
         v-for="(font, index) in fontList"
         :key="index"
         :index="index"
-        :button-type="'object'"
+        :variant="'object'"
       />
     </div>
   </aside>

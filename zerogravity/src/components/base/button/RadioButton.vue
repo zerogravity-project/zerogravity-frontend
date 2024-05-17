@@ -2,7 +2,7 @@
   import { computed, ref, watch } from 'vue'
 
   const props = defineProps({
-    buttonType: {
+    variant: {
       type: String,
       default: 'default',
     },
@@ -18,7 +18,7 @@
   })
 
   const computedId = computed(() => {
-    return `${props.buttonType}-${props.index}`
+    return `${props.variant}-${props.index}`
   })
 
   const selectedOption = ref('')
@@ -31,26 +31,26 @@
 <template>
   <input
     type="radio"
-    :name="props.buttonType"
+    :name="props.variant"
     :id="computedId"
     :value="computedId"
     v-model="selectedOption"
     hidden
   >
   <label
-    :class="['radio-button', props.buttonType]"
+    :class="['radio-button', props.variant]"
     :for="computedId"
     :style="{ backgroundColor: props.color }"
   >
-    <span v-if="props.buttonType === 'typeface'">12:34</span>
+    <span v-if="props.variant === 'typeface'">12:34</span>
     <span
-      v-else-if="(props.buttonType === 'color' || props.buttonType === 'survey')"
+      v-else-if="(props.variant === 'color' || props.variant === 'survey')"
       class="material-symbols-outlined"
     >
       check
     </span>
     <img
-      v-else-if="props.buttonType === 'object'"
+      v-else-if="props.variant === 'object'"
       src="@/assets/images/object.png"
       alt=""
     >
