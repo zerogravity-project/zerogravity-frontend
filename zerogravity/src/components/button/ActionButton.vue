@@ -10,7 +10,11 @@
       type: String,
       default: '',
     },
-    color: {
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
+    textColor: {
       type: String,
       default: '',
     },
@@ -26,13 +30,22 @@
   })
 
   const buttonClass = computed(() => {
-    return `${props.variant} ${props.style} ${props.color} ${props.icon} ${props.text}`
+    return `${props.variant} ${props.style} ${props.backgroundColor} ${props.icon} ${props.text}`
   })
 
+  const emit = defineEmits(['click'])
+
+  const onClick = () => {
+    emit('click')
+  }
 </script>
 
 <template>
-  <button :class="buttonClass">
+  <button
+    @click="onClick"
+    :class="buttonClass"
+    :style="{color: textColor}"
+  >
     <span
       v-if="props.icon"
       class="material-symbols-outlined"

@@ -4,13 +4,6 @@
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import RadioButton from '@/components/input/RadioButton.vue'
 
-  const props = defineProps({
-    drawerStyle: {
-      type: Object,
-      default: null,
-    },
-  })
-
   const fontList = ref([
     'helvetica', 'arial', 'georgia', '',
   ])
@@ -22,10 +15,7 @@
 </script>
 
 <template>
-  <aside
-    class="right-drawer"
-    :style="[props.drawerStyle]"
-  >
+  <div class="customize-drawer">
     <DrawerNavigation
       :title-text="'Customize'"
       :button-icon="'Close'"
@@ -73,30 +63,27 @@
         :variant="'object'"
       />
     </div>
-  </aside>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-.right-drawer {
-    position: fixed;
-    right: 0;
-    height: 100vh;
-    border-left: 1px solid $lightgray300;
-    background: $lightgray100;
-    z-index: 5;
-    transition: 0.5s;
+.customize-drawer {
+  width: 100%;
+  height: 100%;
+  background: $lightgray100;
 }
 
 .btn-container {
   display: flex;
   flex-wrap: wrap;
   padding: $padding-xl-rem $padding-m-rem;
-  &.typeface, &.object{
-  justify-content: space-between;
-  row-gap: 8px;
+
+  &.typeface, &.object {
+    justify-content: space-between;
+    row-gap: 8px;
   }
 
-  &.color{
+  &.color {
     justify-content: center;
     align-items: center;
   }
