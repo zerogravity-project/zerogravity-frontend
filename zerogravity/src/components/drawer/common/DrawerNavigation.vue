@@ -14,18 +14,12 @@
       type: String,
       default: '',
     },
-    buttonIcon: {
-      type: String,
-      default: '',
-    },
     isProfile: Boolean,
   })
 
   const isOnlyTitle = computed(()=>{
     return props.subTitleText === '' && props.detailText === ''
   })
-
-  defineEmits(['hide-drawer'])
 
 </script>
 
@@ -56,15 +50,6 @@
         {{ props.detailText }}
       </p>
     </div>
-    <div
-      v-if="props.buttonIcon"
-      @click="$emit('hide-drawer')"
-      class="icon-button"
-    >
-      <span class="material-symbols-outlined">
-        {{ props.buttonIcon }}
-      </span>
-    </div>
   </div>
 </template>
 
@@ -88,7 +73,6 @@
 
 .drawer-nav-container {
   display: flex;
-  position: relative;
   padding: 16px;
   flex-direction: column;
   align-items: flex-start;
@@ -108,13 +92,6 @@
 .subtitle-text {
   color: $grayopacity50;
   font-size: $text-font-size-s-rem;
-}
-
-.icon-button {
-  position: absolute;
-  right: 16px;
-  top: 16px;
-  cursor: pointer;
 }
 
 .detail-text{

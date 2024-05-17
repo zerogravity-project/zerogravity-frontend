@@ -1,35 +1,52 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerMenu from '@/components/drawer/common/DrawerMenu.vue'
   import router from '@/router'
 
-  const props = defineProps({
-    drawerStyle: {
-      type: Object,
-      default: null,
-    },
-  })
-
   const mainMenus = ref([
-    { path: 'calendar', text: 'Calendar', icon: 'calendar_today' },
-    { path: 'chart', text: 'Chart', icon: 'analytics' },
+    { path: 'profile/calendar', text: 'Calendar', icon: 'calendar_today' },
+    { path: 'profile/chart', text: 'Chart', icon: 'analytics' },
   ])
 
   const subMenus = ref([
-    { path: 'setting', text: 'Setting', icon: 'settings' },
-    { path: 'home', text: 'Home', icon: 'home' },
+    { path: 'profile/setting', text: 'Setting', icon: 'settings' },
+    { path: '', text: 'Home', icon: 'home' },
   ])
+
+  const isHidingAvailable = ref(false) // 기본 드로어 너비 설정
+
+  const updateHidingAvailablity = () => {
+    if (window.innerWidth <= 576) {
+      isHidingAvailable.value = true
+    } else {
+      isHidingAvailable.value = false
+    }
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', updateHidingAvailablity)
+    updateHidingAvailablity()
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', updateHidingAvailablity)
+  })
+
+  const emit = defineEmits(['hideDrawer'])
 
   const goToLink = (linkPath) => {
     router.push(`/${linkPath}`)
+
+    if(isHidingAvailable.value){
+      emit('hideDrawer')
+    }
   }
 </script>
 
 <template>
-  <aside
-    class="left-drawer"
-    :style="[props.drawerStyle]"
+  <div
+    class="menu-drawer"
   >
     <div class="drawer-main-area">
       <DrawerNavigation
@@ -59,21 +76,17 @@
         @go-to-link="goToLink"
       />
     </div>
-  </aside>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-.left-drawer {
+.menu-drawer {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  // position: fixed;
-  // left: 0;
-  height: 100vh;
-  border-right: 1px solid $lightgray300;
+  width: 100%;
+  height: 100%;
   background: $white900;
-  z-index: 5;
-  // transition: 0.5s;
 
   .drawer-navigation {
     padding-top: $padding-m-rem;

@@ -2,13 +2,20 @@
   import { ref } from 'vue'
   import LogoSvg from '../others/LogoSvg.vue'
   import LinkButton from '../button/LinkButton.vue'
+  import ActionButton from '../button/ActionButton.vue'
 
   const mainMenuList = ref([
     { text: 'Home', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: '' },
     { text: 'About', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: '/about' },
   ])
 
+  const emit = defineEmits(['toggle-drawer'])
+  const showDrawer = () => {
+    emit('toggle-drawer')
+  }
+
   const isLoggedIn = ref(false)
+
 </script>
 
 <template>
@@ -43,44 +50,57 @@
             :link-path="'login'"
           />
         </div>
-      </div>
-      <div
-        v-if="isLoggedIn"
-        class="profile-img"
-      >
-        <img
-          src="@/assets/images/profile.png"
-          alt="profile-img"
+        <div
+          v-if="isLoggedIn"
+          class="profile-img"
         >
+          <img
+            src="@/assets/images/profile.png"
+            alt="profile-img"
+          >
+        </div>
+      </div>
+      <div class="nav-btn">
+        <ActionButton
+          @click="showDrawer"
+          class="nav-menu-btn"
+          :variant="'sub'"
+          :icon="'menu'"
+          :text-color="'#FF2E00'"
+        />
       </div>
     </div>
   </nav>
 </template>
 
 <style lang="scss" scoped>
-.top-navigation{
+.top-navigation {
   height: $top-nav-base-height-rem;
   display: flex;
   padding: 0 $padding-xl-rem;
 }
-.nav-logo{
+
+.nav-logo {
   display: flex;
   justify-content: center;
   align-items: center;
   padding-right: $padding-l-rem;
 }
-.nav-menu-area{
+
+.nav-menu-area {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
-.nav-main-menu{
+
+.nav-main-menu {
   display: flex;
 }
 
 .nav-sub-menu {
   display: flex;
 }
+
 .nav-item {
   display: flex;
   justify-content: center;
@@ -88,16 +108,45 @@
   padding: 0px $padding-xs-rem;
 }
 
-.profile-img{
+.profile-img {
   display: flex;
   justify-content: center;
   align-items: center;
 
-  img{
+  img {
     width: 32px;
     height: 32px;
     border-radius: 100px;
   }
 }
 
+.nav-btn {
+  display: none;
+}
+
+@media (max-width: 576px) {
+  .nav-menu-area {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .nav-main-menu {
+    display: none;
+  }
+
+  .nav-sub-menu {
+    display: none;
+  }
+
+  .nav-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .nav-menu-btn {
+      border-radius: $border-radius-xs-rem;
+    }
+  }
+}
 </style>
