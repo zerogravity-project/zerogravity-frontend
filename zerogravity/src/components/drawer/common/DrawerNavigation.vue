@@ -2,42 +2,22 @@
   import { computed } from 'vue'
 
   const props = defineProps({
-    /**
-     * 제목 텍스트
-     * @type {string}
-     */
     titleText: {
       type: String,
       required: true,
     },
-    /**
-     * 소제목 텍스트
-     * @type {string}
-     */
     subTitleText: {
       type: String,
       default: '',
     },
-    /**
-     * 설명 텍스트
-     * @type {string}
-     */
     detailText: {
       type: String,
       default: '',
     },
-    /**
-     * 버튼 아이콘
-     * @type {string}
-     */
     buttonIcon: {
       type: String,
       default: '',
     },
-    /**
-     * 프로파일 이미지 여부
-     * @type {Boolean}
-     */
     isProfile: Boolean,
   })
 

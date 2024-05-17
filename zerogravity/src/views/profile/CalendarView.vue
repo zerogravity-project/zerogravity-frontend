@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div />
+  <h1>CalendarView</h1>
 </template>
 
 <style lang="scss" scoped>

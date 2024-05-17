@@ -1,9 +1,9 @@
 <script setup>
   import { onMounted, ref, computed } from 'vue'
-  import DrawerNavigation from '@/components/base/drawer/DrawerNavigation.vue'
-  import DrawerHeader from '@/components/base/drawer/DrawerHeader.vue'
-  import EmotionContainer from '../containers/EmotionContainer.vue'
-  import TextContainer from '../containers/TextContainer.vue'
+  import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
+  import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
+  import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
+  import TextContainer from '@/components/text/TextContainer.vue'
 
   const props = defineProps({
     drawerStyle: {

@@ -1,7 +1,7 @@
 <script setup>
   import { ref } from 'vue'
-  import DrawerMenu from '@/components/base/drawer/DrawerMenu.vue'
-  import DrawerNavigation from '@/components/base/drawer/DrawerNavigation.vue'
+  import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
+  import DrawerMenu from '@/components/drawer/common/DrawerMenu.vue'
   import router from '@/router'
 
   const props = defineProps({
@@ -67,13 +67,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: fixed;
-  left: 0;
+  // position: fixed;
+  // left: 0;
   height: 100vh;
   border-right: 1px solid $lightgray300;
   background: $white900;
   z-index: 5;
-  transition: 0.5s;
+  // transition: 0.5s;
 
   .drawer-navigation {
     padding-top: $padding-m-rem;

@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div />
+  <h1>StartView</h1>
 </template>
 
 <style lang="scss" scoped>

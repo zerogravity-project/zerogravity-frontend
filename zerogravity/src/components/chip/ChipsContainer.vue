@@ -1,5 +1,5 @@
 <script setup>
-  import InfoChip from '@/components/base/chip/InfoChip.vue'
+  import ActionDisplayChip from '@/components/chip/ActionDisplayChip.vue'
   import { computed } from 'vue'
   const props = defineProps({
     labelList: {
@@ -25,21 +25,21 @@
 <template>
   <div
     v-if="props.labelList.length > 0"
-    :class="['emotion-chips-container', { 'compact': props.isCompact, 'detail': !props.isCompact, 'large': isLarge, 'small': !isLarge }]"
+    :class="['chips-container', { 'compact': props.isCompact, 'detail': !props.isCompact, 'large': isLarge, 'small': !isLarge }]"
   >
-    <InfoChip
+    <ActionDisplayChip
       v-for="(label, index) in props.labelList"
       :key="index"
       :size="size"
       :style="style"
     >
       {{ label }}
-    </InfoChip>
+    </ActionDisplayChip>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.emotion-chips-container {
+.chips-container {
   &.detail {
     display: flex;
     flex-wrap: wrap;

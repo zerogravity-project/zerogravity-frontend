@@ -1,7 +1,7 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import EmotionAsset from '@/components/base/emotion/EmotionAsset.vue'
-  import ChipsContainer from '@/components/base/chip/ChipsContainer.vue'
+  import EmotionAsset from '@/components/emotion/EmotionAsset.vue'
+  import ChipsContainer from '@/components/chip/ChipsContainer.vue'
 
   const props = defineProps({
     size: {

@@ -1,8 +1,8 @@
 <script setup>
   import { ref } from 'vue'
-  import DrawerNavigation from '@/components/base/drawer/DrawerNavigation.vue'
-  import DrawerHeader from '@/components/base/drawer/DrawerHeader.vue'
-  import RadioButton from '@/components/base/button/RadioButton.vue'
+  import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
+  import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
+  import RadioButton from '@/components/input/RadioButton.vue'
 
   const props = defineProps({
     drawerStyle: {
