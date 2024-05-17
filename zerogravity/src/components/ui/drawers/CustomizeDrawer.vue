@@ -24,10 +24,9 @@
 <template>
   <aside
     class="right-drawer"
-    :style="[props.drawerStyle, transformStyle]"
+    :style="[props.drawerStyle]"
   >
     <DrawerNavigation
-      @hide-drawer="hideDrawer"
       :title-text="'Customize'"
       :button-icon="'Close'"
     />

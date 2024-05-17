@@ -3,12 +3,28 @@ import './assets/styles/main.scss'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
-import App from './App.vue'
 import router from './router'
 
-const app = createApp(App)
+/*
+** Main App
+*/
+// import App from './App.vue'
 
-app.use(createPinia())
-app.use(router)
+// const app = createApp(App)
 
-app.mount('#app')
+// app.use(createPinia())
+// app.use(router)
+
+// app.mount('#app')
+
+/*
+** Test App
+*/
+import AppTest from './AppTest.vue'
+
+const appTest = createApp(AppTest)
+
+appTest.use(createPinia())
+appTest.use(router)
+
+appTest.mount('#app')

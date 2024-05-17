@@ -2,22 +2,42 @@
   import { computed } from 'vue'
 
   const props = defineProps({
+    /**
+     * 제목 텍스트
+     * @type {string}
+     */
     titleText: {
       type: String,
       required: true,
     },
+    /**
+     * 소제목 텍스트
+     * @type {string}
+     */
     subTitleText: {
       type: String,
       default: '',
     },
+    /**
+     * 설명 텍스트
+     * @type {string}
+     */
     detailText: {
       type: String,
       default: '',
     },
+    /**
+     * 버튼 아이콘
+     * @type {string}
+     */
     buttonIcon: {
       type: String,
       default: '',
     },
+    /**
+     * 프로파일 이미지 여부
+     * @type {Boolean}
+     */
     isProfile: Boolean,
   })
 
@@ -49,15 +69,6 @@
       >
         {{ props.titleText }}
       </h2>
-      <div
-        v-if="props.buttonIcon"
-        @click="$emit('hide-drawer')"
-        class="icon-button"
-      >
-        <span class="material-symbols-outlined">
-          {{ props.buttonIcon }}
-        </span>
-      </div>
       <p
         v-if="props.detailText"
         class="detail-text"
@@ -65,10 +76,24 @@
         {{ props.detailText }}
       </p>
     </div>
+    <div
+      v-if="props.buttonIcon"
+      @click="$emit('hide-drawer')"
+      class="icon-button"
+    >
+      <span class="material-symbols-outlined">
+        {{ props.buttonIcon }}
+      </span>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+
+.drawer-nav-area{
+  background-color: $white900;
+}
+
 .profile {
   display: flex;
   align-items: center;
@@ -89,7 +114,6 @@
   align-items: flex-start;
   gap: 4px;
   width: 100%;
-  background-color: $white900;
 }
 
 .title-text {
@@ -111,5 +135,10 @@
   right: 16px;
   top: 16px;
   cursor: pointer;
+}
+
+.detail-text{
+  color: $grayopacity50;
+  font-size: $text-font-size-s-rem;
 }
 </style>

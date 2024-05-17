@@ -3,11 +3,11 @@
   const props = defineProps({
     size: {
       type:String,
-      default: '96px',
+      default: 'm',
     },
     emotion: {
       type: String,
-      default: '',
+      default: 'emotion',
     },
   })
 
@@ -21,7 +21,16 @@
   })
 
   const style = computed(() => {
-    const size = assetSize.value[props.size]
+    let size = assetSize.value[props.size]
+
+    if(size === undefined){
+      if(props.size.includes('px')){
+        size = props.size
+      } else {
+        size = `${props.size}px`
+      }
+    }
+
     return {
       width: size,
       height: size,

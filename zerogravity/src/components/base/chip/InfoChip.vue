@@ -72,12 +72,12 @@
     color: $red900;
   }
 
-  &.active{
+  &:active{
     background: $red900;
     color: $white900;
   }
 
-  &.disabled{
+  &:disabled{
     background: $grayopacity10;
     color: $grayopacity30;
   }
