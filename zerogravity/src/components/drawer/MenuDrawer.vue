@@ -12,13 +12,13 @@
   })
 
   const mainMenus = ref([
-    { path: 'Calendar', text: 'Calendar', icon: 'calendar_today' },
-    { path: 'Chart', text: 'Chart', icon: 'analytics' },
+    { path: 'calendar', text: 'Calendar', icon: 'calendar_today' },
+    { path: 'chart', text: 'Chart', icon: 'analytics' },
   ])
 
   const subMenus = ref([
-    { path: 'Setting', text: 'Setting', icon: 'settings' },
-    { path: 'Home', text: 'Home', icon: 'home' },
+    { path: 'setting', text: 'Setting', icon: 'settings' },
+    { path: 'home', text: 'Home', icon: 'home' },
   ])
 
   const goToLink = (linkPath) => {
