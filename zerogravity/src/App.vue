@@ -1,5 +1,5 @@
 <script setup>
-
+  import ActionButton from './components/base/button/ActionButton.vue'
 </script>
 
 <template>
@@ -7,5 +7,4 @@
 </template>
 
 <style lang="scss" scoped>
-
 </style>
