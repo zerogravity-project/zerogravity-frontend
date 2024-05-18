@@ -25,8 +25,8 @@
       <LogoSvg />
     </div>
     <div class="nav-menu-area">
-      <div class="nav-main-menu">
-        <div
+      <ul class="nav-main-menu">
+        <li
           v-for="(menu, index) in mainMenuList"
           :key="index"
           class="nav-item"
@@ -37,10 +37,10 @@
             :active-color="menu.activeColor"
             :link-path="menu.linkPath"
           />
-        </div>
-      </div>
-      <div class="nav-sub-menu">
-        <div
+        </li>
+      </ul>
+      <ul class="nav-sub-menu">
+        <li
           v-if="!isLoggedIn"
           class="nav-item"
         >
@@ -50,8 +50,8 @@
             :active-color="'#ff2e00'"
             :link-path="'login'"
           />
-        </div>
-        <div
+        </li>
+        <li
           v-if="isLoggedIn"
           class="profile-img"
         >
@@ -59,8 +59,8 @@
             src="@/assets/images/profile.png"
             alt="profile-img"
           >
-        </div>
-      </div>
+        </li>
+      </ul>
       <div class="nav-btn">
         <ActionButton
           @click="showDrawer"

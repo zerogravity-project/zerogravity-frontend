@@ -11,8 +11,8 @@
 
 <template>
   <footer class="footer">
-    <div class="footer-menu">
-      <div
+    <ul class="footer-menu">
+      <li
         class="footer-item"
         v-for="(menu, index) in menuList"
         :key="index"
@@ -24,8 +24,8 @@
           :font-size="13"
           :link-path="menu.linkPath"
         />
-      </div>
-    </div>
+      </li>
+    </ul>
     <p class="copyright en-font">
       © Zero Gravity. All rights reserved.
     </p>
