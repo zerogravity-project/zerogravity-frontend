@@ -143,6 +143,9 @@ button {
     border: 1px solid $lightgray300;
     background-color: $white900;
     gap: 2px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
 
     &:hover {
       border: solid 1px $lightgray300;

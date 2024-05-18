@@ -1,38 +1,101 @@
+<template>
+  <div class="cell-container">
+    <div class="header-row">
+      <div
+        v-for="(day, index) in daysOfWeek"
+        :key="'day-' + index"
+        :class="[
+          'day-header',
+          {
+            sunday: showFullMonth.value && index === 0,
+            today: showFullMonth.value ? index === currentWeekDay : index === (currentWeekDay === 0 ? 6 : currentWeekDay - 1)
+          }
+        ]"
+      >
+        {{ day }}
+      </div>
+    </div>
+    <div class="dates-row">
+      <template v-if="showFullMonth">
+        <div
+          class="week-row"
+          v-for="(week, weekIndex) in weeks"
+          :key="'week-' + weekIndex"
+        >
+          <CalendarCell
+            v-for="(cell, cellIndex) in week"
+            :key="'cell-' + weekIndex + '-' + cellIndex"
+            :date="cell.date"
+            :is-today="cell.isToday"
+            :is-sunday="cell.isSunday"
+            :main-state="cell.mainState"
+            :moment-state="cell.momentState"
+            :size="assetSize.value"
+          />
+        </div>
+      </template>
+      <template v-else>
+        <div class="week-row">
+          <div
+            v-for="(cell, index) in dates"
+            :key="'date-' + index"
+            :class="[
+              'date-cell',
+              {
+                today: cell.isToday,
+                sunday: cell.isSunday,
+                'main-state': cell.mainState,
+                'moment-state': cell.momentState,
+                'both-states': cell.mainState && cell.momentState
+              }
+            ]"
+          >
+            <div
+              class="date-wrapper"
+              :class="{ 'main-state': cell.mainState, 'moment-state': cell.momentState, 'both-states': cell.mainState && cell.momentState }"
+            >
+              {{ cell.date }}
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+
 <script setup>
-  import { ref, computed, watch } from 'vue'
   import CalendarCell from './CalendarCell.vue'
+  import { computed, ref, onMounted } from 'vue'
 
-  const props = defineProps({
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
-      required: true,
-    },
-  })
-
-  const numericWidth = computed(() => props.width)
-  const numericHeight = computed(() => props.height)
+  const numericWidth = ref(window.size)
 
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
+
   const currentDate = new Date()
   const currentDay = currentDate.getDate()
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
   const currentWeekDay = currentDate.getDay()
+
   const totalDays = daysInMonth(currentMonth, currentYear)
+
   const daysOfWeekFull = ['일', '월', '화', '수', '목', '금', '토']
+  const daysOfWeekMondayStart = ['월', '화', '수', '목', '금', '토', '일']
+
   const daysOfWeek = ref(daysOfWeekFull)
   const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay()
+
   const showFullMonth = ref(true)
 
   const updateDisplayMode = () => {
-    showFullMonth.value = numericWidth.value > 576
+    showFullMonth.value = window.innerWidth > 576
+    daysOfWeek.value = showFullMonth.value ? daysOfWeekFull : daysOfWeekMondayStart
   }
 
-  watch([numericWidth, numericHeight], updateDisplayMode)  // 수정된 부분
+  onMounted(() => {
+    window.addEventListener('resize', updateDisplayMode)
+    updateDisplayMode()
+  })
 
   const dates = computed(() => {
     const cells = []
@@ -48,7 +111,7 @@
         momentState: '', // 순간 감정 데이터
       })
     }
-    const totalCells = 35
+    const totalCells = cells.length + (7 - (cells.length % 7)) % 7
     const remainingCells = totalCells - cells.length
     for (let i = 0; i < remainingCells; i++) {
       cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '' })
@@ -56,79 +119,43 @@
 
     if (!showFullMonth.value) {
       const todayIndex = cells.findIndex(cell => cell.isToday)
-      const start = Math.max(0, todayIndex - (todayIndex % 7))
+      const start = Math.max(0, todayIndex - ((todayIndex - 1) % 7))
+
       return cells.slice(start, start + 7)
     }
 
     return cells
   })
-</script>
 
-<template>
-  <div class="cell-container">
-    <div
-      v-for="(day, index) in daysOfWeek"
-      :key="'day-' + index"
-      :class="[
-        'day-header',
-        {
-          sunday: showFullMonth && index === 0,
-          today: showFullMonth
-            ? index === currentWeekDay
-            : index === dates.findIndex(cell => cell.isToday) % 7
-        }
-      ]"
-    >
-      {{ day }}
-    </div>
-    <template v-if="showFullMonth">
-      <CalendarCell
-        v-for="(cell, index) in dates"
-        :key="index"
-        :date="cell.date"
-        :is-today="cell.isToday"
-        :is-sunday="cell.isSunday"
-        :main-state="cell.mainState"
-        :moment-state="cell.momentState"
-        :numeric-width="numericWidth"
-        :numeric-height="numericHeight"
-      />
-    </template>
-    <template v-else>
-      <div
-        v-for="(cell, index) in dates"
-        :key="'date-' + index"
-        :class="[
-          'date-cell',
-          {
-            today: cell.isToday,
-            sunday: cell.isSunday,
-            'main-state': cell.mainState,
-            'moment-state': cell.momentState,
-            'both-states': cell.mainState && cell.momentState
-          }
-        ]"
-      >
-        <div
-          class="date-wrapper"
-          :class="{ 'main-state': cell.mainState, 'moment-state': cell.momentState, 'both-states': cell.mainState && cell.momentState }"
-        >
-          {{ cell.date }}
-        </div>
-      </div>
-    </template>
-  </div>
-</template>
+  const weeks = computed(() => {
+    const rows = []
+    for (let i = 0; i < dates.value.length; i += 7) {
+      rows.push(dates.value.slice(i, i + 7))
+    }
+    return rows
+  })
+
+  const assetSize = ref('s')
+</script>
 
 <style lang="scss" scoped>
 .cell-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: 32px auto;
-  width: fit-content;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
   border: solid 1px $lightgray100;
   background-color: $white900;
+}
+
+.header-row {
+  display: flex;
+  width: 100%;
+}
+
+.week-row {
+  display: flex;
+  width: 100%;
 }
 
 .day-header,
@@ -136,6 +163,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
   padding: $padding-xs-rem;
   font-size: $text-font-size-xs-rem;
   font-style: normal;
@@ -156,8 +184,6 @@
   .cell-container {
     justify-content: center;
     align-items: center;
-    grid-template-rows: 30px auto;
-    height: 73px;
     border: transparent;
     gap: 8px;
   }
@@ -182,7 +208,7 @@
   }
 
   .date-wrapper {
-    padding: 8px;
+    padding: 8px 0px;
     display: flex;
     justify-content: center;
     align-items: center;

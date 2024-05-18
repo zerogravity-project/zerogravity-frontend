@@ -1,8 +1,9 @@
 <script setup>
   import { ref, computed } from 'vue'
+
   const props = defineProps({
     size: {
-      type:String,
+      type: String,
       default: 'm',
     },
     emotion: {
@@ -23,8 +24,8 @@
   const style = computed(() => {
     let size = assetSize.value[props.size]
 
-    if(size === undefined){
-      if(props.size.includes('px')){
+    if (size === undefined) {
+      if (props.size.includes('px')) {
         size = props.size
       } else {
         size = `${props.size}px`
@@ -60,7 +61,6 @@
 </template>
 
 <style lang="scss" scoped>
-
 .no-image {
   display: flex;
   flex-direction: column;
