@@ -1,32 +1,90 @@
+<template>
+  <div class="cell-container">
+    <div class="header-row">
+      <div
+        v-for="(day, index) in daysOfWeek"
+        :key="'day-' + index"
+        :class="[
+          'day-header',
+          {
+            sunday: showFullMonth.value && index === 0,
+            today: showFullMonth.value ? index === currentWeekDay : index === (currentWeekDay === 0 ? 6 : currentWeekDay - 1)
+          }
+        ]"
+      >
+        {{ day }}
+      </div>
+    </div>
+    <div class="dates-row">
+      <template v-if="showFullMonth">
+        <div
+          class="week-row"
+          v-for="(week, weekIndex) in weeks"
+          :key="'week-' + weekIndex"
+        >
+          <CalendarCell
+            v-for="(cell, cellIndex) in week"
+            :key="'cell-' + weekIndex + '-' + cellIndex"
+            :date="cell.date"
+            :is-today="cell.isToday"
+            :is-sunday="cell.isSunday"
+            :main-state="cell.mainState"
+            :moment-state="cell.momentState"
+            :size="assetSize.value"
+          />
+        </div>
+      </template>
+      <template v-else>
+        <div class="week-row">
+          <div
+            v-for="(cell, index) in dates"
+            :key="'date-' + index"
+            :class="[
+              'date-cell',
+              {
+                today: cell.isToday,
+                sunday: cell.isSunday,
+                'main-state': cell.mainState,
+                'moment-state': cell.momentState,
+                'both-states': cell.mainState && cell.momentState
+              }
+            ]"
+          >
+            <div
+              class="date-wrapper"
+              :class="{ 'main-state': cell.mainState, 'moment-state': cell.momentState, 'both-states': cell.mainState && cell.momentState }"
+            >
+              {{ cell.date }}
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
+
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
   import CalendarCell from './CalendarCell.vue'
+  import { computed, ref, onMounted } from 'vue'
 
-  const windowWidth = ref(window.innerWidth)
-
-  const handleResize = () => {
-    windowWidth.value = window.innerWidth
-  }
-
-  onMounted(() => {
-    window.addEventListener('resize', handleResize)
-  })
-
-  const numericWidth = computed(() => {
-    return windowWidth.value
-  })
+  const numericWidth = ref(window.size)
 
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
+
   const currentDate = new Date()
   const currentDay = currentDate.getDate()
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
   const currentWeekDay = currentDate.getDay()
+
   const totalDays = daysInMonth(currentMonth, currentYear)
+
   const daysOfWeekFull = ['일', '월', '화', '수', '목', '금', '토']
   const daysOfWeekMondayStart = ['월', '화', '수', '목', '금', '토', '일']
+
   const daysOfWeek = ref(daysOfWeekFull)
   const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay()
+
   const showFullMonth = ref(true)
 
   const updateDisplayMode = () => {
@@ -62,75 +120,42 @@
     if (!showFullMonth.value) {
       const todayIndex = cells.findIndex(cell => cell.isToday)
       const start = Math.max(0, todayIndex - ((todayIndex - 1) % 7))
+
       return cells.slice(start, start + 7)
     }
 
     return cells
   })
-</script>
 
-<template>
-  <div class="cell-container">
-    <div
-      v-for="(day, index) in daysOfWeek"
-      :key="'day-' + index"
-      :class="[
-        'day-header',
-        {
-          sunday: showFullMonth && index === 0,
-          today: showFullMonth ? index === currentWeekDay : index === (currentWeekDay === 0 ? 6 : currentWeekDay - 1)
-        }
-      ]"
-    >
-      {{ day }}
-    </div>
-    <template v-if="showFullMonth">
-      <CalendarCell
-        v-for="(cell, index) in dates"
-        :key="index"
-        :date="cell.date"
-        :is-today="cell.isToday"
-        :is-sunday="cell.isSunday"
-        :main-state="cell.mainState"
-        :moment-state="cell.momentState"
-        :numeric-width="numericWidth"
-      />
-    </template>
-    <template v-else>
-      <div
-        v-for="(cell, index) in dates"
-        :key="'date-' + index"
-        :class="[
-          'date-cell',
-          {
-            today: cell.isToday,
-            sunday: cell.isSunday,
-            'main-state': cell.mainState,
-            'moment-state': cell.momentState,
-            'both-states': cell.mainState && cell.momentState
-          }
-        ]"
-      >
-        <div
-          class="date-wrapper"
-          :class="{ 'main-state': cell.mainState, 'moment-state': cell.momentState, 'both-states': cell.mainState && cell.momentState }"
-        >
-          {{ cell.date }}
-        </div>
-      </div>
-    </template>
-  </div>
-</template>
+  const weeks = computed(() => {
+    const rows = []
+    for (let i = 0; i < dates.value.length; i += 7) {
+      rows.push(dates.value.slice(i, i + 7))
+    }
+    return rows
+  })
+
+  const assetSize = ref('s')
+</script>
 
 <style lang="scss" scoped>
 .cell-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: auto;
-  width: fit-content;
-  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
   border: solid 1px $lightgray100;
   background-color: $white900;
+}
+
+.header-row {
+  display: flex;
+  width: 100%;
+}
+
+.week-row {
+  display: flex;
+  width: 100%;
 }
 
 .day-header,
@@ -138,6 +163,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex: 1;
   padding: $padding-xs-rem;
   font-size: $text-font-size-xs-rem;
   font-style: normal;
@@ -158,8 +184,6 @@
   .cell-container {
     justify-content: center;
     align-items: center;
-    grid-template-rows: repeat(2, auto);
-    height: 100%;
     border: transparent;
     gap: 8px;
   }
@@ -184,7 +208,7 @@
   }
 
   .date-wrapper {
-    padding: 8px;
+    padding: 8px 0px;
     display: flex;
     justify-content: center;
     align-items: center;

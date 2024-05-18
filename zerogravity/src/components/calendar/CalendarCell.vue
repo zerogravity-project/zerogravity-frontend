@@ -25,7 +25,7 @@
     },
     numericWidth: {
       type: Number,
-      default: window.size,
+      default: window.innerWidth,
     },
   })
 
@@ -38,6 +38,21 @@
     return props.date !== null && props.mainState
   })
 
+  const size = computed(() => {
+    if (props.numericWidth > 1200) {
+      return 'm'
+    } else if (props.numericWidth > 992) {
+      return 'm'
+    } else if (props.numericWidth > 768) {
+      return 's'
+    } else if (props.numericWidth > 576) {
+      return 's'
+    } else if (props.numericWidth > 400) {
+      return 's'
+    } else {
+      return 'xs'
+    }
+  })
 </script>
 
 <template>
@@ -49,9 +64,8 @@
         class="emotion-asset-main-area"
       >
         <EmotionAsset
-          :size="props.size"
-          :emotion="props.emotion"
-          :numeric-width="numericWidth"
+          :size="size"
+          :emotion="props.mainState"
         />
       </div>
       <div
@@ -59,9 +73,8 @@
         class="no-image"
       >
         <EmotionAsset
-          :size="s"
+          :size="size"
           :emotion="''"
-          :numeric-width="numericWidth"
         />
       </div>
       <div
@@ -81,6 +94,7 @@
   padding: $padding-xs-rem;
   border: solid 1px $lightgray100;
   width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
   background-color: $white900;
@@ -100,6 +114,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100%;
   padding: $padding-xl-rem;
 }
 
@@ -130,4 +145,17 @@
   right: 8px;
 }
 
+.no-image {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 100px;
+  border: 1px dashed $lightgray300;
+
+  span {
+    color: $grayopacity50;
+    font-size: $text-font-size-xs;
+  }
+}
 </style>
