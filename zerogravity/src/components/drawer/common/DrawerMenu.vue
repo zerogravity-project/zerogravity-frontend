@@ -10,11 +10,11 @@
     },
     linkPath: {
       type: String,
-      default: '',
+      required: true,
     },
   })
 
-  const emit =defineEmits(['goToLink'])
+  const emit = defineEmits(['goToLink'])
 
   const onClick = () => {
     emit('goToLink', props.linkPath)
@@ -45,7 +45,7 @@
   display: flex;
   padding: $padding-xs $padding-s-rem;
 
-  .drawer-menu{
+  .drawer-menu {
     display: flex;
     align-items: center;
     gap: 16px;
@@ -55,11 +55,12 @@
     color: $gray700;
     cursor: pointer;
 
-    .drawer-menu-text{
+    .drawer-menu-text {
       width: 100%;
     }
 
-    &:hover, &:active{
+    &:hover,
+    &:active {
       background-color: $orangeopacity10;
       color: $orange900;
     }

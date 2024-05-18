@@ -1,16 +1,9 @@
 <script setup>
-  import { onMounted, ref, computed } from 'vue'
+  import { onMounted, ref } from 'vue'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
-  import TextContainer from '@/components/text/TextContainer.vue'
-
-  const props = defineProps({
-    drawerStyle: {
-      type: Object,
-      default: null,
-    },
-  })
+  import ContentText from '@/components/text/ContentText.vue'
 
   const emotionList = ref([
     'One', 'Two', 'Three', 'four',
@@ -18,18 +11,10 @@
 
   const divNode = ref(null)
   const momentAreaMaxHeight = ref('')
-  const isHide = ref(false)
-  const translateX = ref(0)
-  const transformStyle = computed(() => {
-    return {
-      transform: `translate(${translateX.value}px)`,
-    }
-  })
-
-  const hideDrawer = () => {
-    isHide.value = true
-    translateX.value = parseInt(props.drawerStyle.width, 10)
-  }
+  const text = ref(`무엇인가를 써보았다....
+오늘 나는 와이어프레임을 그리고 앞으로 있을 우리의 프로젝트에 대해서 계획을 잡았다. 
+그리고 나서 이제 곧 다시 서울을 올라가고 앞으로도 행복하게 살 것이다.
+내일도 화이팅이다.`)
 
   onMounted(() => {
     const updateMaxHeight = () => {
@@ -42,9 +27,8 @@
 </script>
 
 <template>
-  <aside
-    class="right-drawer"
-    :style="[props.drawerStyle, transformStyle]"
+  <div
+    class="emotion-drawer"
   >
     <div ref="divNode">
       <!-- Navigation -->
@@ -77,7 +61,10 @@
         :button-text="'수정하기'"
         :style="'gray'"
       />
-      <TextContainer />
+      <ContentText
+        class="text-container"
+        :text="text"
+      />
 
       <!-- Moment Emotion -->
       <DrawerHeader
@@ -100,23 +87,24 @@
         :chips-style="'badge'"
       />
     </div>
-  </aside>
+  </div>
 </template>
 
 <style lang="scss" scoped>
 
-.right-drawer {
-  position: fixed;
-  right: 0;
-  height: 100vh;
-  border-left: 1px solid $lightgray300;
+.emotion-drawer {
+  width: 100%;
+  height: 100%;
   background: $white900;
-  z-index: 5;
-  transition: 0.5s;
 }
 
 .main-emotion-area{
   padding: $padding-xxl-rem;
+}
+
+.text-container{
+  padding-top: $padding-xl-rem;
+  padding-bottom: $padding-xl-rem;
 }
 
 .moment-emotion-area {

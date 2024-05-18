@@ -1,20 +1,29 @@
 <script setup>
-  import { computed, ref } from 'vue'
-  const text = ref(`무엇인가를 써보았다....
+  import { computed } from 'vue'
 
-오늘 나는 와이어프레임을 그리고 앞으로 있을 우리의 프로젝트에 대해서 계획을 잡았다. 
+  const props = defineProps({
+    text: {
+      type: String,
+      default: '',
+    },
+  })
 
-그리고 나서 이제 곧 다시 서울을 올라가고 앞으로도 행복하게 살 것이다.
+  const textLines = computed(() => {
+    let lines = props.text.split('\n')
 
-내일도 화이팅이다.`)
+    lines = lines.map((line) => {
+      return line.trim()
+    })
 
-  const textLines = computed(() => text.value.split('\n'))
+    return lines
+  })
+
 </script>
 
 <template>
   <div class="text-container">
     <p>
-      <template v-if="text !== ''">
+      <template v-if="props.text !== ''">
         <span
           v-for="line in textLines"
           :key="line"
@@ -22,7 +31,7 @@
       </template>
 
       <span
-        v-if="text === ''"
+        v-if="props.text === ''"
         class="placeholder"
       >텍스트를 입력하세요.</span>
     </p>
@@ -31,15 +40,14 @@
 
 <style lang="scss" scoped>
 .text-container {
-  padding: 36px 16px;
+  padding: $padding-m-rem;
   color: $gray700;
-  font-size: $text-font-size-s;
+  font-size: $text-font-size-s-rem;
 
   p {
     display: flex;
-    line-height: 20px;
+    line-height: 170%;
     flex-direction: column;
-    gap: 8px;
 
     span {
       display: block;
@@ -49,6 +57,12 @@
       text-align: center;
       color: $lightgray300;
     }
+  }
+}
+
+@media (max-width: 576px) {
+  .text-container {
+    font-size: $title-font-size-xs-rem;
   }
 }
 </style>
