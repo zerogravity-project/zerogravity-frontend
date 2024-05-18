@@ -1,20 +1,20 @@
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import CalendarCell from './CalendarCell.vue'
 
-  const windowWidth = ref(window.innerWidth)
-
-  const handleResize = () => {
-    windowWidth.value = window.innerWidth
-  }
-
-  onMounted(() => {
-    window.addEventListener('resize', handleResize)
+  const props = defineProps({
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
   })
 
-  const numericWidth = computed(() => {
-    return windowWidth.value
-  })
+  const numericWidth = computed(() => props.width)
+  const numericHeight = computed(() => props.height)
 
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
   const currentDate = new Date()
@@ -24,20 +24,15 @@
   const currentWeekDay = currentDate.getDay()
   const totalDays = daysInMonth(currentMonth, currentYear)
   const daysOfWeekFull = ['일', '월', '화', '수', '목', '금', '토']
-  const daysOfWeekMondayStart = ['월', '화', '수', '목', '금', '토', '일']
   const daysOfWeek = ref(daysOfWeekFull)
   const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay()
   const showFullMonth = ref(true)
 
   const updateDisplayMode = () => {
-    showFullMonth.value = window.innerWidth > 576
-    daysOfWeek.value = showFullMonth.value ? daysOfWeekFull : daysOfWeekMondayStart
+    showFullMonth.value = numericWidth.value > 576
   }
 
-  onMounted(() => {
-    window.addEventListener('resize', updateDisplayMode)
-    updateDisplayMode()
-  })
+  watch([numericWidth, numericHeight], updateDisplayMode)  // 수정된 부분
 
   const dates = computed(() => {
     const cells = []
@@ -53,7 +48,7 @@
         momentState: '', // 순간 감정 데이터
       })
     }
-    const totalCells = cells.length + (7 - (cells.length % 7)) % 7
+    const totalCells = 35
     const remainingCells = totalCells - cells.length
     for (let i = 0; i < remainingCells; i++) {
       cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '' })
@@ -61,7 +56,7 @@
 
     if (!showFullMonth.value) {
       const todayIndex = cells.findIndex(cell => cell.isToday)
-      const start = Math.max(0, todayIndex - ((todayIndex - 1) % 7))
+      const start = Math.max(0, todayIndex - (todayIndex % 7))
       return cells.slice(start, start + 7)
     }
 
@@ -78,7 +73,9 @@
         'day-header',
         {
           sunday: showFullMonth && index === 0,
-          today: showFullMonth ? index === currentWeekDay : index === (currentWeekDay === 0 ? 6 : currentWeekDay - 1)
+          today: showFullMonth
+            ? index === currentWeekDay
+            : index === dates.findIndex(cell => cell.isToday) % 7
         }
       ]"
     >
@@ -94,6 +91,7 @@
         :main-state="cell.mainState"
         :moment-state="cell.momentState"
         :numeric-width="numericWidth"
+        :numeric-height="numericHeight"
       />
     </template>
     <template v-else>
@@ -126,9 +124,9 @@
 .cell-container {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: auto;
+  grid-template-rows: 32px auto;
   width: fit-content;
-  height: 90vh;
+  height: 100%;
   border: solid 1px $lightgray100;
   background-color: $white900;
 }
@@ -158,8 +156,8 @@
   .cell-container {
     justify-content: center;
     align-items: center;
-    grid-template-rows: repeat(2, auto);
-    height: 100%;
+    grid-template-rows: 30px auto;
+    height: 73px;
     border: transparent;
     gap: 8px;
   }
