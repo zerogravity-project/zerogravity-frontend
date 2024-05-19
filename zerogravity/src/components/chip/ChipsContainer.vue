@@ -1,6 +1,6 @@
 <script setup>
+  import { computed, ref } from 'vue'
   import ActionDisplayChip from '@/components/chip/ActionDisplayChip.vue'
-  import { computed } from 'vue'
   const props = defineProps({
     labelList: {
       type: Array,
@@ -17,6 +17,20 @@
     isCompact: Boolean,
   })
 
+  const selectedList = ref([])
+
+  const updateSelectedList = (payload) => {
+    const { id, name, checked } = payload
+    if (checked) {
+      selectedList.value.push({ id, name })
+    } else {
+      selectedList.value = selectedList.value.filter(item => item.id !== id)
+    }
+
+    // id도 정렬하기
+    selectedList.value.sort((a, b) => a.id.localeCompare(b.id))
+  }
+
   const isLarge = computed(() => {
     return props.size === 'm'
   })
@@ -30,8 +44,11 @@
     <ActionDisplayChip
       v-for="(label, index) in props.labelList"
       :key="index"
+      :name="label"
+      :index="index"
       :size="size"
       :style="style"
+      @update:checked="updateSelectedList"
     >
       {{ label }}
     </ActionDisplayChip>
