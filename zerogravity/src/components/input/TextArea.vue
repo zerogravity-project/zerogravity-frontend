@@ -19,8 +19,9 @@
       default: '0',
     },
     padding: {
-      type: String,
-      default: '24px 24px 0px 24px',
+      type: Array,
+      default: () => [24, 24, 0, 24],
+      validator: value => value.length === 2 || value.length === 3 || value.length === 4,
     },
   })
 
@@ -37,9 +38,18 @@
   })
 
   const containerStyle = computed(() => {
+    const p = props.padding
+    let padding
+    if (p.length === 2) {
+      padding = `${p[0]}px ${p[1]}px`
+    } else if (p.length === 3) {
+      padding = `${p[0]}px ${p[1]}px ${p[2]}px`
+    } else if (p.length === 4) {
+      padding = `${p[0]}px ${p[1]}px ${p[2]}px ${p[3]}px`
+    }
     return {
       margin: props.margin,
-      padding: props.padding,
+      padding: padding,
       boxSizing: 'border-box',
     }
   })
