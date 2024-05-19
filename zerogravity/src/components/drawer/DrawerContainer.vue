@@ -23,7 +23,7 @@
     },
     isRight: Boolean,
     toggleVisibilty: Boolean,
-    isDrawerVisible: Boolean,
+    isDrawerVisible: Boolean, // 상위 컴포넌트에서 Drawer를 Toggle 시키기 위한 프롭스
   })
 
   const transformStyle = ref(null)

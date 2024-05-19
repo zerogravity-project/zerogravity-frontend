@@ -16,10 +16,10 @@
     { text: 'About', defaultColor: '#4e5968', activeColor: '#ff2e00', linkPath: 'about' },
   ])
 
-  const emit = defineEmits(['toggle-drawer'])
+  const emit = defineEmits(['toggleDrawer'])
 
   const showDrawer = () => {
-    emit('toggle-drawer')
+    emit('toggleDrawer')
   }
 
   const isLoggedIn = ref(false)
