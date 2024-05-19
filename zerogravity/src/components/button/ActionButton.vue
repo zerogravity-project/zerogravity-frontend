@@ -1,5 +1,5 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, defineProps, defineEmits } from 'vue'
 
   const props = defineProps({
     variant: {
@@ -26,11 +26,17 @@
       type: String,
       default: '',
     },
-
   })
 
   const buttonClass = computed(() => {
-    return `${props.variant} ${props.style} ${props.backgroundColor} ${props.textColor} ${props.icon} ${props.text}`
+    return [
+      props.variant,
+      props.style,
+      props.icon ? 'has-icon' : '',
+      props.text ? 'has-text' : '',
+      props.backgroundColor ? `bg-${props.backgroundColor}` : '',
+      props.textColor ? `text-${props.textColor}` : '',
+    ].filter(Boolean).join(' ')
   })
 
   const emit = defineEmits(['click'])
@@ -44,7 +50,7 @@
   <button
     @click="onClick"
     :class="buttonClass"
-    :style="{color: textColor}"
+    :style="{ color: props.textColor, backgroundColor: props.backgroundColor }"
   >
     <span
       v-if="props.icon"
@@ -70,13 +76,6 @@ button {
   letter-spacing: 0.32px;
   cursor: pointer;
 
-  /* variant: main, sub, round */
-  /* style: primary, secondary, tertiary */
-  /* color: key, gray */
-  /* icon: iconName */
-  /* text: content */
-
-  // main
   &.main {
     justify-content: center;
     width: 100%;
@@ -108,7 +107,6 @@ button {
         border-radius: $border-radius-l-rem;
         background-color: $gray700;
       }
-
     }
 
     &.secondary {
@@ -134,10 +132,8 @@ button {
       color: $gray700;
       background-color: $white900;
     }
-
   }
 
-  // sub
   &.sub {
     padding: $padding-xxxs-rem;
     border: 1px solid $lightgray300;
@@ -194,6 +190,22 @@ button {
         background-color: $lightgray200;
       }
     }
+
+    &.mobile {
+      padding: $padding-xxs-rem $padding-s-rem;
+      border: none;
+      color: $orange900;
+      border-radius: $border-radius-full-rem;
+      background-color: $orangeopacity10;
+
+      .text-area {
+        display: block;
+        align-content: center;
+        font-size: $text-font-size-s;
+        font-weight: 400;
+        line-height: normal;
+      }
+    }
   }
 
   &.round {
@@ -242,3 +254,229 @@ button {
   }
 }
 </style>
+
+<!-- <script setup>
+  import { computed, defineProps, defineEmits } from 'vue'
+
+  const props = defineProps({
+    variant: {
+      type: String,
+      default: '',
+    },
+    customStyle: {
+      type: String,
+      default: '',
+    },
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
+    textColor: {
+      type: String,
+      default: '',
+    },
+    icon: {
+      type: String,
+      default: '',
+    },
+    text: {
+      type: String,
+      default: '',
+    },
+    borderColor: {
+      type: String,
+      default: '',
+    },
+    borderRadius: {
+      type: String,
+      default: '',
+    },
+    hoverBackgroundColor: {
+      type: String,
+      default: '',
+    },
+    hoverBorderColor: {
+      type: String,
+      default: '',
+    },
+    disabledBackgroundColor: {
+      type: String,
+      default: '',
+    },
+    disabledBorderColor: {
+      type: String,
+      default: '',
+    },
+    disabledTextColor: {
+      type: String,
+      default: '',
+    },
+  })
+
+  const buttonClass = computed(() => {
+    return [
+      props.variant,
+      props.customStyle,
+      props.icon ? 'has-icon' : '',
+      props.text ? 'has-text' : '',
+    ].filter(Boolean).join(' ')
+  })
+
+  const emit = defineEmits(['click'])
+
+  const onClick = () => {
+    emit('click')
+  }
+
+  const hoverEffect = (event) => {
+    event.target.style.backgroundColor = props.hoverBackgroundColor
+    event.target.style.borderColor = props.hoverBorderColor
+  }
+
+  const removeHoverEffect = (event) => {
+    event.target.style.backgroundColor = props.backgroundColor
+    event.target.style.borderColor = props.borderColor
+  }
+
+  const disableEffect = (event) => {
+    event.target.style.backgroundColor = props.disabledBackgroundColor
+    event.target.style.borderColor = props.disabledBorderColor
+    event.target.style.color = props.disabledTextColor
+  }
+</script>
+
+<template>
+  <button
+    @click="onClick"
+    :class="buttonClass"
+    :style="{
+      backgroundColor: props.backgroundColor,
+      color: props.textColor,
+      borderColor: props.borderColor,
+      borderRadius: props.borderRadius
+    }"
+    @mouseover="hoverEffect"
+    @mouseout="removeHoverEffect"
+    @disabled="disableEffect"
+  >
+    <span
+      v-if="props.icon"
+      class="material-symbols-outlined"
+    >{{ props.icon }}</span>
+    <span
+      v-if="props.text"
+      class="text-area"
+    >{{ props.text }}</span>
+  </button>
+</template>
+
+<style lang="scss" scoped>
+body,
+button {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  font-size: $btn-font-size-m;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.32px;
+  cursor: pointer;
+
+  &.main {
+    justify-content: center;
+    width: 100%;
+    padding: $padding-btn-rem 0px;
+    gap: 8px;
+
+    &.primary {
+      &.key {
+        &:hover {
+        }
+        &:disabled {
+        }
+      }
+
+      &.gray {
+      }
+    }
+
+    &.secondary {
+      &:hover {
+      }
+      &:disabled {
+      }
+    }
+
+    &.tertiary {
+    }
+  }
+
+  &.sub {
+    padding: $padding-xxxs-rem;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 24px;
+
+    &:hover {
+    }
+
+    &.primary {
+      .text-area {
+        display: block;
+        align-content: center;
+        height: $padding-xl-rem;
+        margin-left: $margin-xxxs-rem;
+        font-size: $btn-font-size-s-rem;
+        font-weight: 400;
+      }
+    }
+
+    &.secondary {
+      .text-area {
+        display: block;
+        align-content: center;
+        height: $padding-xl-rem;
+        margin-left: $margin-xxxs-rem;
+        font-size: $btn-font-size-s-rem;
+        font-weight: 400;
+      }
+    }
+
+    &.mobile {
+      padding: $padding-xxs-rem $padding-s-rem;
+      border: none;
+
+      .text-area {
+        display: block;
+        align-content: center;
+        font-size: $text-font-size-s;
+        font-weight: 400;
+        line-height: normal;
+      }
+    }
+  }
+
+  &.round {
+    padding: $padding-xs-rem;
+    border-radius: $border-radius-full-rem;
+    gap: 0.25rem;
+
+    &.primary {
+      .text-area {
+        display: block;
+        align-content: center;
+        height: $padding-xl-rem;
+        margin-right: $margin-xxxs-rem;
+      }
+    }
+
+    &.secondary {
+
+      &:disabled {
+      }
+    }
+  }
+}
+</style> -->
