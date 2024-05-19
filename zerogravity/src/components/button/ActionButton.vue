@@ -30,7 +30,7 @@
   })
 
   const buttonClass = computed(() => {
-    return `${props.variant} ${props.style} ${props.backgroundColor} ${props.icon} ${props.text}`
+    return `${props.variant} ${props.style} ${props.backgroundColor} ${props.textColor} ${props.icon} ${props.text}`
   })
 
   const emit = defineEmits(['click'])
