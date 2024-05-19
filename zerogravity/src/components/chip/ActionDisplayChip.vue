@@ -1,7 +1,15 @@
 <script setup>
-  import { computed } from 'vue'
+  import { ref, computed, watch } from 'vue'
 
   const props = defineProps({
+    name: {
+      type: String,
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
     size: {
       type: String,
       default: 'm',
@@ -12,25 +20,50 @@
     },
   })
 
+  const isChecked = ref(false)
+  const emits = defineEmits(['update:checked'])
+
+  watch(isChecked, (newValue) => {
+    if(!isBadge.value){
+      emits('update:checked', { id: id.value, name: props.name, checked: newValue })
+    }
+  })
+
+  const id = computed(()=>{
+    return `${props.index}-${props.name}`
+  })
+
   const chipClass = computed(() => {
     return `chip ${props.size} ${props.style}`
   })
 
-  const isDisabled = computed(()=>{
+  // 추후 Disabled 필요 시
+  const isDisabled = computed(() => {
     return props.style === 'disabled'
   })
+
+  const isBadge = computed(() => {
+    return props.style === 'badge'
+  })
+
 </script>
 
 <template>
-  <button
-    :class="chipClass"
+  <label
+    :for="id"
+    :class="[chipClass, {'checked': !isBadge && isChecked}]"
     :disabled="isDisabled"
     :aria-disabled="isDisabled.toString()"
   >
-    <p class="label">
-      <slot />
-    </p>
-  </button>
+    <slot />
+    <input
+      v-model="isChecked"
+      type="checkbox"
+      :id="id"
+      :name="props.name"
+      hidden
+    >
+  </label>
 </template>
 
 <style lang="scss" scoped>
@@ -38,6 +71,8 @@
   display: flex;
   border: 1px solid transparent;
   border-radius: 100px;
+  user-select: none;
+
   // size
   &.m {
     padding: $padding-xxs-rem $padding-s-rem;
@@ -61,29 +96,25 @@
     color: $red900;
   }
 
-  &.default{
+  &.default {
     background: $redopacity10;
     color: $red900;
   }
 
-  &.outline{
+  &.outline {
     background: transparent;
     border: 1px solid $redopacity50;
     color: $red900;
   }
 
-  &:active{
+  &.checked {
     background: $red900;
     color: $white900;
   }
 
-  &:disabled{
+  &:disabled {
     background: $grayopacity10;
     color: $grayopacity30;
-  }
-
-  .label {
-    user-select: none;
   }
 }
 </style>
