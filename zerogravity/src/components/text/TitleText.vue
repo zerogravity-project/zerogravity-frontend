@@ -10,7 +10,6 @@
     subTitleText: {
       type: String,
       default: 'Sub Title',
-      required: true,
     },
     size: {
       type: String,
@@ -105,7 +104,7 @@
 }
 
 @media (max-width: 576px) {
-  .title-box {
+  .title-container {
     padding-left: $mobile-base-margin;
     padding-right: $mobile-base-margin;
 

@@ -1,9 +1,9 @@
 <script setup>
-
+import DisplayClock from './components/clock/DisplayClock.vue';
 </script>
 
 <template>
-  <div />
+  <DisplayClock />
 </template>
 
 <style lang="scss" scoped></style>
