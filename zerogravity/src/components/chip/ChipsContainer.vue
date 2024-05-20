@@ -10,9 +10,13 @@
       type: String,
       default: 'm',
     },
-    style: {
+    state: {
       type: String,
       default: 'default',
+    },
+    align: {
+      type: String,
+      default: '',
     },
     isCompact: Boolean,
   })
@@ -41,6 +45,7 @@
   <div
     v-if="props.labelList.length > 0"
     :class="['chips-container', { 'compact': props.isCompact, 'detail': !props.isCompact, 'large': isLarge, 'small': !isLarge }]"
+    :style="{justifyContent: props.align}"
   >
     <ActionDisplayChip
       v-for="(label, index) in props.labelList"
@@ -48,7 +53,7 @@
       :name="label"
       :index="index"
       :size="size"
-      :style="style"
+      :style="state"
       @update:checked="updateSelectedList"
     >
       {{ label }}

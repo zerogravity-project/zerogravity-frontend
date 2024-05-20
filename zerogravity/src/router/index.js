@@ -4,7 +4,9 @@ import LoginView from '@/views/LoginView.vue'
 import StartView from '@/views/spaceout/StartView.vue'
 import MainView from '@/views/spaceout/MainView.vue'
 import ResultView from '@/views/spaceout/ResultView.vue'
-import RecordView from '@/views/RecordView.vue'
+import EmotionView from '@/views/record/EmotionView.vue'
+import ReasonView from '@/views/record/ReasonView.vue'
+import DiaryView from '@/views/record/DiaryView.vue'
 import CalendarView from '@/views/profile/CalendarView.vue'
 import ChartView from '@/views/profile/ChartView.vue'
 import SettingView from '@/views/profile/SettingView.vue'
@@ -45,8 +47,23 @@ const router = createRouter({
     },
     {
       path: '/record',
-      name: 'Record',
-      component: RecordView,
+      children: [
+        {
+          path: 'emotion',
+          name: 'EmotionRecord',
+          component: EmotionView,
+        },
+        {
+          path: 'reason',
+          name: 'ReasonRecord',
+          component: ReasonView,
+        },
+        {
+          path: 'diary',
+          name: 'DiaryRecord',
+          component: DiaryView,
+        },
+      ],
     },
     {
       path: '/profile',

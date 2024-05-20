@@ -121,7 +121,7 @@
     }
 
     &.m , &.s{
-      padding-top: 80px;
+      padding-top: 48px;
     }
   }
 }

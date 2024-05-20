@@ -22,12 +22,12 @@
   const cubeTextureLoader = new THREE.CubeTextureLoader()
 
   const cubeEnvironmentMap = cubeTextureLoader.load([
-    './src/assets/environment-maps/cube-01/px.jpg',
-    './src/assets/environment-maps/cube-01/nx.jpg',
-    './src/assets/environment-maps/cube-01/py.jpg',
-    './src/assets/environment-maps/cube-01/ny.jpg',
-    './src/assets/environment-maps/cube-01/pz.jpg',
-    './src/assets/environment-maps/cube-01/nz.jpg',
+    './src/assets/environment-maps/cube/cube-01/px.jpg',
+    './src/assets/environment-maps/cube/cube-01/nx.jpg',
+    './src/assets/environment-maps/cube/cube-01/py.jpg',
+    './src/assets/environment-maps/cube/cube-01/ny.jpg',
+    './src/assets/environment-maps/cube/cube-01/pz.jpg',
+    './src/assets/environment-maps/cube/cube-01/nz.jpg',
   ])
 
   // const hdrEnvironmentMap = ref(null)
