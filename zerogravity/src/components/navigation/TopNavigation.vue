@@ -157,20 +157,22 @@
         .nav-menu-btn {
           border: none;
           border-radius: $border-radius-xs-rem;
+          background-color: transparent;
         }
       }
     }
   }
 
   &.backButton {
+    padding: 0px;
     .nav-logo {
-      display: none;
+      display: flex;
     }
 
     .nav-menu-area {
       display: flex;
       justify-content: flex-start;
-      align-items: center;
+      padding: 6px 4px; /* Adjust padding as needed */
       width: 100%;
     }
 
@@ -191,17 +193,18 @@
       .back-button-content {
         display: flex;
         align-items: center;
-        padding: $padding-xxs-rem $padding-xxxs-rem;
         gap: 4px;
         cursor: pointer;
 
         .material-symbols-outlined {
+          padding: 8px;
           font-size: $title-font-size-m-rem;
           color: $black900;
         }
 
         .back-text {
           display: inline;
+          width: 100%;
           color: $black900;
           font-size: $title-font-size-mobile-rem;
           line-height: 22px;
