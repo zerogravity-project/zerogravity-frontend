@@ -1,0 +1,128 @@
+<script setup>
+  import { ref, onMounted, onUnmounted } from 'vue'
+  import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
+  import TitleText from '@/components/text/TitleText.vue'
+  import ChipsContainer from '@/components/chip/ChipsContainer.vue'
+  import ActionButton from '@/components/button/ActionButton.vue'
+  import router from '@/router'
+
+  const reasonLists = ref([
+    ['건강', '피트니스', '자기 돌봄', '취미', '정체성', '종교'],
+    ['커뮤니티', '가족', '친구', '파트너', '연애'],
+    ['가사 활동', '직장', '교육', '여행', '날씨', '국내외 이슈', '돈'],
+  ])
+
+  const isMobile = ref('')
+  const viewportHeight = ref('')
+
+  // 모바일 사이즈 확인
+  const getWindowSize = () => {
+    viewportHeight.value = `${window.innerHeight}px`
+    if (window.innerWidth > 576) {
+      isMobile.value = false
+    } else {
+      isMobile.value = true
+    }
+  }
+
+  // 버튼 클릭 시
+  const onClick = () => {
+    router.push('/record/diary')
+  }
+
+  onMounted(() => {
+    window.addEventListener('resize', getWindowSize)
+    viewportHeight.value = `${window.innerHeight}px`
+    getWindowSize()
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', getWindowSize)
+  })
+</script>
+
+<template>
+  <main :style="{height: viewportHeight}">
+    <div class="reason-form">
+      <div class="title-area">
+        <EmotionContainer
+          class="emotion-container"
+          :size="isMobile ? 's' : 'm'"
+          :state="'mobile'"
+          :dir="'vertical'"
+          :chips-state="'badge'"
+        />
+        <TitleText
+          :title-text="'감정의 원인을 선택하세요'"
+          :sub-title-text="'오늘 하루의 감정의 원인은 무엇인가요?'"
+        />
+      </div>
+      <div class="chips-area">
+        <ChipsContainer
+          class="chips-container"
+          v-for="(list, index) in reasonLists"
+          :key="index"
+          :size="'m'"
+          :align="'flex-start'"
+          :label-list="list"
+        />
+      </div>
+    </div>
+    <div class="button-container">
+      <ActionButton
+        @click="onClick"
+        :variant="'round'"
+        :background-color="'#4E5968'"
+        :icon="'arrow_forward'"
+      />
+    </div>
+  </main>
+</template>
+
+<style lang="scss" scoped>
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title-area {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 120px;
+  gap: 16px;
+}
+
+.chips-area {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  padding-top: 80px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 60px;
+}
+
+@media (max-width: 576px) {
+  .title-area {
+    padding-top: 60px;
+  }
+
+  .chips-area {
+    gap: 24px;
+    padding: 0 $mobile-base-margin;
+    padding-top: 60px;
+  }
+
+  .button-container {
+    padding-bottom: 0px;
+  }
+}
+</style>
