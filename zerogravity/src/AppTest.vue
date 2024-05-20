@@ -1,10 +1,11 @@
 <script setup>
-import DisplayClock from './components/clock/DisplayClock.vue';
+  import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <DisplayClock />
+  <RouterView />
 </template>
 
 <style lang="scss" scoped>
+
 </style>
