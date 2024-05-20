@@ -29,6 +29,7 @@
 
     // id도 정렬하기
     selectedList.value.sort((a, b) => a.id.localeCompare(b.id))
+    console.log(selectedList.value)
   }
 
   const isLarge = computed(() => {
