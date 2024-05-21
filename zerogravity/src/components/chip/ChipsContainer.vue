@@ -10,9 +10,13 @@
       type: String,
       default: 'm',
     },
-    style: {
+    state: {
       type: String,
       default: 'default',
+    },
+    align: {
+      type: String,
+      default: '',
     },
     isCompact: Boolean,
   })
@@ -29,6 +33,7 @@
 
     // id도 정렬하기
     selectedList.value.sort((a, b) => a.id.localeCompare(b.id))
+    console.log(selectedList.value)
   }
 
   const isLarge = computed(() => {
@@ -40,6 +45,7 @@
   <div
     v-if="props.labelList.length > 0"
     :class="['chips-container', { 'compact': props.isCompact, 'detail': !props.isCompact, 'large': isLarge, 'small': !isLarge }]"
+    :style="{justifyContent: props.align}"
   >
     <ActionDisplayChip
       v-for="(label, index) in props.labelList"
@@ -47,7 +53,7 @@
       :name="label"
       :index="index"
       :size="size"
-      :style="style"
+      :style="state"
       @update:checked="updateSelectedList"
     >
       {{ label }}

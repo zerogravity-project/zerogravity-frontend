@@ -18,11 +18,6 @@
       type: String,
       default: '0',
     },
-    padding: {
-      type: Array,
-      default: () => [24, 24, 0, 24],
-      validator: value => value.length === 2 || value.length === 3 || value.length === 4,
-    },
   })
 
   const emit = defineEmits(['update:modelValue'])
@@ -38,18 +33,8 @@
   })
 
   const containerStyle = computed(() => {
-    const p = props.padding
-    let padding
-    if (p.length === 2) {
-      padding = `${p[0]}px ${p[1]}px`
-    } else if (p.length === 3) {
-      padding = `${p[0]}px ${p[1]}px ${p[2]}px`
-    } else if (p.length === 4) {
-      padding = `${p[0]}px ${p[1]}px ${p[2]}px ${p[3]}px`
-    }
     return {
       margin: props.margin,
-      padding: padding,
       boxSizing: 'border-box',
     }
   })
@@ -102,16 +87,17 @@
       outline: none;
       resize: none;
       color: $black900;
-      font-size: 24px;
+      background-color: transparent;
+      font-size: $title-font-size-m-rem;
       font-weight: 400;
       box-sizing: border-box;
-      padding: 8px;
-      border-radius: 8px;
+      padding: $padding-xs-rem;
+      border-radius: $border-radius-s-rem;
     }
 
     .text-input::placeholder {
       color: $grayopacity30;
-      font-size: 24px;
+      font-size: $title-font-size-m-rem;
       line-height: 24px;
       letter-spacing: -0.15px;
     }
@@ -125,24 +111,24 @@
 
 .char-count {
   color: $orange900;
-  font-size: 13px;
+  font-size: $text-font-size-s-rem;
 }
 
 @media (max-width: 576px) {
   .input-wrapper {
     &.textarea {
       .text-input {
-        font-size: 15px;
+        font-size: $text-font-size-m-rem;
       }
 
       .text-input::placeholder {
-        font-size: 15px;
+        font-size: $text-font-size-m-rem;
       }
     }
   }
 
   .char-count {
-    font-size: 13px;
+    font-size: $text-font-size-s-rem;
   }
 }
 </style>

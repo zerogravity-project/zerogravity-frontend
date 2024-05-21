@@ -6,6 +6,7 @@
       type: String,
       default: '',
     },
+    defaultPadding: Boolean,
   })
 
   const textLines = computed(() => {
@@ -21,7 +22,10 @@
 </script>
 
 <template>
-  <div class="text-container">
+  <div
+    class="text-container"
+    :style="{defaultPadding: props.defaultPadding? '' : '0px'}"
+  >
     <p>
       <template v-if="props.text !== ''">
         <span
