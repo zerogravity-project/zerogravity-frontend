@@ -1,10 +1,44 @@
 <script setup>
-  import EmotionLevelChart from '../../components/chart/EmotionLevelChart.vue'
-  import EmotionCountChart from '../../components/chart/EmotionCountChart.vue'
-  import HeadlineText from '../../components/text/HeadlineText.vue'
+  import EmotionLevelChart from '@/components/chart/EmotionLevelChart.vue'
+  import EmotionCountChart from '@/components/chart/EmotionCountChart.vue'
+  import HeadlineText from '@/components/text/HeadlineText.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import DropDown from '@/components/dropdown/DropDown.vue'
   import { ref } from 'vue'
+
+  const formatDate = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}.${month}.${day}`
+  }
+
+  const getWeekRange = (date) => {
+    const day = date.getDay()
+    const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1)
+    const monday = new Date(date.setDate(diffToMonday))
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+    return { monday, sunday }
+  }
+
+  const currentDate = ref(new Date())
+  const updateWeekRange = () => {
+    const { monday, sunday } = getWeekRange(currentDate.value)
+    const formattedMonday = formatDate(monday)
+    const formattedSunday = formatDate(sunday)
+    dateRange.value = `${formattedMonday} - ${formattedSunday}`
+  }
+
+  const dateRange = ref('')
+  updateWeekRange()
+
+  const changeWeek = (direction) => {
+    const currentMonday = getWeekRange(currentDate.value).monday
+    currentMonday.setDate(currentMonday.getDate() + direction * 7)
+    currentDate.value = currentMonday
+    updateWeekRange()
+  }
 
   const labels = ref([
     '월', '화', '수', '목', '금', '토', '일',
@@ -152,19 +186,33 @@
       </div>
       <div class="button-area">
         <div class="date">
-          2024.05.20-2024.05.26
+          {{ dateRange }}
         </div>
-        <ActionButton
-          :variant="'sub'"
-          :state="'secondary'"
-          :icon="'sort'"
-          :text="'주별 통계'"
-          @click="toggleDropdown"
-        />
-        <DropDown
-          v-if="isDropdownVisible"
-          class="dropdown"
-        />
+        <div class="button">
+          <ActionButton
+            :variant="'sub'"
+            :state="'secondary'"
+            :icon="'chevron_left'"
+            @click="() => changeWeek(-1)"
+          />
+          <ActionButton
+            :variant="'sub'"
+            :state="'secondary'"
+            :icon="'chevron_right'"
+            @click="() => changeWeek(1)"
+          />
+          <ActionButton
+            :variant="'sub'"
+            :state="'secondary'"
+            :icon="'sort'"
+            :text="'Weekly'"
+            @click="toggleDropdown"
+          />
+          <DropDown
+            v-if="isDropdownVisible"
+            class="dropdown"
+          />
+        </div>
       </div>
       <div class="chart-area">
         <EmotionLevelChart
@@ -214,11 +262,19 @@
 }
 
 @media (max-width: 567px) {
+  .layout {
+    max-width: 100%;
+    margin: 0px 20px 20px 20px;
+  }
   .main-area {
     width: 100%;
     margin-left: 0;
     padding: 1rem;
   }
+  .chart-area {
+  width: 100%;
+  max-width: 20rem;
+}
 }
 
 .main-title {
@@ -247,6 +303,11 @@
   display: flex;
 }
 
+.button {
+  display: flex;
+  flex-direction: row;
+}
+
 .dropdown {
   position: absolute;
   top: 100%;
@@ -266,5 +327,6 @@
   border: 1px solid rgb(212, 212, 212);
   border-radius: 8px;
   margin: 1rem 1rem 0.2rem 1rem;
+  background-color: rgb(255, 255, 255);
 }
 </style>
