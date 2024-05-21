@@ -1,46 +1,27 @@
 <script setup>
-  import { onMounted, ref, watch } from 'vue'
-  import { Chart } from 'chart.js/auto'
-  import annotationPlugin from 'chartjs-plugin-annotation'
+  import MixedChart from '../../components/chart/Chart.vue'
+  import MixedChart2 from '../../components/chart/Chart2.vue'
+  import HeadlineText from '../../components/text/HeadlineText.vue'
+  import TitleText from '../../components/text/TitleText.vue'
+  import { ref } from 'vue'
 
-  Chart.register(annotationPlugin)
+  const labels = ref([
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
+    '8월', '9월', '10월', '11월', '12월',
+  ])
 
-  const props = defineProps({
-    labels: {
-      type: Array,
-      required: true,
+  const datasets = ref([
+    {
+      type: 'bar',
+      label: 'Bar Dataset',
+      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2, 1.9, 3.5, 2, 2.4, 1.7, 3.9],
     },
-    datasets: {
-      type: Array,
-      required: true,
+    {
+      type: 'line',
+      label: 'Line Dataset',
+      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2, 1.9, 3.5, 2, 2.4, 1.7, 3.9],
     },
-    chartOptions: {
-      type: Object,
-      required: true,
-    },
-    barColor: {
-      type: String,
-      required: true,
-    },
-    lineColor: {
-      type: String,
-      required: true,
-    },
-    averageLineColor: {
-      type: String,
-      required: true,
-    },
-    yAxisTitle: {
-      type: String,
-      required: true,
-    },
-    xAxisTitle: {
-      type: String,
-      required: true,
-    },
-  })
-
-  const mixedChart = ref(null)
+  ])
 
   const valueToLabel = (value) => {
     if (value === 0) {
@@ -58,120 +39,200 @@
     }
   }
 
-  const calculateAverage = (data) => {
-    const sum = data.reduce((a, b) => a + b, 0)
-    return sum / data.length
-  }
+  const chartOptions = ref({
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 4,
+        title: {
+          display: true,
+        },
+        ticks: {
+          stepSize: 1,
+          callback: valueToLabel,
+        },
+      },
+      x: {
+        title: {
+          display: true,
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+  })
 
-  const createChart = () => {
-    if (mixedChart.value) {
-      const chartInstance = Chart.getChart(mixedChart.value)
-      if (chartInstance) {
-        chartInstance.destroy()
-      }
+  const barColor = ref('rgba(75, 192, 192, 0.5)')
+  const lineColor = ref('rgba(75, 192, 192, 0.5)')
+  const averageLineColor = ref('rgba(75, 192, 192, 0.5)')
 
-      const chartData = {
-        labels: props.labels,
-        datasets: props.datasets.map((dataset) => {
-          if (dataset.type === 'bar') {
-            return {
-              ...dataset,
-              backgroundColor: props.barColor,
-              borderColor: props.barColor.replace('0.5', '1'),
-            }
-          } else if (dataset.type === 'line') {
-            return {
-              ...dataset,
-              backgroundColor: props.lineColor.replace('0.8', '0.3'), // 라인 색상을 반영
-              borderColor: props.lineColor,
-              pointBackgroundColor: props.lineColor.replace('0.8', '1'),
-              pointBorderColor: props.lineColor.replace('0.8', '1'),
-            }
-          }
-          return dataset
-        }),
-      }
+  const emotionLabels = ref([
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
+    '8월', '9월', '10월', '11월', '12월',
+  ])
 
-      const chartOptions = {
-        ...props.chartOptions,
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            ...props.chartOptions.scales.y,
-            title: {
-              ...props.chartOptions.scales.y.title,
-              text: props.yAxisTitle,
-            },
-            ticks: {
-              ...props.chartOptions.scales.y.ticks,
-              callback: valueToLabel,
-            },
-          },
-          x: {
-            ...props.chartOptions.scales.x,
-            title: {
-              ...props.chartOptions.scales.x.title,
-              text: props.xAxisTitle,
-            },
+  const emotionDatasets = ref([
+    {
+      label: '오늘의 감정',
+      data: [
+        { x: '1월', y: 2 },
+        { x: '2월', y: 1 },
+        { x: '3월', y: 1 },
+        { x: '4월', y: 3 },
+        { x: '5월', y: 2 },
+        { x: '6월', y: 1 },
+        { x: '7월', y: 2 },
+        { x: '8월', y: 1 },
+        { x: '9월', y: 3 },
+        { x: '10월', y: 2 },
+        { x: '11월', y: 1 },
+        { x: '12월', y: 3 },
+      ],
+      backgroundColor: 'rgba(255, 99, 132, 0.7)',
+    },
+    {
+      label: '순간의 감정',
+      data: [
+        { x: '1월', y: 1 },
+        { x: '2월', y: 2 },
+        { x: '3월', y: 0 },
+        { x: '4월', y: 1 },
+        { x: '5월', y: 2 },
+        { x: '6월', y: 1 },
+        { x: '7월', y: 0 },
+        { x: '8월', y: 2 },
+        { x: '9월', y: 1 },
+        { x: '10월', y: 3 },
+        { x: '11월', y: 2 },
+        { x: '12월', y: 1 },
+      ],
+      backgroundColor: 'rgba(211, 211, 211, 0.5)',
+    },
+  ])
+
+  const emotionChartOptions = ref({
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 3.5,
+        title: {
+          display: true,
+        },
+        ticks: {
+          stepSize: 1,
+          callback: function(value) {
+            if (value === 0) return 'Low'
+            if (value === 1) return 'Middle'
+            if (value === 2) return 'High'
+            return ''
           },
         },
-        plugins: {
-          ...props.chartOptions.plugins,
-          annotation: {
-            annotations: {
-              averageLine: {
-                type: 'line',
-                scaleID: 'y',
-                value: calculateAverage(props.datasets[0].data),
-                borderColor: props.averageLineColor,
-                borderWidth: 2,
-                borderDash: [5, 5],
-                label: {
-                  enabled: true,
-                  content: 'Average',
-                  position: 'end',
-                  backgroundColor: props.averageLineColor,
-                  color: 'black',
-                  font: {
-                    size: 12,
-                    family: 'Helvetica',
-                    weight: 'bold',
-                  },
-                },
-              },
-            },
-          },
+      },
+      x: {
+        title: {
+          display: true,
         },
-      }
-
-      new Chart(mixedChart.value, {
-        type: 'bar',
-        data: chartData,
-        options: chartOptions,
-      })
-    }
-  }
-
-  onMounted(createChart)
-
-  watch(
-    () => [props.datasets, props.barColor, props.lineColor, props.averageLineColor, props.labels, props.chartOptions],
-    createChart,
-    { deep: true },
-  )
+      },
+    },
+    plugins: {
+      legend: {
+        display: true,
+      },
+    },
+  })
 </script>
 
 <template>
-  <canvas
-    class="chart"
-    ref="mixedChart"
-  />
+  <div class="layout">
+    <main class="main-area">
+      <div class="main-title">
+        <HeadlineText
+          :size="'l'"
+          :text="'감정 기록 통계'"
+          :padding="[48, 0, 0, 0]"
+        />
+        <!-- <TitleText
+          :size="'s'"
+          :title-text="'이번주 감정 기록'"
+          :sub-title-text="'2024.05.20-2024.05.27'"
+        /> -->
+      </div>
+      <div class="chart-area">
+        <MixedChart
+          :labels="labels"
+          :datasets="datasets"
+          :chart-options="chartOptions"
+          :bar-color="barColor"
+          :line-color="lineColor"
+          :average-line-color="averageLineColor"
+          y-axis-title="감정의 정도"
+          x-axis-title="월"
+        />
+      </div>
+      <div class="chart-area">
+        <MixedChart2
+          :labels="emotionLabels"
+          :datasets="emotionDatasets"
+          :chart-options="emotionChartOptions"
+          :bar-color="barColor"
+          :line-color="lineColor"
+          :average-line-color="averageLineColor"
+          y-axis-title="기록 횟수"
+          x-axis-title="월"
+        />
+      </div>
+    </main>
+  </div>
 </template>
 
 <style scoped>
-.chart {
+.layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.main-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: calc(100% - 18.75rem);
+  margin-left: 18.75rem;
+}
+
+@media (max-width: 567px) {
+  .main-area {
+    width: 100%;
+    margin: 30px;
+  }
+}
+
+.main-title {
   width: 100%;
-  height: 400px;
+  max-width: 50rem;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding-left: 0.25rem;
+}
+
+.chart-area {
+  width: 100%;
+  max-width: 50rem;
+  height: 37vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px 10px 20px;
+  border: solid 1px rgb(212, 212, 212);
+  border-radius: 8px;
+  margin: 1rem 1rem 0.2rem 1rem;
 }
 </style>
