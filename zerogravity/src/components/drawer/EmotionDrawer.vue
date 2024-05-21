@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref } from 'vue'
+  import { onMounted, ref, inject, computed } from 'vue'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
@@ -15,6 +15,14 @@
 오늘 나는 와이어프레임을 그리고 앞으로 있을 우리의 프로젝트에 대해서 계획을 잡았다. 
 그리고 나서 이제 곧 다시 서울을 올라가고 앞으로도 행복하게 살 것이다.
 내일도 화이팅이다.`)
+
+  // 선택된 날짜
+  const selectedDate = inject('selectedDate')
+
+  const date = computed(() => selectedDate.value ? selectedDate.value.getDate() : null)
+  const month = computed(() => selectedDate.value ? selectedDate.value.getMonth() : null)
+  const year = computed(() => selectedDate.value ? selectedDate.value.getFullYear() : null)
+  const selectedDateText = computed(() => `${year.value}년 ${month.value + 1}월 ${date.value}일`)
 
   onMounted(() => {
     const updateMaxHeight = () => {
@@ -33,8 +41,7 @@
     <div ref="divNode">
       <!-- Navigation -->
       <DrawerNavigation
-        @hide-drawer="hideDrawer"
-        :title-text="'May 6, 2024'"
+        :title-text="selectedDateText"
         :sub-title-text="'Daily Emotion'"
         :button-icon="'Close'"
       />
@@ -81,10 +88,11 @@
         v-for="(emotion, index) in emotionList"
         :key="index"
         :size="'s'"
-        :style="'compact'"
+        :state="'compact'"
         :dir="'horizontal'"
         :emotion="emotion"
-        :chips-style="'badge'"
+        :chips-state="'badge'"
+        :reason-list="['hello', 'yes', 'no', 'ok']"
       />
     </div>
   </div>

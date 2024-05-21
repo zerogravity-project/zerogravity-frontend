@@ -8,7 +8,7 @@
     },
     emotion: {
       type: String,
-      default: 'emotion',
+      default: '',
     },
   })
 

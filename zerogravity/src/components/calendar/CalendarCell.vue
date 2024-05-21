@@ -25,56 +25,40 @@
     },
     numericWidth: {
       type: Number,
-      default: window.innerWidth,
+      default: 0,
+    },
+    numericHeight: {
+      type: Number,
+      default: 0,
     },
   })
+
+  const adjustment = 48
 
   const cellClass = computed(() => {
     return `cell ${props.isToday ? 'today' : ''} ${props.isSunday ? 'sunday' : ''} 
     ${props.mainState ? 'main-state' : ''} ${props.momentState ? 'moment-state' : ''}`
   })
 
-  const showMainStateAsset = computed(() => {
-    return props.date !== null && props.mainState
-  })
-
   const size = computed(() => {
-    if (props.numericWidth > 1200) {
-      return 'm'
-    } else if (props.numericWidth > 992) {
-      return 'm'
-    } else if (props.numericWidth > 768) {
-      return 's'
-    } else if (props.numericWidth > 576) {
-      return 's'
-    } else if (props.numericWidth > 400) {
-      return 's'
-    } else {
-      return 'xs'
-    }
+    return props.numericWidth < props.numericHeight? `${props.numericWidth-adjustment}px` : `${props.numericHeight-adjustment}px`
   })
 </script>
 
 <template>
-  <div :class="cellClass">
+  <div
+    @click="getDate"
+    :class="cellClass"
+  >
     <div class="emotion-area">
       <span class="date-area">{{ props.date }}</span>
       <div
-        v-if="props.date !== null && showMainStateAsset"
+        v-if="props.date !== null"
         class="emotion-asset-main-area"
       >
         <EmotionAsset
           :size="size"
           :emotion="props.mainState"
-        />
-      </div>
-      <div
-        v-else-if="props.date !== null && !props.mainState"
-        class="no-image"
-      >
-        <EmotionAsset
-          :size="size"
-          :emotion="''"
         />
       </div>
       <div
@@ -114,8 +98,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
   height: 100%;
-  padding: $padding-xl-rem;
+  padding: $padding-m-rem;
 }
 
 .date-area {
@@ -133,6 +118,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
 .emotion-asset-moment-area {
@@ -143,19 +129,5 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-}
-
-.no-image {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 100px;
-  border: 1px dashed $lightgray300;
-
-  span {
-    color: $grayopacity50;
-    font-size: $text-font-size-xs;
-  }
 }
 </style>

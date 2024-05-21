@@ -90,6 +90,7 @@
 .button {
   width: 153px;
   border: none;
+  cursor: pointer;
 }
 
 .text-area {
