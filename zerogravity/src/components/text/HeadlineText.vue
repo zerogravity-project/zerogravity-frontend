@@ -121,10 +121,6 @@
   &.m {
     font-size: $title-font-size-s-rem;
   }
-
-  &.s {
-    font-size: $title-font-size-mobile-rem;
-  }
 }
 
 .buttons-links {
@@ -141,5 +137,18 @@
 .links {
   display: flex;
   align-items: center;
+}
+
+@media (max-width: 576px) {
+  .headline {
+
+    &.l {
+      font-size: $title-font-size-s-rem;
+    }
+
+    &.m {
+      font-size: $title-font-size-mobile-rem;
+    }
+  }
 }
 </style>

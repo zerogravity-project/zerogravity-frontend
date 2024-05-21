@@ -11,45 +11,56 @@
       type: Number,
       required: true,
     },
+    month: {
+      type: Number,
+      required: true,
+    },
+    year: {
+      type: Number,
+      required: true,
+    },
   })
 
-  const numericWidth = computed(() => props.width)
-  const numericHeight = computed(() => props.height)
+  const numericWidth = computed(() => props.width / 7)
+  const numericHeight = computed(() => props.height / totalWeekCount.value)
 
-  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
+  const daysOfWeek = ref(['일', '월', '화', '수', '목', '금', '토'])
+
   const currentDate = new Date()
+
   const currentDay = currentDate.getDate()
-  const currentMonth = currentDate.getMonth()
-  const currentYear = currentDate.getFullYear()
   const currentWeekDay = currentDate.getDay()
-  const totalDays = daysInMonth(currentMonth, currentYear)
-  const daysOfWeekFull = ['일', '월', '화', '수', '목', '금', '토']
-  const daysOfWeek = ref(daysOfWeekFull)
-  const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay()
   const showFullMonth = ref(true)
 
+  const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
+
   const updateDisplayMode = () => {
-    showFullMonth.value = numericWidth.value > 576
+    showFullMonth.value = props.width >= 576
   }
 
-  watch([numericWidth, numericHeight], updateDisplayMode)  // 수정된 부분
+  watch(() => props.width, updateDisplayMode)
 
   const dates = computed(() => {
+    const firstDayOfWeek = new Date(props.year, props.month, 1).getDay()
+    const totalDays = daysInMonth(props.month, props.year)
     const cells = []
+
     for (let i = 0; i < firstDayOfWeek; i++) {
       cells.push({ date: null, isToday: false, isSunday: i === 0, mainState: '', momentState: '' })
     }
+
     for (let i = 0; i < totalDays; i++) {
       cells.push({
         date: i + 1,
-        isToday: i + 1 === currentDay,
+        isToday: currentDate.getFullYear() === props.year && currentDate.getMonth() === props.month && i + 1 === currentDay,
         isSunday: (i + firstDayOfWeek) % 7 === 0,
         mainState: '', // 메인 감정 데이터
         momentState: '', // 순간 감정 데이터
       })
     }
-    const totalCells = 35
-    const remainingCells = totalCells - cells.length
+
+    const remainingCells = 7 - (cells.length % 7)
+
     for (let i = 0; i < remainingCells; i++) {
       cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '' })
     }
@@ -62,6 +73,18 @@
 
     return cells
   })
+
+  const totalWeekCount = computed(()=>{
+    return dates.value.length / 7
+  })
+
+  const emits = defineEmits(['showDetail'])
+
+  const getDate = (date) => {
+    if(date){
+      emits('showDetail', date)
+    }
+  }
 </script>
 
 <template>
@@ -83,6 +106,7 @@
     </div>
     <template v-if="showFullMonth">
       <CalendarCell
+        @click="getDate(cell.date)"
         v-for="(cell, index) in dates"
         :key="index"
         :date="cell.date"
@@ -125,7 +149,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: 32px auto;
-  width: fit-content;
+  width: 100%;
   height: 100%;
   border: solid 1px $lightgray100;
   background-color: $white900;

@@ -15,7 +15,7 @@
     },
     position: {
       type: String,
-      required: true,
+      default: '',
     },
     icon: {
       type: String,
@@ -52,7 +52,7 @@
 <template>
   <aside
     :class="['drawer-container', { 'left': !isRight, 'right': isRight }]"
-    :style="[props.drawerStyle, transformStyle, { width: `${props.width}`, position: props.position }]"
+    :style="[props.drawerStyle, transformStyle, { position: props.position }]"
   >
     <div
       v-if="props.icon"
@@ -64,11 +64,18 @@
       </span>
     </div>
 
-    <CustomizeDrawer v-if="props.variant === 'customize'" />
-    <EmotionDrawer v-if="props.variant === 'emotion'" />
+    <CustomizeDrawer
+      v-if="props.variant === 'customize'"
+      :style="{ width: `${props.width}` }"
+    />
+    <EmotionDrawer
+      v-if="props.variant === 'emotion'"
+      :style="{ width: `${props.width}` }"
+    />
     <MenuDrawer
       v-if="props.variant === 'menu'"
       @hide-drawer="hideDrawer"
+      :style="{ width: `${props.width}` }"
     />
   </aside>
 </template>
@@ -77,7 +84,7 @@
 .drawer-container {
   top: 0;
   height: 100vh;
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+  // box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
   z-index: 3;
   transition: 0.75s;
 

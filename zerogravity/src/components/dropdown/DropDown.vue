@@ -1,6 +1,7 @@
 <script setup>
   import { defineProps, computed } from 'vue'
   import DropDownButton from './DropDownButton.vue'
+  import router from '@/router'
 
   const props = defineProps({
     textColor: {
@@ -27,14 +28,29 @@
       type: String,
       default: '',
     },
+    menuList: {
+      type: Array,
+      required: true,
+    },
   })
 
-  const handleClick = (item) => {
-    console.log(item) // for test
+  const handleClick = (link) => {
+    router.push(link)
   }
 
+  const firstItem = computed(() => props.menuList[0])
+  const computedMenuList= computed(() => props.menuList.slice(1, -1))
+  const lastItem = computed(() => props.menuList[props.menuList.length - 1])
+
+  const dropdownStartPadding = computed(() => ({
+    padding: props.padding.length === 2 ? `${props.padding[0]} ${props.padding[1]} 0 ${props.padding[1]}` : props.padding.join(' '),
+  }))
+
+  const dropdownEndPadding = computed(() => ({
+    padding: props.padding.length === 2 ? `0 ${props.padding[1]} ${props.padding[0]}  ${props.padding[1]}` : props.padding.join(' '),
+  }))
+
   const dropdownItemStyles = computed(() => ({
-    padding: props.padding.length === 2 ? `${props.padding[0]} ${props.padding[1]}` : props.padding.join(' '),
     backgroundColor: props.backgroundColor,
     borderRadius: props.borderRadius,
   }))
@@ -44,43 +60,56 @@
   <div class="dropdown-menu">
     <div
       class="dropdown-item"
-      :style="dropdownItemStyles"
+      :style="[dropdownItemStyles, dropdownStartPadding]"
     >
       <DropDownButton
-        text="오늘의 감정 추가"
+        :text="firstItem.name"
         :text-color="textColor"
         background-color="transparent"
         :border-radius="borderRadius"
-        :padding="['10px', '16px']"
+        :padding="['12px', '16px']"
         :hover-text-color="hoverTextColor"
         :hover-background-color="hoverBackgroundColor"
-        @click="handleClick('오늘의 감정 추가')"
+        @click="handleClick(firstItem.link)"
       />
     </div>
+    <DropDownButton
+      v-for="(menu, index) in computedMenuList"
+      :key="index"
+      :text="menu.name"
+      :text-color="textColor"
+      background-color="transparent"
+      :border-radius="borderRadius"
+      :padding="['12px', '16px']"
+      :hover-text-color="hoverTextColor"
+      :hover-background-color="hoverBackgroundColor"
+      @click="handleClick(menu.link)"
+    />
     <div
       class="dropdown-item"
-      :style="dropdownItemStyles"
+      :style="[dropdownItemStyles, dropdownEndPadding]"
     >
       <DropDownButton
-        text="순간의 감정 추가"
+        :text="lastItem.name"
         :text-color="textColor"
         background-color="transparent"
         :border-radius="borderRadius"
-        :padding="['10px', '16px']"
+        :padding="['12px', '16px']"
         :hover-text-color="hoverTextColor"
         :hover-background-color="hoverBackgroundColor"
-        @click="handleClick('순간의 감정 추가')"
+        @click="handleClick(lastItem.link)"
       />
     </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .dropdown-menu {
   display: flex;
   flex-direction: column;
   width: fit-content;
   border-radius: $border-radius-xs-rem;
-  gap: 4px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+  background-color: $white900;
 }
 </style>
