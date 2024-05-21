@@ -15,7 +15,7 @@
       type: String,
       default: 'm',
     },
-    paddingTop: Boolean,
+    defaultPadding: Boolean,
   })
 
   const subTitleLines = computed(() => {
@@ -32,7 +32,7 @@
 <template>
   <header
     :class="['title-container', props.size]"
-    :style="{paddingTop: props.paddingTop? '' : '0px'}"
+    :style="{defaultPadding: props.defaultPadding? '' : '0px'}"
   >
     <h1 class="title">
       {{ props.titleText }}
@@ -121,7 +121,7 @@
     }
 
     &.m , &.s{
-      padding-top: 80px;
+      padding-top: 48px;
     }
   }
 }

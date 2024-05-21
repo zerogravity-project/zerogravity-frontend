@@ -2,6 +2,7 @@ import './assets/styles/main.scss'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { TroisJSVuePlugin } from 'troisjs'
 
 import router from './router'
 
@@ -14,6 +15,7 @@ import router from './router'
 
 // app.use(createPinia())
 // app.use(router)
+// app.use(TroisJSVuePlugin)
 
 // app.mount('#app')
 
@@ -26,5 +28,6 @@ const appTest = createApp(AppTest)
 
 appTest.use(createPinia())
 appTest.use(router)
+appTest.use(TroisJSVuePlugin)
 
 appTest.mount('#app')

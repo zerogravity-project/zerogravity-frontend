@@ -117,7 +117,7 @@
 
     .text-input::placeholder {
       color: $gray700;
-      font-size: 15px;
+      font-size: $text-font-size-m-rem;
       line-height: 15px;
       letter-spacing: -0.15px;
     }
@@ -134,13 +134,13 @@
       .input-label {
         width: 100%;
         margin-bottom: 4px;
-        font-size: 15px;
+        font-size: $text-font-size-m-rem;
         line-height: 15px;
       }
 
       .text-input {
         width: 100%;
-        font-size: 15px;
+        font-size: $text-font-size-m-rem;
         line-height: 18px;
         padding: 4px 12px;
       }
