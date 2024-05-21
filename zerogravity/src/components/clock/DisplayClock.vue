@@ -1,5 +1,8 @@
 <script setup>
   import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
 
   const props = defineProps({
     size: {
@@ -25,18 +28,18 @@
   const maxRange = 50
 
   const moveCursorToEnd = (event) => {
-    if(event){
+    if (event) {
       const inputElement = event.target
 
-      if(inputElement) {
-        if(inputElement.value === ''){
+      if (inputElement) {
+        if (inputElement.value === '') {
           seconds.value = '00'
           minutes.value = '0'
         }
 
         inputElement.style.caretColor = 'transparent'
 
-        setTimeout(()=>{
+        setTimeout(() => {
           inputElement.setSelectionRange(maxRange, maxRange)
           inputElement.style.caretColor = ''
         }, 0)
@@ -44,21 +47,21 @@
     }
   }
 
-  watch(seconds, ()=>{
-    if(!isTimer.value){
+  watch(seconds, () => {
+    if (!isTimer.value) {
       seconds.value = seconds.value.replace(/\D/g, '')
       const inputSecond = `${seconds.value.charAt(1)}${seconds.value.charAt(2)}`
       const inputMinute = `${seconds.value.charAt(0)}`
 
       if (seconds.value.length >= 3) {
-        if(minutes.value.charAt(0) === '0'){
+        if (minutes.value.charAt(0) === '0') {
           minutes.value = `${seconds.value.charAt(0)}`
           seconds.value = `${seconds.value.charAt(1)}${seconds.value.charAt(2)}`
 
-          if(inputSecond > 59 && inputMinute !== '0') {
+          if (inputSecond > 59 && inputMinute !== '0') {
             inputColor.value = 'blue'
-            setTimeout(()=>{
-              if(inputMinute === '9'){
+            setTimeout(() => {
+              if (inputMinute === '9') {
                 seconds.value = '59'
               } else {
                 seconds.value = '00'
@@ -99,11 +102,14 @@
   const submit = () => {
     isTimer.value = true
 
-    const timer = (timestamp) =>{
+    const timer = (timestamp) => {
       if (timestamp - lastUpdateTime >= updateInterval) {
-        if(seconds.value == 0) {
-          if(minutes.value == 0){
+        if (seconds.value == 0) {
+          if (minutes.value == 0) {
             cancelAnimationFrame(frameId)
+            setTimeout(() => {
+              router.push('/record/emotion')
+            }, 0)
             return
           } else {
             seconds.value = 59
@@ -111,7 +117,7 @@
           }
         } else {
           seconds.value--
-          if(seconds.value < 10){
+          if (seconds.value < 10) {
             seconds.value = `0${seconds.value}`
           }
         }
@@ -164,8 +170,7 @@
       placeholder="0"
       v-model="minutes"
       @focus="(event) => moveCursorToEnd(event)"
-
-      :class="['minutes', 'en-font', {'timer': !props.isClock}]"
+      :class="['minutes', 'en-font', { 'timer': !props.isClock }]"
       :style="{ color: inputColor }"
       readonly
       autocomplete="off"
@@ -184,7 +189,6 @@
       v-model="seconds"
       @focus="(event) => moveCursorToEnd(event)"
       @keypress.enter="submit"
-
       class="seconds en-font"
       :style="{ color: inputColor }"
       :readonly="props.isClock || isTimer"
@@ -207,28 +211,29 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
 .clock {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 2px;
   padding: $padding-m-rem;
 
   label {
     display: flex;
     align-items: end;
-    font-size: 64px;
+    font-size: 88px;
     color: $grayopacity10;
-    padding-bottom: 28px;
+    padding-bottom: 34px;
   }
 
   input {
     padding: 10px 0px;
     display: flex;
-    width: 144px;
-    height: 144px;
+    width: 200px;
+    height: 200px;
     border: none;
     background-color: transparent;
-    font-size: 128px;
+    font-size: 180px;
     line-height: 100%;
     text-align: center;
 
@@ -240,42 +245,71 @@ input[type="number"] {
       outline: none;
     }
 
-    &.timer{
-      width: 70px;
+    &.timer {
+      width: 100px;
     }
   }
 
   span {
-    font-size: 128px;
+    font-size: 170px;
     line-height: 110%;
+  }
+}
+
+@media(max-width: 720px) {
+  .clock {
+    gap: 2px;
+    padding: $padding-xs-rem;
+
+    label {
+      font-size: 54px;
+      color: $grayopacity10;
+      padding-bottom: 28px;
+    }
+
+    input {
+      width: 144px;
+      height: 144px;
+      padding: 8px 0px;
+      font-size: 128px;
+
+      &.timer {
+        width: 72px
+      }
+    }
+
+    span {
+      font-size: 118px;
+      line-height: 110%;
+    }
   }
 }
 
 @media (max-width: 576px) {
   .clock {
-    gap: 6px;
+    gap: 2px;
     padding: $padding-xs-rem;
 
     label {
-    font-size: 36px;
-    color: $grayopacity10;
-    padding-bottom: 16px;
-  }
+      font-size: 36px;
+      color: $grayopacity10;
+      padding-bottom: 18px;
+    }
 
     input {
-      width: 72px;
-      height: 72px;
+      width: 92px;
+      height: 90px;
       padding: 8px 0px;
-      font-size: 64px;
+      font-size: 84px;
 
       &.timer {
-        width: 36px
+        width: 46px
       }
     }
 
     span {
-      font-size: 64px;
-      line-height: 120%;
+      font-size: 80px;
+      line-height: 112%;
     }
   }
 }
