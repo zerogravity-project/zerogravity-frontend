@@ -1,11 +1,4 @@
-<template>
-  <canvas
-    class="chart"
-    ref="mixedChart"
-  />
-</template>
-
-  <script setup>
+<script setup>
   import { onMounted, ref, watch } from 'vue'
   import { Chart } from 'chart.js/auto'
 
@@ -100,6 +93,7 @@
         plugins: {
           legend: {
             display: true,
+            position: 'bottom',
           },
         },
       }
@@ -119,11 +113,18 @@
     createChart,
     { deep: true },
   )
-  </script>
+</script>
 
-  <style scoped>
-  .chart {
-    width: 100%;
-    height: 400px;
-  }
-  </style>
+<template>
+  <canvas
+    class="chart"
+    ref="mixedChart"
+  />
+</template>
+
+<style scoped>
+.chart {
+  width: 100%;
+  height: 400px;
+}
+</style>
