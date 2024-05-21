@@ -1,25 +1,25 @@
 <script setup>
-  import MixedChart from '../../components/chart/Chart.vue'
-  import MixedChart2 from '../../components/chart/Chart2.vue'
+  import EmotionLevelChart from '../../components/chart/EmotionLevelChart.vue'
+  import EmotionCountChart from '../../components/chart/EmotionCountChart.vue'
   import HeadlineText from '../../components/text/HeadlineText.vue'
-  import TitleText from '../../components/text/TitleText.vue'
+  import ActionButton from '@/components/button/ActionButton.vue'
+  import DropDown from '@/components/dropdown/DropDown.vue'
   import { ref } from 'vue'
 
   const labels = ref([
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
-    '8월', '9월', '10월', '11월', '12월',
+    '월', '화', '수', '목', '금', '토', '일',
   ])
 
   const datasets = ref([
     {
       type: 'bar',
       label: 'Bar Dataset',
-      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2, 1.9, 3.5, 2, 2.4, 1.7, 3.9],
+      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2],
     },
     {
       type: 'line',
       label: 'Line Dataset',
-      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2, 1.9, 3.5, 2, 2.4, 1.7, 3.9],
+      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2],
     },
   ])
 
@@ -66,48 +66,37 @@
   })
 
   const barColor = ref('rgba(75, 192, 192, 0.5)')
-  const lineColor = ref('rgba(75, 192, 192, 0.5)')
+  const lineColor = ref('rgba(75, 192, 192, 1)')
   const averageLineColor = ref('rgba(75, 192, 192, 0.5)')
 
   const emotionLabels = ref([
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월',
-    '8월', '9월', '10월', '11월', '12월',
+    '월', '화', '수', '목', '금', '토', '일',
   ])
 
   const emotionDatasets = ref([
     {
       label: '오늘의 감정',
       data: [
-        { x: '1월', y: 2 },
-        { x: '2월', y: 1 },
-        { x: '3월', y: 1 },
-        { x: '4월', y: 3 },
-        { x: '5월', y: 2 },
-        { x: '6월', y: 1 },
-        { x: '7월', y: 2 },
-        { x: '8월', y: 1 },
-        { x: '9월', y: 3 },
-        { x: '10월', y: 2 },
-        { x: '11월', y: 1 },
-        { x: '12월', y: 3 },
+        { x: '월', y: 2 },
+        { x: '화', y: 1 },
+        { x: '수', y: 1 },
+        { x: '목', y: 3 },
+        { x: '금', y: 2 },
+        { x: '토', y: 1 },
+        { x: '일', y: 2 },
       ],
       backgroundColor: 'rgba(255, 99, 132, 0.7)',
     },
     {
       label: '순간의 감정',
       data: [
-        { x: '1월', y: 1 },
-        { x: '2월', y: 2 },
-        { x: '3월', y: 0 },
-        { x: '4월', y: 1 },
-        { x: '5월', y: 2 },
-        { x: '6월', y: 1 },
-        { x: '7월', y: 0 },
-        { x: '8월', y: 2 },
-        { x: '9월', y: 1 },
-        { x: '10월', y: 3 },
-        { x: '11월', y: 2 },
-        { x: '12월', y: 1 },
+        { x: '월', y: 1 },
+        { x: '화', y: 2 },
+        { x: '수', y: 0 },
+        { x: '목', y: 1 },
+        { x: '금', y: 2 },
+        { x: '토', y: 1 },
+        { x: '일', y: 0 },
       ],
       backgroundColor: 'rgba(211, 211, 211, 0.5)',
     },
@@ -143,6 +132,12 @@
       },
     },
   })
+
+  const isDropdownVisible = ref(false)
+
+  const toggleDropdown = () => {
+    isDropdownVisible.value = !isDropdownVisible.value
+  }
 </script>
 
 <template>
@@ -154,14 +149,25 @@
           :text="'감정 기록 통계'"
           :padding="[48, 0, 0, 0]"
         />
-        <!-- <TitleText
-          :size="'s'"
-          :title-text="'이번주 감정 기록'"
-          :sub-title-text="'2024.05.20-2024.05.27'"
-        /> -->
+      </div>
+      <div class="button-area">
+        <div class="date">
+          2024.05.20-2024.05.26
+        </div>
+        <ActionButton
+          :variant="'sub'"
+          :state="'secondary'"
+          :icon="'sort'"
+          :text="'주별 통계'"
+          @click="toggleDropdown"
+        />
+        <DropDown
+          v-if="isDropdownVisible"
+          class="dropdown"
+        />
       </div>
       <div class="chart-area">
-        <MixedChart
+        <EmotionLevelChart
           :labels="labels"
           :datasets="datasets"
           :chart-options="chartOptions"
@@ -169,11 +175,11 @@
           :line-color="lineColor"
           :average-line-color="averageLineColor"
           y-axis-title="감정의 정도"
-          x-axis-title="월"
+          x-axis-title="요일"
         />
       </div>
       <div class="chart-area">
-        <MixedChart2
+        <EmotionCountChart
           :labels="emotionLabels"
           :datasets="emotionDatasets"
           :chart-options="emotionChartOptions"
@@ -181,7 +187,7 @@
           :line-color="lineColor"
           :average-line-color="averageLineColor"
           y-axis-title="기록 횟수"
-          x-axis-title="월"
+          x-axis-title="요일"
         />
       </div>
     </main>
@@ -200,16 +206,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 2rem;
   width: calc(100% - 18.75rem);
   margin-left: 18.75rem;
+  position: relative;
 }
 
 @media (max-width: 567px) {
   .main-area {
     width: 100%;
-    margin: 30px;
+    margin-left: 0;
+    padding: 1rem;
   }
 }
 
@@ -222,6 +230,30 @@
   padding-left: 0.25rem;
 }
 
+.button-area {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: 50rem;
+  align-items: center;
+  padding-top: 15px;
+  padding-left: 8px;
+  justify-content: space-between;
+  position: relative;
+  z-index: 20;
+}
+
+.date {
+  display: flex;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+}
+
 .chart-area {
   width: 100%;
   max-width: 50rem;
@@ -231,7 +263,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px 20px 10px 20px;
-  border: solid 1px rgb(212, 212, 212);
+  border: 1px solid rgb(212, 212, 212);
   border-radius: 8px;
   margin: 1rem 1rem 0.2rem 1rem;
 }
