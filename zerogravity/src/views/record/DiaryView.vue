@@ -61,6 +61,7 @@
     <div class="button-container">
       <ActionButton
         @click="onClick"
+        class="button"
         :variant="'round'"
         :background-color="'#4E5968'"
         :icon="'arrow_forward'"
@@ -70,6 +71,16 @@
 </template>
 
 <style lang="scss" scoped>
+.button{
+  background-color: $orange900;
+  border: none;
+  transition: all 400ms cubic-bezier(.47, 1.64, .41, .8);
+
+  &:hover{
+    transform: rotate(360deg) scale(110%);
+  }
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -96,6 +107,8 @@ main {
   justify-content: center;
   align-items: center;
   padding-bottom: 60px;
+  background-color: #f1f1f1;
+  width: 100%;
 }
 
 @media (max-width: 576px) {

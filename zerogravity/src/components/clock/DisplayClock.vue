@@ -1,6 +1,8 @@
 <script setup>
   import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { useRouter } from 'vue-router'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
 
   const router = useRouter()
 
@@ -38,6 +40,7 @@
         }
 
         inputElement.style.caretColor = 'transparent'
+        inputColor.value = '#4E596860'
 
         setTimeout(() => {
           inputElement.setSelectionRange(maxRange, maxRange)
@@ -99,35 +102,50 @@
     frameId = requestAnimationFrame(updateTime)
   }
 
+  const emits = defineEmits(['checkTimer', 'checkAvailability', 'completeMeditation'])
+  const transform = ref('')
+  const userStore = useUserStore()
+  const { recordStatus } = storeToRefs(userStore)
+
   const submit = () => {
     isTimer.value = true
+    inputColor.value = '#4E596807'
+    transform.value = { transform: 'scale(3)' }
+    emits('checkTimer')
 
-    const timer = (timestamp) => {
-      if (timestamp - lastUpdateTime >= updateInterval) {
-        if (seconds.value == 0) {
-          if (minutes.value == 0) {
-            cancelAnimationFrame(frameId)
-            setTimeout(() => {
+    setTimeout(() => {
+      emits('checkAvailability')
+    }, 1000)
+
+    setTimeout(() => {
+      const timer = (timestamp) => {
+        if (timestamp - lastUpdateTime >= updateInterval) {
+          if (seconds.value == 0) {
+            if (minutes.value == 0) {
+              cancelAnimationFrame(frameId)
+              recordStatus.value.status = 'meditationComplete'
+              recordStatus.value.emotionRecordState = 'moment'
+              userStore.saveRecordStatusToSession()
               router.push('/record/emotion')
-            }, 0)
-            return
+              return
+            } else {
+              seconds.value = 59
+              minutes.value--
+            }
           } else {
-            seconds.value = 59
-            minutes.value--
+            seconds.value--
+            if (seconds.value < 10) {
+              seconds.value = `0${seconds.value}`
+            }
           }
-        } else {
-          seconds.value--
-          if (seconds.value < 10) {
-            seconds.value = `0${seconds.value}`
-          }
+          lastUpdateTime = timestamp
         }
-        lastUpdateTime = timestamp
+
+        frameId = requestAnimationFrame(timer)
       }
 
       frameId = requestAnimationFrame(timer)
-    }
-
-    frameId = requestAnimationFrame(timer)
+    }, 2000)
   }
 
   onMounted(() => {
@@ -146,7 +164,7 @@
 <template>
   <div
     :class="['clock', props.size]"
-    :style="{ color: props.color }"
+    :style="[{ color: props.color }, transform]"
   >
     <input
       v-if="props.isClock"
@@ -177,9 +195,13 @@
     >
     <label
       v-if="!props.isClock"
+      :style="{ color: isTimer ? inputColor : '' }"
       for="minutes"
     >m</label>
-    <span class="colon">:</span>
+    <span
+      :style="{ color: isTimer ? inputColor : '' }"
+      class="colon"
+    >:</span>
     <input
       ref="input"
       type="text"
@@ -196,6 +218,7 @@
     >
     <label
       v-if="!props.isClock"
+      :style="{ color: isTimer ? inputColor : '' }"
       for="minutes"
     >s</label>
   </div>
@@ -217,6 +240,7 @@ input[type="number"] {
   justify-content: center;
   gap: 2px;
   padding: $padding-m-rem;
+  transition: 1s;
 
   label {
     display: flex;

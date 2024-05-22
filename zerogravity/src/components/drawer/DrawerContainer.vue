@@ -23,13 +23,13 @@
     },
     isRight: Boolean,
     toggleVisibilty: Boolean,
-    isDrawerVisible: Boolean, // 상위 컴포넌트에서 Drawer를 Toggle 시키기 위한 프롭스
+    isDrawerHidden: Boolean, // 상위 컴포넌트에서 Drawer를 Toggle 시키기 위한 프롭스
   })
 
   const transformStyle = ref(null)
   const emit = defineEmits(['toggleDrawer', 'resize']) // 추후 레이아웃 변경 시
 
-  watch(() => props.isDrawerVisible, (newValue) => {
+  watch(() => props.isDrawerHidden, (newValue) => {
     if (newValue) {
       transformStyle.value = {
         transform: props.isRight ? 'translateX(100%)' : 'translate(-100%)',
@@ -84,8 +84,8 @@
 .drawer-container {
   top: 0;
   height: 100vh;
-  // box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
-  z-index: 3;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+  z-index: 5;
   transition: 0.75s;
 
   &.left {

@@ -114,7 +114,7 @@ button {
     }
 
     &:not(.secondary):hover::before {
-      background-color: $blackopacity50;
+      background-color: $grayopacity30;
     }
   }
 
@@ -199,7 +199,7 @@ button {
 
       &:hover {
         border-color: $lightgray300;
-        background-color: $lightgray200;
+        background-color: $grayopacity10;
         color: $black900;
       }
     }
