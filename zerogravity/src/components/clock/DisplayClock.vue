@@ -1,5 +1,8 @@
 <script setup>
   import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { useRouter } from 'vue-router'
+
+  const router = useRouter()
 
   const props = defineProps({
     size: {
@@ -104,6 +107,9 @@
         if (seconds.value == 0) {
           if (minutes.value == 0) {
             cancelAnimationFrame(frameId)
+            setTimeout(() => {
+              router.push('/record/emotion')
+            }, 0)
             return
           } else {
             seconds.value = 59
