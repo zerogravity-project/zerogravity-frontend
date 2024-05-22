@@ -17,7 +17,7 @@
   const isHidingAvailable = ref(false)
 
   const updateHidingAvailablity = () => {
-    if (window.innerWidth <= 576) {
+    if (window.innerWidth <= 834) {
       isHidingAvailable.value = true
     } else {
       isHidingAvailable.value = false

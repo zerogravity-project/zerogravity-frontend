@@ -27,6 +27,10 @@
 
   const router = useRouter()
 
+  const goHome = () => {
+    router.push('/')
+  }
+
   const goBack = () => {
     router.go(-1)
   }
@@ -36,8 +40,9 @@
 <template>
   <nav :class="['top-navigation', props.variant]">
     <div
-      class="nav-logo"
       v-if="props.variant === 'menu'"
+      @click="goHome"
+      class="nav-logo"
     >
       <LogoSvg />
     </div>

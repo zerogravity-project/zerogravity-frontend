@@ -9,12 +9,27 @@ export const useEmotionStore = defineStore('emotion', () => {
     {
       emotionRecordId: '',
       userId: 0,
-      emotionReason: '',
+      emotionReason: [],
       emotionRecordType: '',
       emotionRecordLevel: 0,
       emotionRecordState: '',
       diaryEntry: '',
     })
+
+  const resetEmotionRecordToSession = () => {
+    emotionRecord.value =
+      {
+        emotionRecordId: '',
+        userId: 0,
+        emotionReason: [],
+        emotionRecordType: '',
+        emotionRecordLevel: 0,
+        emotionRecordState: '',
+        diaryEntry: '',
+      }
+
+      sessionStorage.removeItem('emotionRecord')
+  }
 
   const saveEmotionRecordToSession = () => {
     sessionStorage.setItem('emotionRecord', JSON.stringify(emotionRecord.value))
@@ -71,7 +86,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   }
 
   return {
-    emotions, emotionRecords, emotionRecord, getAllEmotions, getEmotionRecords, createEmotionRecord, updateEmotionRecord,
+    emotions, emotionRecords, emotionRecord, resetEmotionRecordToSession, getAllEmotions, getEmotionRecords, createEmotionRecord, updateEmotionRecord,
     saveEmotionRecordToSession, getEmotionRecordToSession,
   }
 })

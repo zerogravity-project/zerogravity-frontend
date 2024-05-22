@@ -12,6 +12,7 @@ import ChartView from '@/views/profile/ChartView.vue'
 import SettingView from '@/views/profile/SettingView.vue'
 import CustomizeView from '@/views/profile/setting/CustomizeView.vue'
 import { useUserStore } from '@/stores/user'
+import { useEmotionStore } from '@/stores/emotion'
 import { storeToRefs } from 'pinia'
 
 const perRouteGuardForLoggin = (to, from) => {
@@ -19,30 +20,65 @@ const perRouteGuardForLoggin = (to, from) => {
   return true
 }
 
+const resetStatusAndEmotion = () => {
+  const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
+
+  userStore.resetRecordStatusToSession()
+  emotionStore.resetEmotionRecordToSession()
+}
+
 const checkBeforeRecordEmotion = async (to, from, next) => {
   const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
   const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
 
   userStore.getRecordStatusToSession()
 
   // 만약 유저가 명상을 완료했거나 감정 기록을 했다면
-  if (recordStatus.value.status === 'meditationComplete' || recordStatus.value.status === 'newEmotionRecord') {
+  if (recordStatus.value.status === 'newEmotionRecord' || recordStatus.value.status === 'emotionChecked'
+  || recordStatus.value.status === 'reasonChecked') {
+    // if(recordStatus.value.status === 'reasonChecked'){
+    //   if (confirm('저장하신 내용이 사라집니다!')) {
+    //     recordStatus.value.status = 'emotionChecked'
+    //     userStore.saveRecordStatusToSession()
+
+    //     emotionRecord.value.emotionReason = []
+    //     emotionStore.saveEmotionRecordToSession()
+    //   } else {
+    //     next(from.fullPath)
+    //   }
+    // }
     next()
   } else {
     next(from.fullPath)
   }
 }
 
-const checkBeforeRecordReason = async () => {
+const checkBeforeRecordReason = async (to, from, next) => {
   const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
   const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
 
   userStore.getRecordStatusToSession()
   // 만약 유저가 감정을 체크를 했다면 진입 가능
-  if (recordStatus.value.status === 'emotionChecked') {
-    return true
+  if (recordStatus.value.status === 'emotionChecked' || recordStatus.value.status === 'reasonChecked') {
+    // if(recordStatus.value.status === 'diaryChecked'){
+    //   if (confirm('저장하신 내용이 사라집니다!')) {
+    //     recordStatus.value.status = 'reasonChecked'
+    //     userStore.saveRecordStatusToSession()
+
+    //     emotionRecord.value.emotionReason = []
+    //     emotionStore.saveEmotionRecordToSession()
+    //   } else {
+    //     next(from.fullPath)
+    //   }
+    // }
+    next()
   } else {
-    return false
+    next(from.fullPath)
   }
 }
 
@@ -52,8 +88,8 @@ const checkBeforeRecordDiary = async () => {
 
   userStore.getRecordStatusToSession()
   // 만약에 유저가 원인 체크했고, main 감정 기록이라면
-  if ((recordStatus.value.status === 'reasonChecked' && recordStatus.value.type === 'main') ||
-  recordStatus.value.type === 'diary'
+  if ((recordStatus.value.status === 'reasonChecked' && recordStatus.value.emotionRecordState === 'main') ||
+    recordStatus.value.type === 'diary'
   ) {
     return true
   } else {
@@ -68,13 +104,13 @@ const router = createRouter({
       path: '/',
       name: 'Home',
       component: HomeView,
-      beforeEnter: [perRouteGuardForLoggin],
+      beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
     },
     {
       path: '/login',
       name: 'Login',
       component: LoginView,
-      beforeEnter: [perRouteGuardForLoggin],
+      beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
     },
     {
       path: '/spaceout',
@@ -83,7 +119,7 @@ const router = createRouter({
           path: 'start',
           name: 'SpaceoutStart',
           component: StartView,
-          beforeEnter: [perRouteGuardForLoggin],
+          beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
         },
         {
           path: 'main',
@@ -95,7 +131,7 @@ const router = createRouter({
           path: 'result',
           name: 'SpaceoutResult',
           component: ResultView,
-          beforeEnter: [perRouteGuardForLoggin],
+          beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
         },
       ],
     },
@@ -129,25 +165,25 @@ const router = createRouter({
           path: 'calendar',
           name: 'Calendar',
           component: CalendarView,
-          beforeEnter: [perRouteGuardForLoggin],
+          beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
         },
         {
           path: 'chart',
           name: 'Chart',
           component: ChartView,
-          beforeEnter: [perRouteGuardForLoggin],
+          beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
         },
         {
           path: 'setting',
           name: 'Setting',
           component: SettingView,
-          beforeEnter: [perRouteGuardForLoggin],
+          beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
           children: [
             {
               path: 'customize',
               name: 'Customize',
               component: CustomizeView,
-              beforeEnter: [perRouteGuardForLoggin],
+              beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
             },
           ],
         },

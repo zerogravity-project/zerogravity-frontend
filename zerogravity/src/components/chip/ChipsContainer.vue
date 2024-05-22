@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import ActionDisplayChip from '@/components/chip/ActionDisplayChip.vue'
   const props = defineProps({
     labelList: {
@@ -23,6 +23,8 @@
 
   const selectedList = ref([])
 
+  const emits = defineEmits(['getCheckedList'])
+
   const updateSelectedList = (payload) => {
     const { id, name, checked } = payload
     if (checked) {
@@ -33,7 +35,9 @@
 
     // id도 정렬하기
     selectedList.value.sort((a, b) => a.id.localeCompare(b.id))
-    console.log(selectedList.value)
+    // console.log(selectedList.value)
+
+    emits('getCheckedList', selectedList.value)
   }
 
   const isLarge = computed(() => {

@@ -1,6 +1,7 @@
 <script setup>
   import { ref, computed, watch, onMounted } from 'vue'
   import { useEmotionStore } from '@/stores/emotion.js'
+  import { storeToRefs } from 'pinia'
   import CalendarCell from './CalendarCell.vue'
 
   const props = defineProps({
@@ -25,8 +26,8 @@
   /*
   ** 감정 가져오기
   */
-  const { emotions } = useEmotionStore()
-  const userId = ref('example-user-id')
+  const emotionStore = useEmotionStore()
+  const { emotionRecords } = storeToRefs(emotionStore)
 
   /*
   ** 날짜 계산

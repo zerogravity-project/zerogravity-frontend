@@ -65,11 +65,11 @@
       <DropDownButton
         :text="firstItem.name"
         :text-color="textColor"
-        background-color="transparent"
         :border-radius="borderRadius"
         :padding="['12px', '16px']"
         :hover-text-color="hoverTextColor"
         :hover-background-color="hoverBackgroundColor"
+        :emotion-record-state="firstItem.emotionRecordState"
         @click="handleClick(firstItem.link)"
       />
     </div>
@@ -78,11 +78,11 @@
       :key="index"
       :text="menu.name"
       :text-color="textColor"
-      background-color="transparent"
       :border-radius="borderRadius"
       :padding="['12px', '16px']"
       :hover-text-color="hoverTextColor"
       :hover-background-color="hoverBackgroundColor"
+      :emotion-record-state="menu.emotionRecordState"
       @click="handleClick(menu.link)"
     />
     <div
@@ -92,11 +92,11 @@
       <DropDownButton
         :text="lastItem.name"
         :text-color="textColor"
-        background-color="transparent"
         :border-radius="borderRadius"
         :padding="['12px', '16px']"
         :hover-text-color="hoverTextColor"
         :hover-background-color="hoverBackgroundColor"
+        :emotion-record-state="lastItem.emotionRecordState"
         @click="handleClick(lastItem.link)"
       />
     </div>

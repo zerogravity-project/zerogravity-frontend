@@ -1,6 +1,8 @@
 <!-- components/dropdown/DropDownButton.vue -->
 <script setup>
   import { computed } from 'vue'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
 
   const props = defineProps({
     textColor: {
@@ -34,12 +36,22 @@
       type: String,
       default: '',
     },
+    emotionRecordState: {
+      type: String,
+      default: '',
+    },
   })
 
   const emit = defineEmits(['click'])
 
+  const userStore = useUserStore()
+  const { recordStatus } = storeToRefs(userStore)
+
   const onClick = () => {
     emit('click')
+    recordStatus.value.status = 'newEmotionRecord'
+    recordStatus.value.emotionRecordState = props.emotionRecordState
+    userStore.saveRecordStatusToSession()
   }
 
   const computedPadding = computed(() => {

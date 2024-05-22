@@ -11,13 +11,13 @@
   import { storeToRefs } from 'pinia'
 
   const emotionList = ref([
-    { name: '아주 불쾌함', checked: false, width: '45px' },
-    { name: '불쾌함', checked: false, width: '35px' },
-    { name: '약간 불쾌함', checked: false, width: '30px' },
-    { name: '보통', checked: false, width: '25px' },
-    { name: '약간 기분 좋음', checked: false, width: '30px' },
-    { name: '기분 좋음', checked: false, width: '35px' },
-    { name: '아주 기분 좋음', checked: false, width: '45px' },
+    { name: '아주 불쾌함', checked: false, width: '45px', color: '#ff3b30' },
+    { name: '불쾌함', checked: false, width: '35px', color: '#ff9500' },
+    { name: '약간 불쾌함', checked: false, width: '30px', color: '#ffcc00' },
+    { name: '보통', checked: false, width: '25px', color: '#34C759' },
+    { name: '약간 기분 좋음', checked: false, width: '30px', color: '#00C7BE' },
+    { name: '기분 좋음', checked: false, width: '35px', color: '#007AFF' },
+    { name: '아주 기분 좋음', checked: false, width: '45px', color: '#5856D6' },
   ])
 
   const selectedEmotion = ref('')
@@ -52,15 +52,18 @@
   // 버튼 클릭 시
   const onClick = () => {
     if (selectedEmotion.value) {
-      console.log(selectedEmotion.value)
       // 감정 선택 저장
       recordStatus.value.status = 'emotionChecked'
       userStore.saveRecordStatusToSession()
 
-      emotionRecord.value.emotionRecordType = selectedEmotion.value
+      const selected = selectedEmotion.value.split('-')
+
+      emotionRecord.value.emotionRecordLevel = parseInt(selected[0], 10) + 1
+      emotionRecord.value.emotionRecordType = selected[2]
       emotionStore.saveEmotionRecordToSession()
+
+      router.push('/record/reason')
     }
-    router.push('/record/reason')
   }
 
   onMounted(() => {

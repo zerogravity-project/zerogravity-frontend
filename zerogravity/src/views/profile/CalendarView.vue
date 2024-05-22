@@ -1,6 +1,7 @@
 <script setup>
   import { onMounted, ref, onUnmounted, nextTick, provide, watch, computed, watchEffect } from 'vue'
   import { useEmotionStore } from '@/stores/emotion.js'
+  import { storeToRefs } from 'pinia'
   import EmotionCalendar from '@/components/calendar/EmotionCalendar.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import DrawerContainer from '@/components/drawer/DrawerContainer.vue'
@@ -60,7 +61,8 @@
   /*
   ** 날짜 계산 및 API
   */
-  const { fetchEmotions } = useEmotionStore()
+  const emotionStore = useEmotionStore()
+  const { getEmotionRecords } = storeToRefs(emotionStore)
   const currentYear = ref(0)
   const currentMonth = ref(0)
   const currentWeek = ref(0)
@@ -116,15 +118,18 @@
   //   currentWeek.value = weekNumber
   // }
 
-  watchEffect(async () => {
-    fetchEmotions(userId.value, currentYear, currentMonth)
-  })
+  const userId = ref(123)
+
+  // watchEffect(async () => {
+  //   emotionStore.getEmotionRecords(userId.value, currentYear, currentMonth)
+  // })
 
   /*
   ** 드롭다운
   */
   const isDropdown = ref(false)
-  const dropdownMenu = [{ name: '오늘의 감정 추가', link: '/record/emotion' }, { name: '순간의 감정 추가', link: '/record/emotion' }]
+  const dropdownMenu = [{ name: '오늘의 감정 추가', link: '/record/emotion', emotionRecordState: 'main' },
+                        { name: '순간의 감정 추가', link: '/record/emotion', emotionRecordState: 'moment' }]
 
   const onClick = () => {
     isDropdown.value = !isDropdown.value

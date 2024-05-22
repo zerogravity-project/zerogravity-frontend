@@ -4,6 +4,13 @@ import { defineStore } from 'pinia'
 export const useUserStore = defineStore('counter', () => {
   const recordStatus = ref({status: '', emotionRecordState: ''})
 
+  const resetRecordStatusToSession = () => {
+      recordStatus.value.status = ''
+      recordStatus.value.emotionRecordState = ''
+
+      sessionStorage.removeItem('recordStatus')
+  }
+
   const saveRecordStatusToSession = () => {
     sessionStorage.setItem('recordStatus', JSON.stringify(recordStatus.value))
   }
@@ -15,5 +22,5 @@ export const useUserStore = defineStore('counter', () => {
     }
   }
 
-  return { recordStatus, saveRecordStatusToSession, getRecordStatusToSession }
+  return { recordStatus, saveRecordStatusToSession, getRecordStatusToSession, resetRecordStatusToSession }
 })

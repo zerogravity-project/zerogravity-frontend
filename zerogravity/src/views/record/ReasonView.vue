@@ -5,6 +5,9 @@
   import ChipsContainer from '@/components/chip/ChipsContainer.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import router from '@/router'
+  import { useUserStore } from '@/stores/user'
+  import { useEmotionStore } from '@/stores/emotion'
+  import { storeToRefs } from 'pinia'
 
   const reasonLists = ref([
     ['건강', '피트니스', '자기 돌봄', '취미', '정체성', '종교'],
@@ -25,9 +28,39 @@
     }
   }
 
+  const checkedList = ref([])
+
+  const getCheckedList = (payload) => {
+    payload.forEach(item => {
+      const name = item.name
+      if (!checkedList.value.includes(name)) { // Name이 checkedList에 존재하지 않으면 추가
+        checkedList.value.push(name)
+      }
+    })
+
+    console.log(checkedList.value)
+  }
+
+  const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
+  const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
+
   // 버튼 클릭 시
   const onClick = () => {
-    router.push('/record/diary')
+    if (checkedList.value) {
+      recordStatus.value.status = 'reasonChecked'
+      userStore.saveRecordStatusToSession()
+
+      emotionRecord.value.emotionReason = checkedList.value
+      emotionStore.saveEmotionRecordToSession()
+
+      if(recordStatus.value.emotionRecordState === 'moment'){
+        router.push('/profile/calendar')
+      } else {
+        router.push('/record/diary')
+      }
+    }
   }
 
   onMounted(() => {
@@ -66,6 +99,7 @@
           :size="'m'"
           :align="'flex-start'"
           :label-list="list"
+          @get-checked-list="getCheckedList"
         />
       </div>
     </div>
@@ -74,7 +108,7 @@
         @click="onClick"
         class="button"
         :variant="'round'"
-        :background-color="'#4E5968'"
+        :state="'primary'"
         :icon="'arrow_forward'"
       />
     </div>
@@ -90,8 +124,6 @@ main {
 }
 
 .button{
-  background-color: $orange900;
-  border: none;
   transition: all 400ms cubic-bezier(.47, 1.64, .41, .8);
 
   &:hover{

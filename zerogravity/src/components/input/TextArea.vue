@@ -89,6 +89,8 @@
       color: $black900;
       background-color: transparent;
       font-size: $title-font-size-m-rem;
+      font-family: pretendard;
+      line-height: 170%;
       font-weight: 400;
       box-sizing: border-box;
       padding: $padding-xs-rem;
