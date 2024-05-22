@@ -1,9 +1,8 @@
 <script setup>
-
 </script>
 
 <template>
-  <h1>SpaceoutView</h1>
+  <div />
 </template>
 
 <style lang="scss" scoped>

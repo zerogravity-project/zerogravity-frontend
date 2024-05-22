@@ -55,6 +55,7 @@
         <TitleText
           :title-text="'감정의 원인을 선택하세요'"
           :sub-title-text="'오늘 하루의 감정의 원인은 무엇인가요?'"
+          :default-padding="false"
         />
       </div>
       <div class="chips-area">
@@ -71,6 +72,7 @@
     <div class="button-container">
       <ActionButton
         @click="onClick"
+        class="button"
         :variant="'round'"
         :background-color="'#4E5968'"
         :icon="'arrow_forward'"
@@ -85,6 +87,16 @@ main {
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+}
+
+.button{
+  background-color: $orange900;
+  border: none;
+  transition: all 400ms cubic-bezier(.47, 1.64, .41, .8);
+
+  &:hover{
+    transform: rotate(360deg) scale(110%);
+  }
 }
 
 .title-area {
@@ -108,6 +120,8 @@ main {
   justify-content: center;
   align-items: center;
   padding-bottom: 60px;
+  background-color: #f1f1f1;
+  width: 100%;
 }
 
 @media (max-width: 576px) {

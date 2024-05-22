@@ -4,6 +4,7 @@
   import { Renderer, Camera, Scene, PointLight, GltfModel } from 'troisjs'
   // import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
+  const emits = defineEmits(['updateIsLoaded'])
   /**
    * Basic Three.js refs
    */
@@ -22,12 +23,12 @@
   const cubeTextureLoader = new THREE.CubeTextureLoader()
 
   const cubeEnvironmentMap = cubeTextureLoader.load([
-    './src/assets/environment-maps/cube/cube-01/px.jpg',
-    './src/assets/environment-maps/cube/cube-01/nx.jpg',
-    './src/assets/environment-maps/cube/cube-01/py.jpg',
-    './src/assets/environment-maps/cube/cube-01/ny.jpg',
-    './src/assets/environment-maps/cube/cube-01/pz.jpg',
-    './src/assets/environment-maps/cube/cube-01/nz.jpg',
+    '../src/assets/environment-maps/cube/cube-01/px.jpg',
+    '../src/assets/environment-maps/cube/cube-01/nx.jpg',
+    '../src/assets/environment-maps/cube/cube-01/py.jpg',
+    '../src/assets/environment-maps/cube/cube-01/ny.jpg',
+    '../src/assets/environment-maps/cube/cube-01/pz.jpg',
+    '../src/assets/environment-maps/cube/cube-01/nz.jpg',
   ])
 
   // const hdrEnvironmentMap = ref(null)
@@ -52,13 +53,25 @@
    * Animation
    */
   const elapsedTime = ref(0)
+  const elapsedTime2 = ref(0)
+
+  // const maxRotationX = Math.PI / 3  // 최대 30도 회전
+  // const maxRotationZ = Math.PI / 6  // 최대 30도 회전
 
   const animate = () => {
     if (model.value && model.value.position) {
       elapsedTime.value += 0.02
+      elapsedTime2.value += 0.0001
       model.value.position.y = initialPosition.value.y + 0.0001 * Math.sin(elapsedTime.value)
       model.value.rotation.y += 0.001
       model.value.rotation.z += 0.0001
+      model.value.rotation.x += 0.0001
+
+      // x와 z 축에 대해 진자 운동 효과 적용
+      // model.value.rotation.x = maxRotationX * Math.sin(elapsedTime2.value * 0.5)  // 속도 조절을 위해 elapsedTime에 계수 적용
+      // model.value.rotation.z = maxRotationZ * Math.sin(elapsedTime2.value * 0.5)  // 속도 조절을 위해 elapsedTime에 계수 적용
+
+      // console.log(model.value.rotation)
     }
 
     requestAnimationFrame(animate)
@@ -68,7 +81,7 @@
    * Model & Events
    */
 
-  const initialRotation = ref({ x: 0, y: Math.PI / 20 , z: Math.PI / 30 })
+  const initialRotation = ref({ x: 0 , y: Math.PI / 20 , z: Math.PI / 30 })
   const initialPosition = ref(new THREE.Vector3(0, -0.15, 0))
   // 모델 로드 된 후
   const onLoad = (e) => {
@@ -91,7 +104,11 @@
       }
     })
 
-    computedRenderer.value.antialias = true
+    // computedRenderer.value.antialias = true
+
+    setTimeout(()=>{
+      emits('updateIsLoaded')
+    }, 1500)
   }
 
   // 모델 로드 진행 중
@@ -112,12 +129,14 @@
 </script>
 
 <template>
-  <section>
+  <div class="display-scene">
     <Renderer
       ref="renderer"
       :alpha="true"
       :orbit-ctrl="true"
       :resize="true"
+      :antialias="true"
+      :auto-clear="true"
     >
       <Camera
         ref="camera"
@@ -130,21 +149,21 @@
           ref="model"
           :position="initialPosition"
           :rotation="initialRotation"
-          src="./src/assets/models/potted-plant-04/potted_plant_04_4k.gltf"
+          src="../src/assets/models/potted-plant-04/potted_plant_04_4k.gltf"
           @load="onLoad"
           @progress="onProgress"
           @error="onError"
         />
       </Scene>
     </Renderer>
-  </section>
+  </div>
 </template>
 
 <style lang="scss" scoped>
-section {
+.display-scene {
   position: fixed;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 </style>

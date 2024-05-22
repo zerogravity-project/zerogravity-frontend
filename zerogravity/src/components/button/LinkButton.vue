@@ -25,7 +25,7 @@
   })
 
   const onClick = () => {
-    router.push(`/${props.linkPath}`)
+    router.push(`${props.linkPath}`)
   }
 </script>
 

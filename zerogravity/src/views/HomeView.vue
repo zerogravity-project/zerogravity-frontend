@@ -1,29 +1,46 @@
 <script setup>
-  import TopNavigation from '@/components/navigation/TopNavigation.vue'
+  import { ref } from 'vue'
   import DisplayClock from '@/components/clock/DisplayClock.vue'
   import MainDisplayScene from '@/components/scene/MainDisplayScene.vue'
   import FooterBar from '@/components/others/FooterBar.vue'
+  import ActionButton from '@/components/button/ActionButton.vue'
+  import router from '@/router'
+
+  const isLoaded = ref(false)
+
+  const updateIsLoaded = () => {
+    isLoaded.value = !isLoaded.value
+  }
+
+  const startSpaceout = () => {
+    router.push('/spaceout/start')
+  }
 </script>
 
 <template>
-  <main>
-    <TopNavigation class="top-navigation" />
+  <section>
     <DisplayClock class="display-clock" />
-    <MainDisplayScene class="main-display-scene" />
+    <MainDisplayScene
+      @update-is-loaded="updateIsLoaded"
+      class="main-display-scene"
+    />
+    <ActionButton
+      @click="startSpaceout"
+      class="start-button"
+      :style="{opacity: isLoaded? '': '0%'}"
+      :text="'시작하기'"
+      :variant="'round'"
+      :state="'primary'"
+      :icon="'arrow_forward'"
+    />
     <FooterBar class="footer-bar" />
-  </main>
+  </section>
 </template>
 
 <style lang="scss" scoped>
-main {
-  width: 100vw;
-  height: 100vh;
-  background-color: #e1e1e0a1;
-
-  .top-navigation {
-    position: relative;
-    z-index: 5;
-  }
+section {
+  width: 100%;
+  height: 100%;
 
   .display-clock {
     margin-top: 7vh;
@@ -32,10 +49,26 @@ main {
   .main-display-scene {
     z-index: 0;
   }
+
+  .start-button {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 150px;
+    font-size: 20px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.5s;
+    bottom: 130px;
+
+    &:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+  }
 }
 
 @media(max-width: 720px) {
-  main {
+  section {
     .display-clock {
       margin-top: 7vh;
     }
@@ -43,7 +76,7 @@ main {
 }
 
 @media (max-width: 576px) {
-  main {
+  section {
     .display-clock {
       margin-top: 7vh;
     }

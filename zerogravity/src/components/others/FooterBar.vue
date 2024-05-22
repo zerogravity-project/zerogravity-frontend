@@ -42,6 +42,7 @@
   bottom: 0;
   width: 100%;
   padding: 20px $padding-xxl-rem;
+  z-index: 5;
 }
 .footer-menu{
   display: flex;

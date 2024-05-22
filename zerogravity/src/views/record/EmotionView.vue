@@ -6,6 +6,9 @@
   import RadioButtonGroup from '@/components/input/RadioButtonGroup.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import router from '@/router'
+  import { useUserStore } from '@/stores/user'
+  import { useEmotionStore } from '@/stores/emotion'
+  import { storeToRefs } from 'pinia'
 
   const emotionList = ref([
     { name: '아주 불쾌함', checked: false, width: '45px' },
@@ -41,8 +44,22 @@
     }
   }
 
+  const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
+  const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
+
   // 버튼 클릭 시
   const onClick = () => {
+    if (selectedEmotion.value) {
+      console.log(selectedEmotion.value)
+      // 감정 선택 저장
+      recordStatus.value.status = 'emotionChecked'
+      userStore.saveRecordStatusToSession()
+
+      emotionRecord.value.emotionRecordType = selectedEmotion.value
+      emotionStore.saveEmotionRecordToSession()
+    }
     router.push('/record/reason')
   }
 
@@ -60,7 +77,7 @@
 <template>
   <main
     class="emotion-record"
-    :style="{height: viewportHeight}"
+    :style="{ height: viewportHeight }"
   >
     <div class="title-area">
       <TopNavigation
@@ -70,7 +87,7 @@
       <TitleText
         :title-text="'감정을 선택하세요'"
         :sub-title-text="'오늘의 순간의 감정을 선택하세요'"
-        :padding-top="true"
+        :default-padding="true"
       />
     </div>
     <div
@@ -99,8 +116,9 @@
     <div class="button-container">
       <ActionButton
         @click="onClick"
+        class="button"
         :variant="'round'"
-        :background-color="'#4E5968'"
+        :state="'primary'"
         :icon="'arrow_forward'"
       />
     </div>
@@ -108,6 +126,16 @@
 </template>
 
 <style lang="scss" scoped>
+.button {
+  background-color: $orange900;
+  border: none;
+  transition: all 400ms cubic-bezier(.47, 1.64, .41, .8);
+
+  &:hover {
+    transform: rotate(360deg) scale(110%);
+  }
+}
+
 .emotion-record {
   display: flex;
   flex-direction: column;
@@ -149,6 +177,7 @@
   justify-content: center;
   align-items: center;
   padding-bottom: 60px;
+  background-color: #f1f1f1;
 }
 
 @media (max-width: 435px) {

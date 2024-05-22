@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router'
   import LogoSvg from '../others/LogoSvg.vue'
   import LinkButton from '../button/LinkButton.vue'
+  import ActionButton from '../button/ActionButton.vue'
 
   const props = defineProps({
     variant: {
@@ -22,7 +23,7 @@
     emit('toggleDrawer')
   }
 
-  const isLoggedIn = ref(false)
+  const isLoggedIn = ref(true)
 
   const router = useRouter()
 
@@ -84,18 +85,14 @@
         </li>
       </ul>
       <div class="nav-btn">
-        <button
+        <ActionButton
           @click="showDrawer"
-          class="nav-menu-btn"
-        >
-          <span
-            v-if="props.variant === 'menu'"
-            class="material-symbols-outlined"
-            style="color: #FF2E00;"
-          >
-            menu
-          </span>
-        </button>
+          class="menu-button"
+          :variant="'sub'"
+          :state="'secondary'"
+          :icon="'menu'"
+          :style="{color: '#ff2e00'}"
+        />
         <div
           v-if="props.variant === 'backButton'"
           class="back-button-content"
@@ -113,7 +110,10 @@
 .top-navigation {
   height: $top-nav-base-height-rem;
   display: flex;
+  position: relative;
+  width: 100%;
   padding: 0 $padding-xl-rem;
+  z-index: 50;
 
   &.menu {
     .nav-menu-area {
@@ -134,37 +134,14 @@
       display: none;
     }
 
-    @media (max-width: 576px) {
-      .nav-menu-area {
-        display: flex;
-        justify-content: flex-end;
-        width: 100%;
-      }
-
-      .nav-main-menu {
-        display: none;
-      }
-
-      .nav-sub-menu {
-        display: none;
-      }
-
-      .nav-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .nav-menu-btn {
-          border: none;
-          border-radius: $border-radius-xs-rem;
-          background-color: transparent;
-        }
-      }
+    .menu-button{
+      background-color: transparent;
     }
   }
 
   &.backButton {
     padding: 0px;
+
     .nav-logo {
       display: flex;
     }
@@ -172,7 +149,8 @@
     .nav-menu-area {
       display: flex;
       justify-content: flex-start;
-      padding: 6px 4px; /* Adjust padding as needed */
+      padding: 6px 4px;
+      /* Adjust padding as needed */
       width: 100%;
     }
 
@@ -208,6 +186,39 @@
           color: $black900;
           font-size: $title-font-size-mobile-rem;
           line-height: 22px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 834px) {
+  .top-navigation {
+    &.menu {
+
+      .nav-menu-area {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+      }
+
+      .nav-main-menu {
+        display: none;
+      }
+
+      .nav-sub-menu {
+        display: none;
+      }
+
+      .nav-btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .nav-menu-btn {
+          border: none;
+          border-radius: $border-radius-xs-rem;
+          background-color: transparent;
         }
       }
     }

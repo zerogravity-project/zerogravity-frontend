@@ -1,5 +1,6 @@
 <script setup>
-  import { ref, computed, watch } from 'vue'
+  import { ref, computed, watch, onMounted } from 'vue'
+  import { useEmotionStore } from '@/stores/emotion.js'
   import CalendarCell from './CalendarCell.vue'
 
   const props = defineProps({
@@ -21,24 +22,24 @@
     },
   })
 
+  /*
+  ** 감정 가져오기
+  */
+  const { emotions } = useEmotionStore()
+  const userId = ref('example-user-id')
+
+  /*
+  ** 날짜 계산
+  */
   const numericWidth = computed(() => props.width / 7)
   const numericHeight = computed(() => props.height / totalWeekCount.value)
-
   const daysOfWeek = ref(['일', '월', '화', '수', '목', '금', '토'])
-
   const currentDate = new Date()
-
   const currentDay = currentDate.getDate()
   const currentWeekDay = currentDate.getDay()
   const showFullMonth = ref(true)
 
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
-
-  const updateDisplayMode = () => {
-    showFullMonth.value = props.width >= 576
-  }
-
-  watch(() => props.width, updateDisplayMode)
 
   const dates = computed(() => {
     const firstDayOfWeek = new Date(props.year, props.month, 1).getDay()
@@ -54,12 +55,12 @@
         date: i + 1,
         isToday: currentDate.getFullYear() === props.year && currentDate.getMonth() === props.month && i + 1 === currentDay,
         isSunday: (i + firstDayOfWeek) % 7 === 0,
-        mainState: '', // 메인 감정 데이터
-        momentState: '', // 순간 감정 데이터
+        mainState: '',
+        momentState: '',
       })
     }
 
-    const remainingCells = 7 - (cells.length % 7)
+    const remainingCells = cells.length % 7 === 0 ? 0 : 7 - (cells.length % 7)
 
     for (let i = 0; i < remainingCells; i++) {
       cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '' })
@@ -78,6 +79,9 @@
     return dates.value.length / 7
   })
 
+  /*
+  ** Drawer Toggle
+  */
   const emits = defineEmits(['showDetail'])
 
   const getDate = (date) => {
@@ -85,6 +89,15 @@
       emits('showDetail', date)
     }
   }
+
+  /*
+  ** 반응형 구축
+  */
+  const updateDisplayMode = () => {
+    showFullMonth.value = props.width > 576
+  }
+
+  watch(() => props.width, updateDisplayMode)
 </script>
 
 <template>

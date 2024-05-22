@@ -1,5 +1,4 @@
 <script setup>
-  import DrawerContainer from '@/components/drawer/DrawerContainer.vue'
   import HeadlineText from '@/components/text/HeadlineText.vue'
   import TextInput from '@/components/input/TextInput.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
@@ -7,13 +6,7 @@
 
 <template>
   <div class="layout">
-    <DrawerContainer
-      class="menu"
-      variant="menu"
-      :width="'18.75rem'"
-      :is-right="false"
-    />
-    <main class="main-area">
+    <section class="main-area">
       <div class="main-title">
         <HeadlineText
           :size="'l'"
@@ -66,7 +59,7 @@
           :text-color="'white'"
         />
       </div>
-    </main>
+    </section>
   </div>
 </template>
 

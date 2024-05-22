@@ -32,7 +32,7 @@
 <template>
   <header
     :class="['title-container', props.size]"
-    :style="{defaultPadding: props.defaultPadding? '' : '0px'}"
+    :style="{paddingTop: props.defaultPadding? '' : '0px'}"
   >
     <h1 class="title">
       {{ props.titleText }}

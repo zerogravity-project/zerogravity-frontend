@@ -54,8 +54,8 @@
       class="no-image"
       :style="style"
     >
-      <span v-if="style.numericWidth >= 96">Select</span>
-      <span v-if="style.numericWidth >= 96">Main Emotion</span>
+      <span v-if="style.numericWidth >= 120">Select</span>
+      <span v-if="style.numericWidth >= 120">Main Emotion</span>
     </div>
   </div>
 </template>

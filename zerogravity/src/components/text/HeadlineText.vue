@@ -112,7 +112,7 @@
 
 .headline {
   color: $black900;
-  font-weight: 500;
+  font-weight: 600;
 
   &.l {
     font-size: $title-font-size-xl-rem;
