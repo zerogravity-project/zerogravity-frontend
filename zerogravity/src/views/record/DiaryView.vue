@@ -5,9 +5,13 @@
   import TextArea from '@/components/input/TextArea.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import router from '@/router'
+  import { useUserStore } from '@/stores/user'
+  import { useEmotionStore } from '@/stores/emotion'
+  import { storeToRefs } from 'pinia'
 
   const isMobile = ref('')
   const viewportHeight = ref('')
+  const diaryText = ref('')
 
   const reason = ref(['건강', '피트니스', '자기 돌봄', '취미', '정체성', '종교'])
 
@@ -21,9 +25,26 @@
     }
   }
 
+  const getDiaryText = (payload) => {
+    diaryText.value = payload
+  }
+
+  const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
+  const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
+
   // 버튼 클릭 시
   const onClick = () => {
-    router.push('/profile/calendar')
+    if (diaryText.value) {
+      recordStatus.value.status = 'diaryWritten'
+      userStore.saveRecordStatusToSession()
+
+      emotionRecord.value.diaryEntry = diaryText.value
+      emotionStore.saveEmotionRecordToSession()
+
+      router.push('/profile/calendar')
+    }
   }
 
   onMounted(() => {
@@ -55,7 +76,10 @@
         />
       </div>
       <div class="text-area">
-        <TextArea />
+        <TextArea
+          :placeholder="'내용을 입력하세요'"
+          @update:model-value="getDiaryText"
+        />
       </div>
     </div>
     <div class="button-container">
@@ -98,6 +122,7 @@ main {
 }
 
 .text-area {
+  padding-top: 5vh;
   max-width: 500px;
   height: 40vh;
 }

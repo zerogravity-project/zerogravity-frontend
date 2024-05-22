@@ -23,6 +23,10 @@
       default: '',
     },
     isChecked: Boolean,
+    color: {
+      type: String,
+      default: '',
+    },
   })
 
   const computedId = computed(() => {
@@ -43,6 +47,7 @@
   })
 
   const selectedOption = defineModel()
+
 </script>
 
 <template>
@@ -58,14 +63,20 @@
   <label
     :for="computedId"
     :class="['radio-button', props.variant]"
-    :style="[{ backgroundColor: props.selection }, surveyStyle]"
+    :style="[{ backgroundColor: variant === 'range'? props.color : props.selection }, surveyStyle]"
   >
     <span
       v-if="props.variant === 'font'"
       :style="{ fontFamily: props.selection }"
     >12:34</span>
     <span
-      v-else-if="(props.variant === 'color' || props.variant === 'range')"
+      v-else-if="(props.variant === 'color')"
+      class="material-symbols-outlined"
+    >
+      check
+    </span>
+    <span
+      v-else-if="(props.variant === 'range')"
       class="material-symbols-outlined"
     >
       check
@@ -127,7 +138,7 @@
     align-items: center;
     width: 25px;
     height: 25px;
-    border: 1.5px solid $gray700;
+    border: 1.5px solid $lightgray300;
     border-radius: $border-radius-full-rem;
   }
 }
@@ -186,6 +197,7 @@ input[type="radio"]:checked+label {
 
   &.range {
     background-color: $gray700;
+    border: none;
 
     .material-symbols-outlined {
       display: block;

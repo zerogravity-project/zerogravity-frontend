@@ -123,7 +123,7 @@
           if (seconds.value == 0) {
             if (minutes.value == 0) {
               cancelAnimationFrame(frameId)
-              recordStatus.value.status = 'meditationComplete'
+              recordStatus.value.status = 'newEmotionRecord'
               recordStatus.value.emotionRecordState = 'moment'
               userStore.saveRecordStatusToSession()
               router.push('/record/emotion')

@@ -99,6 +99,7 @@
   &.default {
     background: $redopacity10;
     color: $red900;
+    cursor: pointer;
   }
 
   &.outline {

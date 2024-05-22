@@ -1,5 +1,6 @@
 <script setup>
   import RadioButton from './RadioButton.vue'
+  import { computed } from 'vue'
   const props = defineProps({
     variant: {
       type: String,
@@ -16,6 +17,10 @@
   })
 
   const selectedOption = defineModel()
+
+  const computedSelected = computed(()=>{
+    return parseInt(selectedOption.value.split('-')[0], 10)
+  })
 </script>
 
 <template>
@@ -30,6 +35,7 @@
       :selection="item.name"
       :width="item.width"
       :is-checked="item.checked"
+      :color="index === computedSelected ? item.color : ''"
     />
   </fieldset>
 </template>
