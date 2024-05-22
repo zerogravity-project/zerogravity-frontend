@@ -44,19 +44,18 @@
       </div>
       <div class="button-area">
         <ActionButton
+          class="buttons"
           :variant="'round'"
-          :border-color="'transparent'"
-          :background-color="'#ccc'"
+          :state="'primary'"
+          :color="'gray'"
           :text="'회원탈퇴'"
-          :text-color="'white'"
         />
-
         <ActionButton
+          class="buttons"
           :variant="'round'"
-          :border-color="'transparent'"
-          :background-color="'#ccc'"
+          :state="'primary'"
+          :color="'gray'"
           :text="'로그아웃'"
-          :text-color="'white'"
         />
       </div>
     </section>
@@ -64,24 +63,24 @@
 </template>
 
 <style lang="scss" scoped>
-.layout {
-  display: grid;
-  grid-template-columns: 18.75rem 1fr;
-  height: 100vh;
-}
 
-.drawer-area {
-  grid-column: 1 / 2;
+.layout {
+  display: flex;
+  width: calc(100% - 18.75rem);
+  margin-left: 15px;
+  @media (max-width: 567px) {
+    width: 100vw;
+  }
 }
 
 .main-area {
-  grid-column: 2 / 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  flex: 1;
   padding: 0 2rem;
+
 }
 
 .main-title {
@@ -90,6 +89,7 @@
   display: flex;
   justify-content: left;
   padding-left: 0.25rem;
+
 }
 
 .personal-area {
@@ -102,17 +102,16 @@
   .personal-setting,
   .personal-info {
     width: 100%;
-    height: fit-content;
     max-width: 50rem;
     padding: 0 0 2rem 0;
-    background-color: white;
+    border: solid 1px $lightgray300;
+    background-color: $white900;
     border-radius: 0.5rem;
 
     .title {
       width: 100%;
       text-align: center;
       margin-bottom: 2rem;
-      height: fit-content;
     }
 
     .info-detail {
@@ -136,6 +135,8 @@
 .button-area {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   gap: 1rem;
+  margin-top: 2rem;
 }
 </style>
