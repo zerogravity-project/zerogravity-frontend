@@ -167,7 +167,7 @@
     scales: {
       y: {
         beginAtZero: true,
-        max: 7,
+        max: 8, // Changed max value to 8
         title: {
           display: true,
         },
@@ -193,7 +193,7 @@
     scales: {
       y: {
         beginAtZero: true,
-        max: 7,
+        max: 8, // Changed max value to 8
         title: {
           display: true,
         },
@@ -297,12 +297,14 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .layout {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  width: 100vw;
+  background-color: $lightgray-background;
 
   .main-area {
     display: flex;
@@ -355,15 +357,14 @@
     align-items: center;
     justify-content: center;
     padding: 20px 20px 10px 20px;
-    border: 1px solid rgb(212, 212, 212);
+    border: 1px solid $grayopacity30;
     border-radius: 8px;
     margin: 1rem 1rem 0.2rem 1rem;
-    background-color: hwb(0 96% 4% / 0.632);
+    background-color: $white900;
   }
   @media (max-width: 567px) {
     .layout {
-      max-width: 100%;
-      margin: 0px 20px 20px 20px;
+      max-width: 100vw;
     }
 
     .main-area {

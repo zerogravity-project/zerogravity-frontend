@@ -39,7 +39,6 @@
 
   const mixedChart = ref(null)
 
-  // Function to convert value to label
   const valueToLabel = (value) => {
     const labels = [
       '매우 불쾌함', '불쾌함', '약간 불쾌함',
@@ -138,7 +137,7 @@
   />
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .chart {
   width: 100%;
   height: 400px;
