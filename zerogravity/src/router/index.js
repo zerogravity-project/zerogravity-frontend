@@ -38,7 +38,7 @@ const checkBeforeRecordEmotion = async (to, from, next) => {
 
   // 만약 유저가 명상을 완료했거나 감정 기록을 했다면
   if (recordStatus.value.status === 'newEmotionRecord' || recordStatus.value.status === 'emotionChecked'
-  || recordStatus.value.status === 'reasonChecked') {
+  || recordStatus.value.status === 'reasonChecked' || recordStatus.value.status === 'updateMainRecord') {
     // if(recordStatus.value.status === 'reasonChecked'){
     //   if (confirm('저장하신 내용이 사라집니다!')) {
     //     recordStatus.value.status = 'emotionChecked'
@@ -89,7 +89,7 @@ const checkBeforeRecordDiary = async () => {
   userStore.getRecordStatusToSession()
   // 만약에 유저가 원인 체크했고, main 감정 기록이라면
   if ((recordStatus.value.status === 'reasonChecked' && recordStatus.value.emotionRecordState === 'main') ||
-    recordStatus.value.type === 'diary'
+    (recordStatus.value.status === 'updateDiaryRecord' && recordStatus.value.emotionRecordState === 'main')
   ) {
     return true
   } else {

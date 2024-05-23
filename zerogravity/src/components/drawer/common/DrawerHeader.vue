@@ -16,7 +16,31 @@
       type: String,
       default: '',
     },
+    type: {
+      type: String,
+      default: '',
+    },
   })
+
+  const emits = defineEmits(['addMomentEmotion','updateMainEmotion', 'addMainEmotion', 'updateDiary'])
+
+  const onClick = () => {
+    if(props.type === 'moment'){
+      emits('addMomentEmotion')
+    }
+
+    if(props.type === 'main-update'){
+      emits('updateMainEmotion')
+    }
+
+    if(props.type === 'main-add'){
+      emits('addMainEmotion')
+    }
+
+    if (props.type === 'diary') {
+      emits('updateDiary')
+    }
+  }
 </script>
 
 <template>
@@ -27,7 +51,9 @@
     <!-- props 필요 -->
     <a
       v-if="props.buttonText"
+      @click.prevent="onClick"
       class="text-button"
+      :style="{color: props.type === 'main-add' || props.type === 'moment' ? '#ff2e00' : ''}"
       href=""
     >{{ props.buttonText }}</a>
 

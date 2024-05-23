@@ -1,11 +1,13 @@
 <script setup>
-  import { computed } from 'vue'
+  import { computed, watch, ref } from 'vue'
   import EmotionAsset from '../emotion/EmotionAsset.vue'
+  import { useEmotionStore } from '@/stores/emotion'
+  import { storeToRefs } from 'pinia'
 
   const props = defineProps({
     date: {
-      type: Number,
-      default: 1,
+      type: Date,
+      default: null,
     },
     isToday: {
       type: Boolean,
@@ -39,9 +41,17 @@
       type: Number,
       default: 0,
     },
+    isSelected: Boolean,
   })
 
+  const emotionStore = useEmotionStore()
+  const { selectedDate, selectedMonth } = storeToRefs(emotionStore)
+
   const adjustment = 48
+
+  const numericDate = computed(() => {
+    return props.date ? props.date.getDate() : ''
+  })
 
   const cellClass = computed(() => {
     return `cell ${props.isToday ? 'today' : ''} ${props.isSunday ? 'sunday' : ''} 
@@ -51,20 +61,31 @@
   const size = computed(() => {
     return props.numericWidth < props.numericHeight? `${props.numericWidth-adjustment}px` : `${props.numericHeight-adjustment}px`
   })
+
+  const isChanged = ref(false)
+
+  const onClick = () => {
+    isChanged.value =false
+  }
+
+  watch(selectedMonth, () => {
+    isChanged.value = true
+  })
 </script>
 
 <template>
   <div
-    @click="getDate"
     :class="cellClass"
+    :style="{backgroundColor: selectedDate.getDate() === numericDate && !isChanged ? '#f4f4f4' : ''}"
   >
     <div class="emotion-area">
-      <span class="date-area">{{ props.date }}</span>
+      <span class="date-area">{{ numericDate }}</span>
       <div
         v-if="props.date !== null"
         class="emotion-asset-main-area"
       >
         <EmotionAsset
+          @click="onClick"
           :size="size"
           :emotion="props.emotion"
           :level="props.level"

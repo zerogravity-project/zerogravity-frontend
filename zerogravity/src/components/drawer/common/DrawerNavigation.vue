@@ -20,7 +20,6 @@
   const isOnlyTitle = computed(()=>{
     return props.subTitleText === '' && props.detailText === ''
   })
-
 </script>
 
 <template>

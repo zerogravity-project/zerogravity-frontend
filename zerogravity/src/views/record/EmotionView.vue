@@ -1,14 +1,14 @@
 <script setup>
   import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+  import router from '@/router'
+  import { useUserStore } from '@/stores/user'
+  import { useEmotionStore } from '@/stores/emotion'
+  import { storeToRefs } from 'pinia'
   import TopNavigation from '@/components/navigation/TopNavigation.vue'
   import TitleText from '@/components/text/TitleText.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
   import RadioButtonGroup from '@/components/input/RadioButtonGroup.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
-  import router from '@/router'
-  import { useUserStore } from '@/stores/user'
-  import { useEmotionStore } from '@/stores/emotion'
-  import { storeToRefs } from 'pinia'
 
   const emotionList = ref([
     { name: '아주 불쾌함', checked: false, width: '45px', color: '#ff3b30' },
@@ -20,24 +20,25 @@
     { name: '아주 기분 좋음', checked: false, width: '45px', color: '#5856D6' },
   ])
 
-  const selectedEmotion = ref('')
-  const isMobile = ref('')
-  const isEmotionNull = ref(true)
   const viewportHeight = ref('')
+  const isMobile = ref('')
 
-  const selectedEmotionName = computed(() => {
-    const text = selectedEmotion.value
+  const isEmotionNull = ref(true)
+  const checkedEmotion = ref('')
+
+  const checkedEmotionName = computed(() => {
+    const text = checkedEmotion.value
     const parts = text.split('-')
     return parts[2]
   })
 
-  const selectedEmotionLevel = computed(() => {
-    const text = selectedEmotion.value
+  const checkedEmotionLevel = computed(() => {
+    const text = checkedEmotion.value
     const parts = text.split('-')
     return parseInt(parts[0], 10) + 1
   })
 
-  watch(selectedEmotion, () => {
+  watch(checkedEmotion, () => {
     isEmotionNull.value = false
   })
 
@@ -57,12 +58,12 @@
 
   // 버튼 클릭 시
   const onClick = () => {
-    if (selectedEmotion.value) {
+    if (checkedEmotion.value) {
       // 감정 선택 저장
       recordStatus.value.status = 'emotionChecked'
       userStore.saveRecordStatusToSession()
 
-      const selected = selectedEmotion.value.split('-')
+      const selected = checkedEmotion.value.split('-')
 
       emotionRecord.value.emotionRecordLevel = parseInt(selected[0], 10) + 1
       emotionRecord.value.emotionRecordType = selected[2]
@@ -76,6 +77,11 @@
     window.addEventListener('resize', checkIsMobile)
     viewportHeight.value = `${window.innerHeight}px`
     checkIsMobile()
+
+    // if(recordStatus emotionRecord.value.emotionRecordLevel && emotionRecord.value.emotionRecordType){
+    //   isEmotionNull.value = false
+    //   checkedEmotion.value = `${emotionRecord.value.emotionRecordLevel - 1}-range-${emotionRecord.value.emotionRecordType}`
+    // }
   })
 
   onUnmounted(() => {
@@ -106,12 +112,12 @@
       <EmotionContainer
         :state="'label'"
         :size="isMobile ? 's' : 'm'"
-        :emotion="isEmotionNull ? '' : selectedEmotionName"
-        :level="isEmotionNull ? 0 : selectedEmotionLevel"
+        :emotion="isEmotionNull ? '' : checkedEmotionName"
+        :level="isEmotionNull ? 0 : checkedEmotionLevel"
       />
       <div class="radio-group-area">
         <RadioButtonGroup
-          v-model="selectedEmotion"
+          v-model="checkedEmotion"
           class="radios"
           :variant="'range'"
           :list="emotionList"
