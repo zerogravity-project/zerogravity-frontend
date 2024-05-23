@@ -2,6 +2,7 @@
 <script setup>
   import { computed } from 'vue'
   import { useUserStore } from '@/stores/user'
+  import { useEmotionStore } from '@/stores/emotion'
   import { storeToRefs } from 'pinia'
 
   const props = defineProps({
@@ -45,13 +46,29 @@
   const emit = defineEmits(['click'])
 
   const userStore = useUserStore()
+  const emotionStore = useEmotionStore()
   const { recordStatus } = storeToRefs(userStore)
+  const { emotionRecord, emotionRecords } = storeToRefs(emotionStore)
 
   const onClick = () => {
     emit('click')
     recordStatus.value.status = 'newEmotionRecord'
     recordStatus.value.emotionRecordState = props.emotionRecordState
     userStore.saveRecordStatusToSession()
+
+    console.log(emotionRecords)
+
+    if(recordStatus.value.emotionRecordState === 'main') {
+      const formattedDate = new Date().toISOString().split('T')[0]
+      console.log(formattedDate)
+      const todayEmotions = emotionRecords.value[formattedDate]
+
+      console.log(todayEmotions)
+      if(todayEmotions){
+        emotionRecord.value = todayEmotions.find(emotion => emotion.emotionRecordState === 'main')
+        emotionStore.saveEmotionRecordToSession()
+      }
+    }
   }
 
   const computedPadding = computed(() => {

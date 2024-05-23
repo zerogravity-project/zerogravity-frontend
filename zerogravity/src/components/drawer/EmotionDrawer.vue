@@ -1,20 +1,17 @@
 <script setup>
   import { onMounted, ref, inject, computed } from 'vue'
+  import { storeToRefs } from 'pinia'
+  import { useEmotionStore } from '@/stores/emotion'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
   import ContentText from '@/components/text/ContentText.vue'
 
-  const emotionList = ref([
-    'One', 'Two', 'Three', 'four',
-  ])
+  const emotionStore = useEmotionStore()
+  const { emotionRecords } = storeToRefs(emotionStore)
 
   const divNode = ref(null)
   const momentAreaMaxHeight = ref('')
-  const text = ref(`무엇인가를 써보았다....
-오늘 나는 와이어프레임을 그리고 앞으로 있을 우리의 프로젝트에 대해서 계획을 잡았다. 
-그리고 나서 이제 곧 다시 서울을 올라가고 앞으로도 행복하게 살 것이다.
-내일도 화이팅이다.`)
 
   // 선택된 날짜
   const selectedDate = inject('selectedDate')
@@ -22,7 +19,22 @@
   const date = computed(() => selectedDate.value ? selectedDate.value.getDate() : null)
   const month = computed(() => selectedDate.value ? selectedDate.value.getMonth() : null)
   const year = computed(() => selectedDate.value ? selectedDate.value.getFullYear() : null)
+  const formattedDate = computed(() => selectedDate.value? selectedDate.value.toISOString().split('T')[0] : null)
   const selectedDateText = computed(() => `${year.value}년 ${month.value + 1}월 ${date.value}일`)
+
+  const todayEmotions = computed(()=>{
+    return emotionRecords.value[formattedDate.value] || []
+  })
+
+  const mainEmotion = computed(() => {
+    return todayEmotions.value.find(emotion => emotion.emotionRecordState === 'main')
+  })
+
+  const momentEmotion = computed(() => {
+    return todayEmotions.value.filter(emotion => emotion.emotionRecordState === 'moment')
+  })
+
+  console.log(mainEmotion.value)
 
   onMounted(() => {
     const updateMaxHeight = () => {
@@ -57,8 +69,10 @@
           :size="'s'"
           :style="'compact'"
           :dir="'vertical'"
-          :emotion="'Emotion'"
+          :emotion="mainEmotion ? mainEmotion.emotionRecordType : ''"
+          :level="mainEmotion ? mainEmotion.emotionRecordLevel : ''"
           :chips-style="'badge'"
+          :reason-list="mainEmotion ? JSON.parse(mainEmotion.emotionReason) : []"
         />
       </div>
 
@@ -70,7 +84,7 @@
       />
       <ContentText
         class="text-container"
-        :text="text"
+        :text="mainEmotion ? mainEmotion.diaryEntry : ''"
       />
 
       <!-- Moment Emotion -->
@@ -85,14 +99,15 @@
       :style="{maxHeight: momentAreaMaxHeight}"
     >
       <EmotionContainer
-        v-for="(emotion, index) in emotionList"
+        v-for="(emotion, index) in momentEmotion"
         :key="index"
         :size="'s'"
         :state="'compact'"
         :dir="'horizontal'"
-        :emotion="emotion"
+        :emotion="emotion.emotionRecordType"
+        :level="emotion.emotionRecordLevel"
         :chips-state="'badge'"
-        :reason-list="['hello', 'yes', 'no', 'ok']"
+        :reason-list="JSON.parse(emotion.emotionReason)"
       />
     </div>
   </div>

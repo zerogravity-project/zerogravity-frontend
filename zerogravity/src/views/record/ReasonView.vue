@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, onMounted, onUnmounted, watchEffect } from 'vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
   import TitleText from '@/components/text/TitleText.vue'
   import ChipsContainer from '@/components/chip/ChipsContainer.vue'
@@ -8,6 +8,7 @@
   import { useUserStore } from '@/stores/user'
   import { useEmotionStore } from '@/stores/emotion'
   import { storeToRefs } from 'pinia'
+  import { v4 as uuidv4 } from 'uuid'
 
   const reasonLists = ref([
     ['건강', '피트니스', '자기 돌봄', '취미', '정체성', '종교'],
@@ -43,8 +44,12 @@
 
   const userStore = useUserStore()
   const emotionStore = useEmotionStore()
-  const { recordStatus } = storeToRefs(userStore)
+  const { recordStatus, userId } = storeToRefs(userStore)
   const { emotionRecord } = storeToRefs(emotionStore)
+
+  watchEffect(()=>{
+    emotionStore.getEmotionRecordToSession()
+  })
 
   // 버튼 클릭 시
   const onClick = () => {
@@ -52,10 +57,27 @@
       recordStatus.value.status = 'reasonChecked'
       userStore.saveRecordStatusToSession()
 
-      emotionRecord.value.emotionReason = checkedList.value
+      emotionRecord.value.emotionReason = JSON.stringify(checkedList.value)
       emotionStore.saveEmotionRecordToSession()
+      console.log(emotionRecord.value)
+
+      // 1. 유저의 데이터가 있는지
 
       if(recordStatus.value.emotionRecordState === 'moment'){
+        if(emotionRecord.value.emotionRecordType && emotionRecord.value.emotionRecordLevel && emotionRecord.value.emotionReason){
+          // 1. userID 넣기
+          emotionRecord.value.userId = userId
+          // 2. uuid 활용해서 record 넣어주기
+          const emotionRecordId = uuidv4()
+          emotionRecord.value.emotionRecordId = emotionRecordId
+
+          // 3. state 넣어주기
+          if(recordStatus.value.emotionRecordState){
+            emotionRecord.value.emotionRecordState = recordStatus.value.emotionRecordState
+          }
+          // 4. post(모던트는 무조건 포스트)
+          emotionStore.createEmotionRecord(emotionRecord.value)
+        }
         router.push('/profile/calendar')
       } else {
         router.push('/record/diary')
@@ -84,6 +106,8 @@
           :state="'mobile'"
           :dir="'vertical'"
           :chips-state="'badge'"
+          :emotion="emotionRecord.emotionRecordType"
+          :level="emotionRecord.emotionRecordLevel"
         />
         <TitleText
           :title-text="'감정의 원인을 선택하세요'"

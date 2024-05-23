@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watch, onMounted } from 'vue'
+  import { ref, computed, watch } from 'vue'
   import { useEmotionStore } from '@/stores/emotion.js'
   import { storeToRefs } from 'pinia'
   import CalendarCell from './CalendarCell.vue'
@@ -40,6 +40,8 @@
   const currentWeekDay = currentDate.getDay()
   const showFullMonth = ref(true)
 
+  // const dates = ref([])
+
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
 
   const dates = computed(() => {
@@ -48,23 +50,43 @@
     const cells = []
 
     for (let i = 0; i < firstDayOfWeek; i++) {
-      cells.push({ date: null, isToday: false, isSunday: i === 0, mainState: '', momentState: '' })
+      cells.push({ date: null, isToday: false, isSunday: i === 0, mainState: '', momentState: '', level: null, type: null })
     }
 
     for (let i = 0; i < totalDays; i++) {
+      const date = new Date(props.year, props.month, i + 1)
+      const formattedDate = date.toISOString().split('T')[0]
+      const emotions = emotionRecords.value[formattedDate] || []
+
+      let mainState = ''
+      let momentState = false
+      let type = null
+      let level = null
+      emotions.forEach(emotion => {
+        if (emotion.emotionRecordState === 'main') {
+          mainState = 'main'
+          type = emotion.emotionRecordType
+          level = emotion.emotionRecordLevel
+        }
+        if (emotion.emotionRecordState === 'moment') {
+          momentState = true
+        }
+      })
+
       cells.push({
         date: i + 1,
         isToday: currentDate.getFullYear() === props.year && currentDate.getMonth() === props.month && i + 1 === currentDay,
         isSunday: (i + firstDayOfWeek) % 7 === 0,
-        mainState: '',
-        momentState: '',
+        mainState: mainState,
+        momentState: momentState ? 'moment' : '',
+        type: type,
+        level: level,
       })
     }
 
     const remainingCells = cells.length % 7 === 0 ? 0 : 7 - (cells.length % 7)
-
     for (let i = 0; i < remainingCells; i++) {
-      cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '' })
+      cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '', level: null, type: null })
     }
 
     if (!showFullMonth.value) {
@@ -128,6 +150,8 @@
         :is-sunday="cell.isSunday"
         :main-state="cell.mainState"
         :moment-state="cell.momentState"
+        :emotion="cell.type"
+        :level="cell.level"
         :numeric-width="numericWidth"
         :numeric-height="numericHeight"
       />
