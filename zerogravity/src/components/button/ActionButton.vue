@@ -237,7 +237,6 @@ button {
 
       .text-area {
         height: $padding-xl-rem;
-        margin-right: $margin-xxxs-rem;
         color: $white900;
       }
     }
