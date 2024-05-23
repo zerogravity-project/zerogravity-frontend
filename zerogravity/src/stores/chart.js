@@ -25,7 +25,7 @@ export const dailyChartStore = defineStore('chart', () => {
 
     async function getAllCharts(userId, period, searchDate) {
         try {
-            const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/${userId}`, {
+            const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/level/${userId}`, {
                 params: { period, searchDate },
             })
             dailyCharts.value = response.data
@@ -36,7 +36,7 @@ export const dailyChartStore = defineStore('chart', () => {
 
     async function getAllCounts(userId, period, searchDate) {
         try {
-            const response = await axios.get(`http://localhost:8080/api-zerogravity/emotions/chart/${userId}`, {
+            const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/count/${userId}`, {
                 params: { period, searchDate },
             })
             countCharts.value = response.data
