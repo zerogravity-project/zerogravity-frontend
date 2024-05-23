@@ -43,24 +43,11 @@
   const mixedChart = ref(null)
 
   const valueToLabel = (value) => {
-    if (value === 0) {
-      return '매우 불쾌함'
-    } else if (value === 1) {
-      return '약간 불쾌함'
-    } else if (value === 2) {
-      return '보통'
-    } else if (value === 3) {
-      return '약간 좋음'
-    } else if (value === 4) {
-      return '매우 좋음'
-    } else {
-      return ''
-    }
-  }
-
-  const calculateAverage = (data) => {
-    const sum = data.reduce((a, b) => a + b, 0)
-    return sum / data.length
+    const labels = [
+      '매우 불쾌함', '불쾌함', '약간 불쾌함',
+      '보통', '약간 기분 좋음', '기분 좋음', '매우 기분 좋음',
+    ]
+    return labels[value - 1] || ''
   }
 
   const createChart = () => {
@@ -72,24 +59,26 @@
 
       const chartData = {
         labels: props.labels,
-        datasets: props.datasets.map((dataset) => {
-          if (dataset.type === 'bar') {
-            return {
-              ...dataset,
-              backgroundColor: props.barColor,
-              borderColor: props.barColor.replace('0.5', '1'),
-            }
-          } else if (dataset.type === 'line') {
-            return {
-              ...dataset,
-              backgroundColor: props.lineColor.replace('0.8', '0.3'), // 라인 색상을 반영
-              borderColor: props.lineColor,
-              pointBackgroundColor: props.lineColor.replace('0.8', '1'),
-              pointBorderColor: props.lineColor.replace('0.8', '1'),
-            }
-          }
-          return dataset
-        }),
+        datasets: [
+          {
+            type: 'bar',
+            label: props.datasets[0].label,
+            data: props.datasets[0].data,
+            backgroundColor: props.barColor,
+            borderColor: props.barColor,
+            borderWidth: 1,
+          },
+          {
+            type: 'line',
+            label: '',
+            data: props.datasets[0].data,
+            backgroundColor: props.lineColor,
+            borderColor: props.lineColor,
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointHoverRadius: 4,
+          },
+        ],
       }
 
       const chartOptions = {
@@ -106,24 +95,31 @@
             ticks: {
               ...props.chartOptions.scales.y.ticks,
               callback: valueToLabel,
+              stepSize: 1,
+              min: 1,
+              max: 7,
             },
           },
           x: {
-            ...props.chartOptions.scales.x,
+            type: 'category',
+            labels: props.labels,
             title: {
-              ...props.chartOptions.scales.x.title,
+              display: true,
               text: props.xAxisTitle,
             },
           },
         },
         plugins: {
-          ...props.chartOptions.plugins,
+          legend: {
+            display: false,
+            position: 'bottom',
+          },
           annotation: {
             annotations: {
               averageLine: {
                 type: 'line',
                 scaleID: 'y',
-                value: calculateAverage(props.datasets[0].data),
+                value: props.datasets[0].data.reduce((a, b) => a + b, 0) / props.datasets[0].data.length,
                 borderColor: props.averageLineColor,
                 borderWidth: 2,
                 borderDash: [5, 5],
@@ -156,7 +152,7 @@
   onMounted(createChart)
 
   watch(
-    () => [props.datasets, props.barColor, props.lineColor, props.averageLineColor, props.labels, props.chartOptions],
+    () => [props.datasets, props.labels, props.chartOptions],
     createChart,
     { deep: true },
   )
@@ -168,6 +164,13 @@
     ref="mixedChart"
   />
 </template>
+
+<style scoped>
+.chart {
+  width: 100%;
+  height: 400px;
+}
+</style>
 
 <style scoped>
 .chart {
