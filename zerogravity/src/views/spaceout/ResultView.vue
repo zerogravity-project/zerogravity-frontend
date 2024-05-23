@@ -4,7 +4,7 @@
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
 
-  const countRecord = ref(1)
+  const countRecord = ref(0)
   const showTitle = ref(true)
   const showNewTitle = ref(false)
   const isMobile = ref(false)

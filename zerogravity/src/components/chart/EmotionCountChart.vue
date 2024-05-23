@@ -39,6 +39,15 @@
 
   const mixedChart = ref(null)
 
+  // Function to convert value to label
+  const valueToLabel = (value) => {
+    const labels = [
+      '매우 불쾌함', '불쾌함', '약간 불쾌함',
+      '보통', '약간 기분 좋음', '기분 좋음', '매우 기분 좋음',
+    ]
+    return labels[value - 1] || ''
+  }
+
   const createChart = () => {
     if (mixedChart.value) {
       const chartInstance = Chart.getChart(mixedChart.value)
@@ -71,14 +80,10 @@
             },
             ticks: {
               ...props.chartOptions.scales.y.ticks,
-              callback: function (value) {
-                if (value === 0) return '0'
-                if (value === 1) return '1'
-                if (value === 2) return '2'
-                if (value === 3) return '3'
-                if (value === 4) return '4'
-                if (value === 5) return '5'
-              },
+              callback: valueToLabel,
+              stepSize: 1,
+              min: 1,
+              max: 7,
             },
           },
           x: {

@@ -4,7 +4,122 @@
   import HeadlineText from '@/components/text/HeadlineText.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
   import DropDown from '@/components/dropdown/DropDown.vue'
-  import { ref } from 'vue'
+  import { onMounted, ref } from 'vue'
+  import { dailyChartStore } from '@/stores/chart'
+
+  const charts = ref([])
+  const chartStore = dailyChartStore()
+
+  const labels = ref([
+    '월', '화', '수', '목', '금', '토', '일',
+  ])
+
+  const barColor = '#FF3B3080'
+  const lineColor = '#FF3B30'
+  const averageLineColor = '#FF3B3080'
+
+  const datasets = ref([
+    {
+      type: 'bar',
+      label: '하루의 평균',
+      data: Array(7).fill(null),
+      backgroundColor: barColor,
+      borderColor: barColor,
+      borderWidth: 1,
+    },
+    {
+      type: 'line',
+      data: Array(7).fill(null),
+      backgroundColor: lineColor,
+      borderColor: lineColor,
+      borderWidth: 2,
+    },
+  ])
+
+  const emotionDatasets = ref([
+    {
+      type: 'bar',
+      label: '감정의 정도',
+      data: Array(7).fill(null),
+      backgroundColor: barColor,
+      borderColor: barColor,
+      borderWidth: 1,
+    },
+  ])
+
+  const countDatasets = ref([])
+
+  const getDayIndex = (dateString) => {
+    const date = new Date(dateString)
+    const day = date.getDay()
+    return day === 0 ? 6 : day - 1
+  }
+
+  const searchDate = ref(new Date().toISOString().split('T')[0] + ' 00:00:00')
+
+  const fetchData = async () => {
+    datasets.value[0].data = Array(7).fill(null)
+    datasets.value[1].data = Array(7).fill(null)
+    emotionDatasets.value[0].data = Array(7).fill(null)
+    countDatasets.value = []
+
+    const userId = '1'
+    const period = 'weekly'
+    await chartStore.getAllCharts(userId, period, searchDate.value)
+    await chartStore.getAllCounts(userId, period, searchDate.value)
+
+    charts.value = chartStore.dailyCharts
+    const counts = chartStore.countCharts
+
+    const dailyAverages = Array(7).fill(null)
+    const emotionLevels = Array(7).fill(null)
+    const mainCounts = Array(7).fill(null)
+    const momentCounts = Array(7).fill(null)
+
+    chartStore.dailyCharts.forEach(chart => {
+      const dayIndex = getDayIndex(chart.createdTime)
+      dailyAverages[dayIndex] = chart.dailyAverage
+      emotionLevels[dayIndex] = chart.dailyAverage
+    })
+
+    counts.forEach(count => {
+      const dayIndex = getDayIndex(count.createdTime)
+      if (count.emotionRecordState === 'main' && count.emotionRecordLevel > 0) {
+        mainCounts[dayIndex] = count.emotionRecordLevel
+      } else if (count.emotionRecordState === 'moment' && count.emotionRecordLevel > 0) {
+        momentCounts[dayIndex] = count.emotionRecordLevel
+      }
+    })
+
+    datasets.value[0].data = dailyAverages
+    datasets.value[1].data = dailyAverages
+    emotionDatasets.value[0].data = emotionLevels
+
+    const countDatasetsTemp = []
+    if (mainCounts.some(count => count !== null)) {
+      countDatasetsTemp.push({
+        type: 'scatter',
+        label: '오늘의 감정',
+        data: mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null),
+        backgroundColor: '#FF3B30',
+        borderColor: '#FF3B30',
+        borderWidth: 1,
+      })
+    }
+
+    if (momentCounts.some(count => count !== null)) {
+      countDatasetsTemp.push({
+        type: 'scatter',
+        label: '순간의 감정',
+        data: momentCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null),
+        backgroundColor: 'rgba(128, 128, 128, 0.6)',
+        borderColor: 'rgba(128, 128, 128, 0.6)',
+        borderWidth: 1,
+      })
+    }
+
+    countDatasets.value = countDatasetsTemp
+  }
 
   const formatDate = (date) => {
     const year = date.getFullYear()
@@ -16,7 +131,8 @@
   const getWeekRange = (date) => {
     const day = date.getDay()
     const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1)
-    const monday = new Date(date.setDate(diffToMonday))
+    const monday = new Date(date)
+    monday.setDate(diffToMonday)
     const sunday = new Date(monday)
     sunday.setDate(monday.getDate() + 6)
     return { monday, sunday }
@@ -33,51 +149,28 @@
   const dateRange = ref('')
   updateWeekRange()
 
-  const changeWeek = (direction) => {
-    const currentMonday = getWeekRange(currentDate.value).monday
-    currentMonday.setDate(currentMonday.getDate() + direction * 7)
-    currentDate.value = currentMonday
+  const changeWeek = async (direction) => {
+    const newDate = new Date(searchDate.value)
+    newDate.setDate(newDate.getDate() + direction * 7)
+    searchDate.value = newDate.toISOString().split('T')[0] + ' 00:00:00'
+    currentDate.value = new Date(searchDate.value)
     updateWeekRange()
+    await fetchData()
   }
-
-  const labels = ref([
-    '월', '화', '수', '목', '금', '토', '일',
-  ])
-
-  const datasets = ref([
-    {
-      type: 'bar',
-      label: 'Bar Dataset',
-      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2],
-    },
-    {
-      type: 'line',
-      label: 'Line Dataset',
-      data: [2, 1.4, 2.7, 1, 3.7, 1.5, 2],
-    },
-  ])
 
   const valueToLabel = (value) => {
-    if (value === 0) {
-      return '매우 불쾌함'
-    } else if (value === 1) {
-      return '약간 불쾌함'
-    } else if (value === 2) {
-      return '보통'
-    } else if (value === 3) {
-      return '약간 좋음'
-    } else if (value === 4) {
-      return '매우 좋음'
-    } else {
-      return ''
-    }
+    const labels = [
+      '매우 불쾌함', '불쾌함', '약간 불쾌함',
+      '보통', '약간 기분 좋음', '기분 좋음', '매우 기분 좋음',
+    ]
+    return labels[value - 1] || ''
   }
 
-  const chartOptions = ref({
+  const emotionChartOptions = ref({
     scales: {
       y: {
         beginAtZero: true,
-        max: 4,
+        max: 7,
         title: {
           display: true,
         },
@@ -94,64 +187,22 @@
     },
     plugins: {
       legend: {
-        display: false,
+        display: true,
       },
     },
   })
 
-  const barColor = ref('rgba(75, 192, 192, 0.5)')
-  const lineColor = ref('rgba(75, 192, 192, 1)')
-  const averageLineColor = ref('rgba(75, 192, 192, 0.5)')
-
-  const emotionLabels = ref([
-    '월', '화', '수', '목', '금', '토', '일',
-  ])
-
-  const emotionDatasets = ref([
-    {
-      label: '오늘의 감정',
-      data: [
-        { x: '월', y: 2 },
-        { x: '화', y: 1 },
-        { x: '수', y: 1 },
-        { x: '목', y: 3 },
-        { x: '금', y: 2 },
-        { x: '토', y: 1 },
-        { x: '일', y: 2 },
-      ],
-      backgroundColor: 'rgba(255, 99, 132, 0.7)',
-    },
-    {
-      label: '순간의 감정',
-      data: [
-        { x: '월', y: 1 },
-        { x: '화', y: 2 },
-        { x: '수', y: 0 },
-        { x: '목', y: 1 },
-        { x: '금', y: 2 },
-        { x: '토', y: 1 },
-        { x: '일', y: 0 },
-      ],
-      backgroundColor: 'rgba(211, 211, 211, 0.5)',
-    },
-  ])
-
-  const emotionChartOptions = ref({
+  const countChartOptions = ref({
     scales: {
       y: {
         beginAtZero: true,
-        max: 3.5,
+        max: 7,
         title: {
           display: true,
         },
         ticks: {
           stepSize: 1,
-          callback: function(value) {
-            if (value === 0) return 'Low'
-            if (value === 1) return 'Middle'
-            if (value === 2) return 'High'
-            return ''
-          },
+          callback: valueToLabel,
         },
       },
       x: {
@@ -172,11 +223,15 @@
   const toggleDropdown = () => {
     isDropdownVisible.value = !isDropdownVisible.value
   }
+
+  onMounted(async () => {
+    await fetchData()
+  })
 </script>
 
 <template>
   <div class="layout">
-    <main class="main-area">
+    <section class="main-area">
       <div class="main-title">
         <HeadlineText
           :size="'l'"
@@ -217,28 +272,28 @@
       <div class="chart-area">
         <EmotionLevelChart
           :labels="labels"
-          :datasets="datasets"
-          :chart-options="chartOptions"
-          :bar-color="barColor"
-          :line-color="lineColor"
-          :average-line-color="averageLineColor"
-          y-axis-title="감정의 정도"
-          x-axis-title="요일"
-        />
-      </div>
-      <div class="chart-area">
-        <EmotionCountChart
-          :labels="emotionLabels"
           :datasets="emotionDatasets"
           :chart-options="emotionChartOptions"
           :bar-color="barColor"
           :line-color="lineColor"
-          :average-line-color="averageLineColor"
-          y-axis-title="기록 횟수"
+          y-axis-title="감정의 정도"
           x-axis-title="요일"
+          :average-line-color="averageLineColor"
         />
       </div>
-    </main>
+      <div class="chart-area">
+        <EmotionCountChart
+          :labels="labels"
+          :datasets="countDatasets"
+          :chart-options="countChartOptions"
+          :bar-color="barColor"
+          :line-color="lineColor"
+          y-axis-title="감정의 정도"
+          x-axis-title="요일"
+          :average-line-color="averageLineColor"
+        />
+      </div>
+    </section>
   </div>
 </template>
 
@@ -248,85 +303,79 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
 
-.main-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 2rem;
-  width: calc(100% - 18.75rem);
-  margin-left: 18.75rem;
-  position: relative;
-}
-
-@media (max-width: 567px) {
-  .layout {
-    max-width: 100%;
-    margin: 0px 20px 20px 20px;
-  }
   .main-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem;
+    width: calc(100vw - 18.75rem);
+    position: relative;
+  }
+  .main-title {
     width: 100%;
-    margin-left: 0;
-    padding: 1rem;
+    max-width: 50rem;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding-left: 0.25rem;
+  }
+  .button-area {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 50rem;
+    align-items: center;
+    padding-top: 15px;
+    padding-left: 8px;
+    justify-content: space-between;
+    position: relative;
+    z-index: 20;
+  }
+  .date {
+    display: flex;
+  }
+  .button {
+    display: flex;
+    flex-direction: row;
+  }
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
   }
   .chart-area {
-  width: 100%;
-  max-width: 20rem;
-}
-}
+    width: 100%;
+    max-width: 50rem;
+    height: 37vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px 10px 20px;
+    border: 1px solid rgb(212, 212, 212);
+    border-radius: 8px;
+    margin: 1rem 1rem 0.2rem 1rem;
+    background-color: rgb(255, 255, 255);
+  }
+  @media (max-width: 567px) {
+    .layout {
+      max-width: 100%;
+      margin: 0px 20px 20px 20px;
+    }
 
-.main-title {
-  width: 100%;
-  max-width: 50rem;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  padding-left: 0.25rem;
-}
+    .main-area {
+      width: 100%;
+      margin-left: 0;
+      padding: 1rem;
+    }
 
-.button-area {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 50rem;
-  align-items: center;
-  padding-top: 15px;
-  padding-left: 8px;
-  justify-content: space-between;
-  position: relative;
-  z-index: 20;
-}
-
-.date {
-  display: flex;
-}
-
-.button {
-  display: flex;
-  flex-direction: row;
-}
-
-.dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 10;
-}
-
-.chart-area {
-  width: 100%;
-  max-width: 50rem;
-  height: 37vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 20px 10px 20px;
-  border: 1px solid rgb(212, 212, 212);
-  border-radius: 8px;
-  margin: 1rem 1rem 0.2rem 1rem;
-  background-color: rgb(255, 255, 255);
+    .chart-area {
+      width: 100%;
+      max-width: 20rem;
+    }
+  }
 }
 </style>
