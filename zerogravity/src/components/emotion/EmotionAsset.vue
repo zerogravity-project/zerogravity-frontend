@@ -10,6 +10,10 @@
       type: String,
       default: '',
     },
+    level: {
+      type: Number,
+      default: 0,
+    },
   })
 
   const assetSize = ref({
@@ -38,14 +42,18 @@
       numericWidth: parseInt(size, 10),
     }
   })
+
+  const imgSrc = computed(() => {
+    return `../src/assets/images/emotions/emotion-asset-${props.level}.png`
+  })
 </script>
 
 <template>
   <div>
     <img
       v-if="emotion"
-      src="@/assets/images/emotion-asset.png"
-      alt=""
+      :src="imgSrc"
+      :alt="`emotion-asset-image-${props.emotion}`"
       :style="style"
     >
 

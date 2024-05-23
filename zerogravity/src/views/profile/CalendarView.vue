@@ -9,10 +9,11 @@
   import HeadlineText from '@/components/text/HeadlineText.vue'
   import LinkButton from '@/components/button/LinkButton.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
+  import { useUserStore } from '@/stores/user'
 
-  /*
-  ** 초기 화면 설정
-  */
+  /**
+   * 초기 화면 설정
+   */
   const section = ref(null)
   const container = ref(null)
   const viewportWidth = ref(window.innerWidth)
@@ -31,9 +32,9 @@
     calendarHeight.value = container.value.clientHeight - heightAdjustment
   }
 
-  /*
-  ** Drawer Toggle
-  */
+  /**
+   * Drawer Toggle
+   */
   const isShowDetail = ref(false)
   const isDrawerHidden = ref(true)
 
@@ -58,11 +59,9 @@
     })
   })
 
-  /*
-  ** 날짜 계산 및 API
-  */
-  const emotionStore = useEmotionStore()
-  const { getEmotionRecords } = storeToRefs(emotionStore)
+  /**
+   * 날짜 계산 로직
+   */
   const currentYear = ref(0)
   const currentMonth = ref(0)
   const currentWeek = ref(0)
@@ -118,15 +117,41 @@
   //   currentWeek.value = weekNumber
   // }
 
-  const userId = ref(123)
+  const emotionStore = useEmotionStore()
+  const userStore = useUserStore()
+  const { userId } = storeToRefs(userStore)
 
-  // watchEffect(async () => {
-  //   emotionStore.getEmotionRecords(userId.value, currentYear, currentMonth)
+  // const searchDate = computed(() => {
+  //   const year = currentDate.value.getFullYear()
+  //   const month = (currentDate.value.getMonth() + 1).toString().padStart(2, '0')
+  //   const day = currentDate.value.getDate().toString().padStart(2, '0')
+  //   const hours = currentDate.value.getHours().toString().padStart(2, '0')
+  //   const minutes = currentDate.value.getMinutes().toString().padStart(2, '0')
+  //   const seconds = currentDate.value.getSeconds().toString().padStart(2, '0')
+
+  //   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
   // })
 
-  /*
-  ** 드롭다운
-  */
+  watchEffect(() => {
+    currentDate.value = new Date()
+    currentMonth.value = currentDate.value.getMonth()
+    currentYear.value = currentDate.value.getFullYear()
+  })
+
+  watchEffect(async () => {
+    emotionStore.getEmotionRecords(userId.value, parseInt(currentYear.value, 10), parseInt(currentMonth.value, 10) + 1)
+  })
+  /**
+   * API Fetch
+   */
+  // const emotionStore = useEmotionStore()
+  // const userStore = useUserStore()
+  // const { getEmotionRecords } = storeToRefs(emotionStore)
+  // const { userId } = storeToRefs(userStore)
+
+  /**
+   * 드롭다운
+   */
   const isDropdown = ref(false)
   const dropdownMenu = [{ name: '오늘의 감정 추가', link: '/record/emotion', emotionRecordState: 'main' },
                         { name: '순간의 감정 추가', link: '/record/emotion', emotionRecordState: 'moment' }]
@@ -136,10 +161,6 @@
   }
 
   onMounted(() => {
-    currentDate.value = new Date()
-    currentMonth.value = currentDate.value.getMonth()
-    currentYear.value = currentDate.value.getFullYear()
-
     // getWeekOfMonth()
 
     window.addEventListener('resize', getSectionSize)

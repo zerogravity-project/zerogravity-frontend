@@ -20,6 +20,10 @@
       type: String,
       default: '감정 이름',
     },
+    level: {
+      type: Number,
+      default: 0,
+    },
     chipsState: {
       type: String,
       default: 'default',
@@ -73,6 +77,7 @@
     <EmotionAsset
       :size="emotionAssetSize"
       :emotion="props.emotion"
+      :level="props.level"
     />
 
     <div class="emotion-info">

@@ -2,11 +2,12 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('counter', () => {
-  const recordStatus = ref({status: '', emotionRecordState: ''})
+  const userId = ref(1)
+  const recordStatus = ref({status: null, emotionRecordState: null})
 
   const resetRecordStatusToSession = () => {
-      recordStatus.value.status = ''
-      recordStatus.value.emotionRecordState = ''
+      recordStatus.value.status = null
+      recordStatus.value.emotionRecordState = null
 
       sessionStorage.removeItem('recordStatus')
   }
@@ -22,5 +23,5 @@ export const useUserStore = defineStore('counter', () => {
     }
   }
 
-  return { recordStatus, saveRecordStatusToSession, getRecordStatusToSession, resetRecordStatusToSession }
+  return { userId, recordStatus, saveRecordStatusToSession, getRecordStatusToSession, resetRecordStatusToSession }
 })

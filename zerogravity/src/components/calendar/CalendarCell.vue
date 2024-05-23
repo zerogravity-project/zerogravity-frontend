@@ -23,6 +23,14 @@
       type: String,
       default: '',
     },
+    emotion: {
+      type: String,
+      default: '',
+    },
+    level:{
+      type: Number,
+      default: 0,
+    },
     numericWidth: {
       type: Number,
       default: 0,
@@ -58,7 +66,8 @@
       >
         <EmotionAsset
           :size="size"
-          :emotion="props.mainState"
+          :emotion="props.emotion"
+          :level="props.level"
         />
       </div>
       <div
@@ -125,7 +134,7 @@
   width: 1rem;
   height: 1rem;
   border-radius: $border-radius-full-rem;
-  background-color: $grayopacity50;
+  background-color: $orange900;
   position: absolute;
   bottom: 8px;
   right: 8px;

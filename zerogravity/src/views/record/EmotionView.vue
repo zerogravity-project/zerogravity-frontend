@@ -31,6 +31,12 @@
     return parts[2]
   })
 
+  const selectedEmotionLevel = computed(() => {
+    const text = selectedEmotion.value
+    const parts = text.split('-')
+    return parseInt(parts[0], 10) + 1
+  })
+
   watch(selectedEmotion, () => {
     isEmotionNull.value = false
   })
@@ -101,6 +107,7 @@
         :state="'label'"
         :size="isMobile ? 's' : 'm'"
         :emotion="isEmotionNull ? '' : selectedEmotionName"
+        :level="isEmotionNull ? 0 : selectedEmotionLevel"
       />
       <div class="radio-group-area">
         <RadioButtonGroup
