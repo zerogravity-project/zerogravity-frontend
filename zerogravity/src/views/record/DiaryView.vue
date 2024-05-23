@@ -33,7 +33,7 @@
   const userStore = useUserStore()
   const emotionStore = useEmotionStore()
   const { recordStatus, userId } = storeToRefs(userStore)
-  const { emotionRecord, todayMainEmotion } = storeToRefs(emotionStore)
+  const { emotionRecord } = storeToRefs(emotionStore)
 
   watchEffect(() => {
     emotionStore.getEmotionRecordToSession()

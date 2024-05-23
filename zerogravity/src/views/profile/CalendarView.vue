@@ -11,7 +11,7 @@
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
 
   const emotionStore = useEmotionStore()
-  const { selectedDate, selectedMonth, selectedYear, todayDate, selectedMainEmotion, todayMainEmotion } = storeToRefs(emotionStore)
+  const { selectedDate, selectedMonth, selectedYear, todayDate } = storeToRefs(emotionStore)
 
   // 선택한 날짜
   // const selectedDate = ref(null)
@@ -147,8 +147,6 @@
     selectedDate.value = todayDate.value
 
     window.addEventListener('resize', getSectionSize)
-
-    console.log(todayMainEmotion.value)
 
     if (container.value && section.value) {
       nextTick(() => {

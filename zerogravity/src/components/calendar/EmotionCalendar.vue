@@ -16,7 +16,7 @@
   })
 
   const emotionStore = useEmotionStore()
-  const { selectedMonthRecords, todayDate, todayDay, todayWeekDay, selectedYear, selectedMonth } = storeToRefs(emotionStore)
+  const { selectedMonthRecords, todayDate, todayDay, todayWeekDay, selectedYear, selectedMonth  } = storeToRefs(emotionStore)
 
   // const currentDate = new Date()
   // const currentDay = currentDate.getDate()
@@ -28,7 +28,6 @@
    */
   const numericWidth = computed(() => props.width / 7)
   const numericHeight = computed(() => props.height / totalWeekCount.value)
-
   /**
    * 날짜 계산
    */

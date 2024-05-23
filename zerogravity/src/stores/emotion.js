@@ -1,4 +1,4 @@
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { useUserStore } from './user'
 import axios from 'axios'
@@ -27,8 +27,13 @@ export const useEmotionStore = defineStore('emotion', () => {
   const todayDate = ref(new Date())
   const todayDay = computed(() => todayDate.value.getDate())
   const todayWeekDay = computed(() => todayDate.value.getDay())
-
+  const todayMonth = computed(() => todayDate.value.getMonth())
+  const todayYear = computed(() => todayDate.value.getFullYear())
+  const todayMonthRecords = ref([])
+  const todayEmotionRecords = ref([])
   const todayMainEmotion = ref(null)
+  const todayMomentEmotions = ref(null)
+  const todayFormattedDate = computed(() => todayDate.value.toISOString().split('T')[0])
 
   // 선택된 날짜 데이터
   const selectedDate = ref(todayDate.value)
@@ -39,22 +44,8 @@ export const useEmotionStore = defineStore('emotion', () => {
   const selectedDateText = computed(() => `${selectedYear.value}년 ${selectedMonth.value + 1}월 ${selectedDateNum.value}일`)
   const selectedFormattedDate = computed(() => selectedDate.value.toISOString().split('T')[0]) // 2024-xx-xx
 
-  const selectedMonthRecords  = ref([])
+  const selectedMonthRecords = ref([])
   const selectedEmotionRecords = ref([])
-
-  // 모든 감정 레코드를 날짜별로 그룹화
-  const groupedEmotions = computed(() => groupEmotionByDate(emotions.value))
-
-  // 오늘 날짜에 해당하는 감정 레코드
-  const todayEmotions = computed(() => {
-    const todayFormatted = todayDate.value.toISOString().split('T')[0]
-    return groupedEmotions.value[todayFormatted] || []
-  })
-
-  // 오늘의 주요 감정 설정
-  watch(todayEmotions, (newEmotions) => {
-    todayMainEmotion.value = newEmotions.find(emotion => emotion.emotionRecordState === 'main') || null
-  }, { immediate: true })
 
   const selectedMainEmotion = computed(() => {
     return selectedEmotionRecords.value.find(emotion => emotion.emotionRecordState === 'main') || null
@@ -65,15 +56,21 @@ export const useEmotionStore = defineStore('emotion', () => {
   })
 
   // 만약 달이 바뀐다면 다시 불러와야함
-  watch(selectedMonth, async() => {
+  watch(selectedMonth, async () => {
     selectedMonthRecords.value = await getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
-  }, {immediate: true})
+  }, { immediate: true })
 
-  watch(selectedDate, ()=>{
-    selectedEmotionRecords.value = selectedMonthRecords.value ?.[selectedFormattedDate.value] || []
+  watch(selectedDate, () => {
+    selectedEmotionRecords.value = selectedMonthRecords.value?.[selectedFormattedDate.value] || []
     // console.log(selectedEmotionRecords.value)
   })
 
+  watchEffect(async () => {
+    todayMonthRecords.value = await getEmotionRecords(todayYear.value, todayMonth.value + 1)
+    todayEmotionRecords.value = todayMonthRecords.value?.[todayFormattedDate.value] || []
+    todayMainEmotion.value = todayEmotionRecords.value.find(emotion => emotion.emotionRecordState === 'main') || null
+    todayMomentEmotions.value = todayEmotionRecords.value.filter(emotion => emotion.emotionRecordState === 'moment') || null
+  })
   /**
    * 시간 관리
    */
@@ -88,7 +85,7 @@ export const useEmotionStore = defineStore('emotion', () => {
     const milliseconds = date.getMilliseconds().toString().padStart(3, '0')
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
-}
+  }
 
   /**
    * SessionStorage Controls
@@ -204,6 +201,8 @@ export const useEmotionStore = defineStore('emotion', () => {
     todayDay,
     todayWeekDay,
     todayMainEmotion,
+    todayMonth,
+    todayYear,
     selectedDate,
     selectedYear,
     selectedMonth,
