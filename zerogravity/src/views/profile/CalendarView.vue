@@ -1,5 +1,5 @@
 <script setup>
-  import { onMounted, ref, onUnmounted, nextTick, provide, watch, computed, watchEffect } from 'vue'
+  import { onMounted, ref, onUnmounted, nextTick, watch, computed, watchEffect } from 'vue'
   import { useEmotionStore } from '@/stores/emotion.js'
   import { storeToRefs } from 'pinia'
   import EmotionCalendar from '@/components/calendar/EmotionCalendar.vue'
@@ -9,7 +9,33 @@
   import HeadlineText from '@/components/text/HeadlineText.vue'
   import LinkButton from '@/components/button/LinkButton.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
-  import { useUserStore } from '@/stores/user'
+
+  const emotionStore = useEmotionStore()
+  const { selectedDate, selectedMonth, selectedYear, todayDate, selectedMainEmotion, todayMainEmotion } = storeToRefs(emotionStore)
+
+  // 선택한 날짜
+  // const selectedDate = ref(null)
+  // provide('selectedDate', selectedDate)
+
+  // const selectedYear = ref(0)
+  // const selectedMonth = ref(0)
+  // const currentWeek = ref(0)
+  // const currentDate = ref(null)
+
+  // const getWeekOfMonth = () => {
+  //   const firstDayOfMonth = new Date(selectedYear.value, selectedMonth.value, 1)
+  //   const firstDayOfWeek = firstDayOfMonth.getDay()
+
+  //   const daysInFirstWeek = 7 - firstDayOfWeek
+
+  //   const dayOfMonth = currentDate.value.getDate()
+
+  //   const weekNumber = dayOfMonth > daysInFirstWeek
+  //     ? 1 + Math.ceil((dayOfMonth - daysInFirstWeek) / 7)
+  //     : 1
+
+  //   currentWeek.value = weekNumber
+  // }
 
   /**
    * 초기 화면 설정
@@ -38,15 +64,12 @@
   const isShowDetail = ref(false)
   const isDrawerHidden = ref(true)
 
-  // 선택한 날짜
-  const selectedDate = ref(null)
-  provide('selectedDate', selectedDate)
-
   const toggleDetail = (date) => {
     if (date) {
+      date.setHours(12, 0, 0, 0) // 시간을 오후 12시 0분 0초로 설정
+      selectedDate.value = date
       isShowDetail.value = true
       isDrawerHidden.value = false
-      selectedDate.value = new Date(currentYear.value, currentMonth.value, date)
     } else {
       isShowDetail.value = false
       isDrawerHidden.value = true
@@ -62,18 +85,13 @@
   /**
    * 날짜 계산 로직
    */
-  const currentYear = ref(0)
-  const currentMonth = ref(0)
-  const currentWeek = ref(0)
-  const currentDate = ref(null)
-
   const getPreviousMonth = () => {
     if (!isTablet.value) {
-      if (currentMonth.value === 0) {
-        currentMonth.value = 11
-        currentYear.value--
+      if (selectedMonth.value === 0) {
+        selectedMonth.value = 11
+        selectedYear.value--
       } else {
-        currentMonth.value--
+        selectedMonth.value--
       }
     } else {
       return
@@ -82,11 +100,11 @@
 
   const getNextMonth = () => {
     if (!isTablet.value) {
-      if (currentMonth.value === 11) {
-        currentMonth.value = 0
-        currentYear.value++
+      if (selectedMonth.value === 11) {
+        selectedMonth.value = 0
+        selectedYear.value++
       } else {
-        currentMonth.value++
+        selectedMonth.value++
       }
     } else {
       return
@@ -95,59 +113,23 @@
 
   const getTodayMonth = () => {
     if (!isTablet.value) {
-      currentMonth.value = currentDate.value.getMonth()
-      currentYear.value = currentDate.value.getFullYear()
+      selectedMonth.value = todayDate.value.getMonth()
+      selectedYear.value = todayDate.value.getFullYear()
     } else {
       return
     }
   }
 
-  // const getWeekOfMonth = () => {
-  //   const firstDayOfMonth = new Date(currentYear.value, currentMonth.value, 1)
-  //   const firstDayOfWeek = firstDayOfMonth.getDay()
-
-  //   const daysInFirstWeek = 7 - firstDayOfWeek
-
-  //   const dayOfMonth = currentDate.value.getDate()
-
-  //   const weekNumber = dayOfMonth > daysInFirstWeek
-  //     ? 1 + Math.ceil((dayOfMonth - daysInFirstWeek) / 7)
-  //     : 1
-
-  //   currentWeek.value = weekNumber
-  // }
-
-  const emotionStore = useEmotionStore()
-  const userStore = useUserStore()
-  const { userId } = storeToRefs(userStore)
-
-  // const searchDate = computed(() => {
-  //   const year = currentDate.value.getFullYear()
-  //   const month = (currentDate.value.getMonth() + 1).toString().padStart(2, '0')
-  //   const day = currentDate.value.getDate().toString().padStart(2, '0')
-  //   const hours = currentDate.value.getHours().toString().padStart(2, '0')
-  //   const minutes = currentDate.value.getMinutes().toString().padStart(2, '0')
-  //   const seconds = currentDate.value.getSeconds().toString().padStart(2, '0')
-
-  //   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-  // })
-
-  watchEffect(() => {
-    currentDate.value = new Date()
-    currentMonth.value = currentDate.value.getMonth()
-    currentYear.value = currentDate.value.getFullYear()
-  })
-
-  watchEffect(async () => {
-    emotionStore.getEmotionRecords(userId.value, parseInt(currentYear.value, 10), parseInt(currentMonth.value, 10) + 1)
-  })
   /**
    * API Fetch
    */
-  // const emotionStore = useEmotionStore()
-  // const userStore = useUserStore()
-  // const { getEmotionRecords } = storeToRefs(emotionStore)
-  // const { userId } = storeToRefs(userStore)
+  watchEffect(() => {
+    todayDate.value = new Date()
+  })
+
+  // watchEffect(async () => {
+  //   emotionStore.getEmotionRecords(parseInt(selectedYear.value, 10), parseInt(selectedMonth.value, 10) + 1)
+  // })
 
   /**
    * 드롭다운
@@ -161,9 +143,12 @@
   }
 
   onMounted(() => {
-    // getWeekOfMonth()
+    todayDate.value = new Date()
+    selectedDate.value = todayDate.value
 
     window.addEventListener('resize', getSectionSize)
+
+    console.log(todayMainEmotion.value)
 
     if (container.value && section.value) {
       nextTick(() => {
@@ -245,7 +230,7 @@
           v-if="!isMobile"
           class="date-title"
         >
-          {{ currentYear }}년 {{ currentMonth + 1 }}월
+          {{ selectedYear }}년 {{ selectedMonth + 1 }}월
         </h1>
       </header>
       <div
@@ -256,8 +241,6 @@
           @show-detail="toggleDetail"
           :width="calendarWidth"
           :height="calendarHeight"
-          :month="currentMonth"
-          :year="currentYear"
         />
         <div
           v-if="isMobile"
@@ -296,16 +279,6 @@
           </div>
         </div>
       </div>
-      <!-- <DrawerContainer
-        @toggle-drawer="toggleDetail"
-        :variant="'emotion'"
-        :width="'300px'"
-        :position="'fixed'"
-        :icon="'close'"
-        :is-right="true"
-        :toggle-visibilty="true"
-        :is-drawer-visible="!isShowDetail"
-      /> -->
     </div>
   </section>
   <DrawerContainer

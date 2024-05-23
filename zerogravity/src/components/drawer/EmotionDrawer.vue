@@ -1,40 +1,73 @@
 <script setup>
-  import { onMounted, ref, inject, computed } from 'vue'
+  import { computed, onMounted, ref } from 'vue'
   import { storeToRefs } from 'pinia'
+  import { useUserStore } from '@/stores/user'
   import { useEmotionStore } from '@/stores/emotion'
+  import router from '@/router'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerHeader from '@/components/drawer/common/DrawerHeader.vue'
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
   import ContentText from '@/components/text/ContentText.vue'
 
+  const userStore = useUserStore()
+  const { recordStatus } = storeToRefs(userStore)
   const emotionStore = useEmotionStore()
-  const { emotionRecords } = storeToRefs(emotionStore)
+  const { selectedDate, selectedDateText, selectedMainEmotion, selectedMomentEmotions, emotionRecord } = storeToRefs(emotionStore)
 
   const divNode = ref(null)
   const momentAreaMaxHeight = ref('')
 
-  // 선택된 날짜
-  const selectedDate = inject('selectedDate')
-
-  const date = computed(() => selectedDate.value ? selectedDate.value.getDate() : null)
-  const month = computed(() => selectedDate.value ? selectedDate.value.getMonth() : null)
-  const year = computed(() => selectedDate.value ? selectedDate.value.getFullYear() : null)
-  const formattedDate = computed(() => selectedDate.value? selectedDate.value.toISOString().split('T')[0] : null)
-  const selectedDateText = computed(() => `${year.value}년 ${month.value + 1}월 ${date.value}일`)
-
-  const todayEmotions = computed(()=>{
-    return emotionRecords.value[formattedDate.value] || []
+  const isNoMoment = computed(() => {
+    return selectedMomentEmotions.value.length
   })
 
-  const mainEmotion = computed(() => {
-    return todayEmotions.value.find(emotion => emotion.emotionRecordState === 'main')
+  const isMainUpdate = computed(() => {
+    return selectedMainEmotion.value === null
   })
 
-  const momentEmotion = computed(() => {
-    return todayEmotions.value.filter(emotion => emotion.emotionRecordState === 'moment')
+  const isDiaryUpdate = computed(() => {
+    return selectedMainEmotion.value === null || selectedMainEmotion.value.diaryEntry === null
   })
 
-  console.log(mainEmotion.value)
+  const addMomentEmotion = () => {
+    recordStatus.value.status = 'newEmotionRecord'
+    recordStatus.value.emotionRecordState = 'moment'
+    userStore.saveRecordStatusToSession()
+    const date = emotionStore.formatDateToTimestamp(selectedDate.value)
+    emotionRecord.value.createdTime = date
+    emotionStore.saveEmotionRecordToSession()
+    router.push('/record/emotion')
+  }
+
+  const updateMainEmotion = () => {
+    recordStatus.value.status = 'updateMainRecord'
+    recordStatus.value.emotionRecordState = 'main'
+    userStore.saveRecordStatusToSession()
+
+    emotionRecord.value = selectedMainEmotion.value
+    emotionStore.saveEmotionRecordToSession()
+    router.push('/record/emotion')
+  }
+
+  const addMainEmotion = () => {
+    recordStatus.value.status = 'newEmotionRecord'
+    recordStatus.value.emotionRecordState = 'main'
+    userStore.saveRecordStatusToSession()
+    const date = emotionStore.formatDateToTimestamp(selectedDate.value)
+    emotionRecord.value.createdTime = date
+    emotionStore.saveEmotionRecordToSession()
+    router.push('/record/emotion')
+  }
+
+  const updateDiary = () => {
+    recordStatus.value.status = 'updateDiaryRecord'
+    recordStatus.value.emotionRecordState = 'main'
+    userStore.saveRecordStatusToSession()
+
+    emotionRecord.value = selectedMainEmotion.value
+    emotionStore.saveEmotionRecordToSession()
+    router.push('/record/diary')
+  }
 
   onMounted(() => {
     const updateMaxHeight = () => {
@@ -60,37 +93,45 @@
 
       <!-- Main Emotion -->
       <DrawerHeader
+        @add-main-emotion="addMainEmotion"
+        @update-main-emotion="updateMainEmotion"
         :title-text="'Main Emotion'"
-        :button-text="'수정하기'"
+        :button-text="isMainUpdate ? '추가하기' : '수정하기' "
         :style="'gray'"
+        :type="isMainUpdate?'main-add' : 'main-update'"
       />
       <div class="main-emotion-area">
         <EmotionContainer
+          class=".emotion-container.detail.s"
           :size="'s'"
-          :style="'compact'"
           :dir="'vertical'"
-          :emotion="mainEmotion ? mainEmotion.emotionRecordType : ''"
-          :level="mainEmotion ? mainEmotion.emotionRecordLevel : ''"
-          :chips-style="'badge'"
-          :reason-list="mainEmotion ? JSON.parse(mainEmotion.emotionReason) : []"
+          :emotion="selectedMainEmotion ? selectedMainEmotion.emotionRecordType : ''"
+          :level="selectedMainEmotion ? selectedMainEmotion.emotionRecordLevel : 0"
+          :chips-state="'badge'"
+          :reason-list="selectedMainEmotion ? JSON.parse(selectedMainEmotion.emotionReason) : []"
         />
       </div>
 
       <!-- Daily Note -->
       <DrawerHeader
+        @update-diary="updateDiary"
         :title-text="'Daily Note'"
-        :button-text="'수정하기'"
+        :button-text="isDiaryUpdate ? '' : '수정하기' "
         :style="'gray'"
+        :type="'diary'"
       />
       <ContentText
         class="text-container"
-        :text="mainEmotion ? mainEmotion.diaryEntry : ''"
+        :text="selectedMainEmotion ? selectedMainEmotion.diaryEntry : ''"
       />
 
       <!-- Moment Emotion -->
       <DrawerHeader
+        @add-moment-emotion="addMomentEmotion"
         :title-text="'Moment Emotion'"
+        :button-text="'추가하기'"
         :style="'gray'"
+        :type="'moment'"
       />
     </div>
 
@@ -99,7 +140,7 @@
       :style="{maxHeight: momentAreaMaxHeight}"
     >
       <EmotionContainer
-        v-for="(emotion, index) in momentEmotion"
+        v-for="(emotion, index) in selectedMomentEmotions"
         :key="index"
         :size="'s'"
         :state="'compact'"
@@ -107,7 +148,8 @@
         :emotion="emotion.emotionRecordType"
         :level="emotion.emotionRecordLevel"
         :chips-state="'badge'"
-        :reason-list="JSON.parse(emotion.emotionReason)"
+        :reason-list="JSON.parse(emotion ? emotion.emotionReason : '')"
+        :time="emotion.createdTime"
       />
     </div>
   </div>
@@ -121,6 +163,9 @@
   background: $white900;
 }
 
+.emotion-container.detail.s{
+  padding-bottom: 0;
+}
 .main-emotion-area{
   padding: $padding-xxl-rem;
 }

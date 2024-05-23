@@ -48,7 +48,7 @@
   const userStore = useUserStore()
   const emotionStore = useEmotionStore()
   const { recordStatus } = storeToRefs(userStore)
-  const { emotionRecord, emotionRecords } = storeToRefs(emotionStore)
+  const { emotionRecord, todayMainEmotion } = storeToRefs(emotionStore)
 
   const onClick = () => {
     emit('click')
@@ -56,18 +56,9 @@
     recordStatus.value.emotionRecordState = props.emotionRecordState
     userStore.saveRecordStatusToSession()
 
-    console.log(emotionRecords)
-
     if(recordStatus.value.emotionRecordState === 'main') {
-      const formattedDate = new Date().toISOString().split('T')[0]
-      console.log(formattedDate)
-      const todayEmotions = emotionRecords.value[formattedDate]
-
-      console.log(todayEmotions)
-      if(todayEmotions){
-        emotionRecord.value = todayEmotions.find(emotion => emotion.emotionRecordState === 'main')
-        emotionStore.saveEmotionRecordToSession()
-      }
+      emotionRecord.value = todayMainEmotion.value
+      emotionStore.saveEmotionRecordToSession()
     }
   }
 

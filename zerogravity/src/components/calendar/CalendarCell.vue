@@ -4,8 +4,8 @@
 
   const props = defineProps({
     date: {
-      type: Number,
-      default: 1,
+      type: Date,
+      default: null,
     },
     isToday: {
       type: Boolean,
@@ -43,6 +43,10 @@
 
   const adjustment = 48
 
+  const numericDate = computed(() => {
+    return props.date ? props.date.getDate() : ''
+  })
+
   const cellClass = computed(() => {
     return `cell ${props.isToday ? 'today' : ''} ${props.isSunday ? 'sunday' : ''} 
     ${props.mainState ? 'main-state' : ''} ${props.momentState ? 'moment-state' : ''}`
@@ -55,11 +59,10 @@
 
 <template>
   <div
-    @click="getDate"
     :class="cellClass"
   >
     <div class="emotion-area">
-      <span class="date-area">{{ props.date }}</span>
+      <span class="date-area">{{ numericDate }}</span>
       <div
         v-if="props.date !== null"
         class="emotion-asset-main-area"

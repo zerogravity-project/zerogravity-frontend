@@ -31,6 +31,10 @@
     router.push('/')
   }
 
+  const goProfile = () => {
+    router.push('/profile/calendar')
+  }
+
   const goBack = () => {
     router.go(-1)
   }
@@ -80,6 +84,7 @@
           />
         </li>
         <li
+          @click="goProfile"
           v-if="isLoggedIn"
           class="profile-img"
         >
@@ -248,6 +253,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 
   img {
     width: 32px;

@@ -62,7 +62,6 @@
       console.log(emotionRecord.value)
 
       // 1. 유저의 데이터가 있는지
-
       if(recordStatus.value.emotionRecordState === 'moment'){
         if(emotionRecord.value.emotionRecordType && emotionRecord.value.emotionRecordLevel && emotionRecord.value.emotionReason){
           // 1. userID 넣기
@@ -71,10 +70,17 @@
           const emotionRecordId = uuidv4()
           emotionRecord.value.emotionRecordId = emotionRecordId
 
+          // 시간 설정 안했으면 (오늘 날짜 추가)
+          if(!emotionRecord.value.createdTime){
+            emotionRecord.value.createdTime = emotionStore.formatDateToTimestamp(new Date())
+          }
+          console.log(emotionRecord.value)
+
           // 3. state 넣어주기
           if(recordStatus.value.emotionRecordState){
             emotionRecord.value.emotionRecordState = recordStatus.value.emotionRecordState
           }
+
           // 4. post(모던트는 무조건 포스트)
           emotionStore.createEmotionRecord(emotionRecord.value)
         }

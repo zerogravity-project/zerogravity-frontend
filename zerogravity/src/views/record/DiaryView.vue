@@ -33,7 +33,7 @@
   const userStore = useUserStore()
   const emotionStore = useEmotionStore()
   const { recordStatus, userId } = storeToRefs(userStore)
-  const { emotionRecord } = storeToRefs(emotionStore)
+  const { emotionRecord, todayMainEmotion } = storeToRefs(emotionStore)
 
   watchEffect(() => {
     emotionStore.getEmotionRecordToSession()
@@ -51,9 +51,10 @@
       console.log(emotionRecord.value)
 
       // 유저가 있는지 체크 해야하는데 일단 없으니 패스
-      if(emotionRecord.value.emotionRecordType && emotionRecord.value.emotionRecordLevel
-        && emotionRecord.value.emotionReason && emotionRecord.value.diaryEntry){
-        if(emotionRecord.value.emotionRecordId){
+      if (emotionRecord.value.emotionRecordType && emotionRecord.value.emotionRecordLevel
+        && emotionRecord.value.emotionReason) {
+        // 만약 이미 추가된 id가 있다면 업데이트
+        if (emotionRecord.value.emotionRecordId) {
           emotionStore.updateEmotionRecord(emotionRecord.value.emotionRecordId, emotionRecord.value)
         } else {
           // 1. userID 넣기
@@ -62,8 +63,13 @@
           const emotionRecordId = uuidv4()
           emotionRecord.value.emotionRecordId = emotionRecordId
 
+          // 시간 설정 안했으면 (오늘 날짜 추가)
+          if(!emotionRecord.value.createdTime){
+            emotionRecord.value.createdTime = emotionStore.formatDateToTimestamp(new Date())
+          }
+
           // 3. state 넣어주기
-          if(recordStatus.value.emotionRecordState){
+          if (recordStatus.value.emotionRecordState) {
             emotionRecord.value.emotionRecordState = recordStatus.value.emotionRecordState
           }
           // 4. post(모던트는 무조건 포스트)
@@ -125,12 +131,12 @@
 </template>
 
 <style lang="scss" scoped>
-.button{
+.button {
   background-color: $orange900;
   border: none;
   transition: all 400ms cubic-bezier(.47, 1.64, .41, .8);
 
-  &:hover{
+  &:hover {
     transform: rotate(360deg) scale(110%);
   }
 }

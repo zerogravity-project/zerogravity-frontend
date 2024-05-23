@@ -1,10 +1,13 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useUserStore = defineStore('counter', () => {
+export const useUserStore = defineStore('user', () => {
   const userId = ref(1)
   const recordStatus = ref({status: null, emotionRecordState: null})
 
+  /**
+   * SessionStorage Controls
+   */
   const resetRecordStatusToSession = () => {
       recordStatus.value.status = null
       recordStatus.value.emotionRecordState = null

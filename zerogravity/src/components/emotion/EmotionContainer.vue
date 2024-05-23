@@ -32,10 +32,25 @@
       type: Array,
       default: () => [],
     },
+    time: {
+      type: String,
+      default: '',
+    },
   })
 
   const emotionContainerClass = computed(() => {
     return `emotion-container ${props.size} ${props.state} ${props.dir}`
+  })
+
+  const formatedToKoreanTime = computed(() => {
+    const time = props.time.split('T')[1]
+
+    const [fullTime ] = time.split('.')
+    let [hours, minutes ] = fullTime.split(':')
+    const isPM = hours >= 12
+    hours = hours % 12 || 12
+
+    return `${isPM ? '오후' : '오전'} ${hours}시 ${minutes}분`
   })
 
   const emotionAssetSize = computed(() => {
@@ -89,7 +104,7 @@
           v-if="props.dir === 'horizontal'"
           class="record-time"
         >
-          오전 11시 11분
+          {{ formatedToKoreanTime }}
         </p>
       </div>
 

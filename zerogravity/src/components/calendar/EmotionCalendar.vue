@@ -13,55 +13,50 @@
       type: Number,
       required: true,
     },
-    month: {
-      type: Number,
-      required: true,
-    },
-    year: {
-      type: Number,
-      required: true,
-    },
   })
 
-  /*
-  ** 감정 가져오기
-  */
   const emotionStore = useEmotionStore()
-  const { emotionRecords } = storeToRefs(emotionStore)
+  const { selectedMonthRecords, todayDate, todayDay, todayWeekDay, selectedYear, selectedMonth } = storeToRefs(emotionStore)
 
-  /*
-  ** 날짜 계산
-  */
+  // const currentDate = new Date()
+  // const currentDay = currentDate.getDate()
+  // const currentWeekDay = currentDate.getDay()
+  // const dates = ref([])
+
+  /**
+   * Width & Height
+   */
   const numericWidth = computed(() => props.width / 7)
   const numericHeight = computed(() => props.height / totalWeekCount.value)
-  const daysOfWeek = ref(['일', '월', '화', '수', '목', '금', '토'])
-  const currentDate = new Date()
-  const currentDay = currentDate.getDate()
-  const currentWeekDay = currentDate.getDay()
-  const showFullMonth = ref(true)
 
-  // const dates = ref([])
+  /**
+   * 날짜 계산
+   */
+  const daysOfWeek = ref(['일', '월', '화', '수', '목', '금', '토'])
+  const showFullMonth = ref(true)
 
   const daysInMonth = (month, year) => new Date(year, month + 1, 0).getDate()
 
   const dates = computed(() => {
-    const firstDayOfWeek = new Date(props.year, props.month, 1).getDay()
-    const totalDays = daysInMonth(props.month, props.year)
+    const firstDayOfWeek = new Date(selectedYear.value, selectedMonth.value, 1).getDay()
+    const totalDays = daysInMonth(selectedMonth.value, selectedYear.value)
     const cells = []
 
     for (let i = 0; i < firstDayOfWeek; i++) {
-      cells.push({ date: null, isToday: false, isSunday: i === 0, mainState: '', momentState: '', level: null, type: null })
+      cells.push({ date: null, isToday: false, isSunday: i === 0, mainState: '', momentState: '', type: null, level: 0 })
     }
 
-    for (let i = 0; i < totalDays; i++) {
-      const date = new Date(props.year, props.month, i + 1)
+    for (let i = 1; i <= totalDays; i++) {
+      const date = new Date(Date.UTC(selectedYear.value, selectedMonth.value, i))
       const formattedDate = date.toISOString().split('T')[0]
-      const emotions = emotionRecords.value[formattedDate] || []
+      // console.log(formattedDate)
+      const emotions = selectedMonthRecords.value[formattedDate] || []
 
       let mainState = ''
       let momentState = false
       let type = null
-      let level = null
+      let level = 0
+
       emotions.forEach(emotion => {
         if (emotion.emotionRecordState === 'main') {
           mainState = 'main'
@@ -74,8 +69,10 @@
       })
 
       cells.push({
-        date: i + 1,
-        isToday: currentDate.getFullYear() === props.year && currentDate.getMonth() === props.month && i + 1 === currentDay,
+        date: date,
+        isToday: todayDate.value.getFullYear() === selectedYear.value
+          && todayDate.value.getMonth() === selectedMonth.value
+          && i === todayDay.value,
         isSunday: (i + firstDayOfWeek) % 7 === 0,
         mainState: mainState,
         momentState: momentState ? 'moment' : '',
@@ -86,15 +83,17 @@
 
     const remainingCells = cells.length % 7 === 0 ? 0 : 7 - (cells.length % 7)
     for (let i = 0; i < remainingCells; i++) {
-      cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '', level: null, type: null })
+      cells.push({ date: null, isToday: false, isSunday: (cells.length + i) % 7 === 0, mainState: '', momentState: '', level: 0, type: null })
     }
 
+    // 주 단위 캘린더 (모바일)
     if (!showFullMonth.value) {
       const todayIndex = cells.findIndex(cell => cell.isToday)
       const start = Math.max(0, todayIndex - (todayIndex % 7))
       return cells.slice(start, start + 7)
     }
 
+    // console.log(cells)
     return cells
   })
 
@@ -107,10 +106,8 @@
   */
   const emits = defineEmits(['showDetail'])
 
-  const getDate = (date) => {
-    if(date){
-      emits('showDetail', date)
-    }
+  const showEmotionDetail = (payload) => {
+    emits('showDetail', payload)
   }
 
   /*
@@ -133,7 +130,7 @@
         {
           sunday: showFullMonth && index === 0,
           today: showFullMonth
-            ? index === currentWeekDay
+            ? index === todayWeekDay
             : index === dates.findIndex(cell => cell.isToday) % 7
         }
       ]"
@@ -142,7 +139,7 @@
     </div>
     <template v-if="showFullMonth">
       <CalendarCell
-        @click="getDate(cell.date)"
+        @click="showEmotionDetail(cell.date)"
         v-for="(cell, index) in dates"
         :key="index"
         :date="cell.date"
