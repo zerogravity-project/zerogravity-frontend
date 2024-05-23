@@ -107,7 +107,7 @@
               },
               label: (tooltipItem) => {
                 const dayIndex = tooltipItem.dataIndex
-                return `${tooltipItem.raw.y})` // Show the label and the value
+                return `감정의 정도: ${tooltipItem.raw.y}`
               },
             },
           },
