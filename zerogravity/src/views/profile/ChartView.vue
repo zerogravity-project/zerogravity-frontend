@@ -74,7 +74,7 @@
     const dailyAverages = Array(7).fill(null)
     const emotionLevels = Array(7).fill(null)
     const mainCounts = Array(7).fill(null)
-    const momentCounts = Array(7).fill(null)
+    const momentCounts = Array(7).fill().map(() => [])
 
     chartStore.dailyCharts.forEach(chart => {
       const dayIndex = getDayIndex(chart.createdTime)
@@ -87,7 +87,7 @@
       if (count.emotionRecordState === 'main' && count.emotionRecordLevel > 0) {
         mainCounts[dayIndex] = count.emotionRecordLevel
       } else if (count.emotionRecordState === 'moment' && count.emotionRecordLevel > 0) {
-        momentCounts[dayIndex] = count.emotionRecordLevel
+        momentCounts[dayIndex].push({ x: labels.value[dayIndex], y: count.emotionRecordLevel })
       }
     })
 
@@ -95,28 +95,27 @@
     datasets.value[1].data = dailyAverages
     emotionDatasets.value[0].data = emotionLevels
 
-    const countDatasetsTemp = []
-    if (mainCounts.some(count => count !== null)) {
-      countDatasetsTemp.push({
-        type: 'scatter',
-        label: '오늘의 감정',
-        data: mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null),
-        backgroundColor: '#FF3B30',
-        borderColor: '#FF3B30',
-        borderWidth: 1,
-      })
-    }
+    const mainData = mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null)
+    const momentData = momentCounts.flat().filter(item => item !== null)
 
-    if (momentCounts.some(count => count !== null)) {
-      countDatasetsTemp.push({
-        type: 'scatter',
-        label: '순간의 감정',
-        data: momentCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null),
-        backgroundColor: 'rgba(128, 128, 128, 0.6)',
-        borderColor: 'rgba(128, 128, 128, 0.6)',
-        borderWidth: 1,
-      })
-    }
+    const countDatasetsTemp = []
+    countDatasetsTemp.push({
+      type: 'scatter',
+      label: '오늘의 감정',
+      data: mainData.length > 0 ? mainData : [{ x: '', y: null }],
+      backgroundColor: '#FF3B30',
+      borderColor: '#FF3B30',
+      borderWidth: 1,
+    })
+
+    countDatasetsTemp.push({
+      type: 'scatter',
+      label: '순간의 감정',
+      data: momentData.length > 0 ? momentData : [{ x: '', y: null }],
+      backgroundColor: 'rgba(128, 128, 128, 0.6)',
+      borderColor: 'rgba(128, 128, 128, 0.6)',
+      borderWidth: 1,
+    })
 
     countDatasets.value = countDatasetsTemp
   }
@@ -150,10 +149,8 @@
   updateWeekRange()
 
   const changeWeek = async (direction) => {
-    const newDate = new Date(searchDate.value)
-    newDate.setDate(newDate.getDate() + direction * 7)
-    searchDate.value = newDate.toISOString().split('T')[0] + ' 00:00:00'
-    currentDate.value = new Date(searchDate.value)
+    currentDate.value.setDate(currentDate.value.getDate() + direction * 7)
+    searchDate.value = currentDate.value.toISOString().split('T')[0] + ' 00:00:00'
     updateWeekRange()
     await fetchData()
   }
@@ -209,6 +206,9 @@
         title: {
           display: true,
         },
+        ticks: {
+          align: 'center',
+        },
       },
     },
     plugins: {
@@ -243,7 +243,7 @@
         <div class="date">
           {{ dateRange }}
         </div>
-        <div class="button">
+        <div class="buttons">
           <ActionButton
             :variant="'sub'"
             :state="'secondary'"
@@ -336,7 +336,7 @@
   .date {
     display: flex;
   }
-  .button {
+  .buttons {
     display: flex;
     flex-direction: row;
   }
@@ -358,7 +358,7 @@
     border: 1px solid rgb(212, 212, 212);
     border-radius: 8px;
     margin: 1rem 1rem 0.2rem 1rem;
-    background-color: rgb(255, 255, 255);
+    background-color: hwb(0 96% 4% / 0.632);
   }
   @media (max-width: 567px) {
     .layout {

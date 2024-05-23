@@ -83,7 +83,7 @@
               callback: valueToLabel,
               stepSize: 1,
               min: 1,
-              max: 7,
+              max: 8,
             },
           },
           x: {
@@ -99,6 +99,17 @@
           legend: {
             display: true,
             position: 'bottom',
+          },
+          tooltip: {
+            callbacks: {
+              title: () => {
+                return ''
+              },
+              label: (tooltipItem) => {
+                const dayIndex = tooltipItem.dataIndex
+                return `${tooltipItem.raw.y})` // Show the label and the value
+              },
+            },
           },
         },
       }
