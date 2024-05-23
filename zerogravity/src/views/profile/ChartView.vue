@@ -167,7 +167,7 @@
     scales: {
       y: {
         beginAtZero: true,
-        max: 8, // Changed max value to 8
+        max: 8,
         title: {
           display: true,
         },
@@ -193,7 +193,7 @@
     scales: {
       y: {
         beginAtZero: true,
-        max: 8, // Changed max value to 8
+        max: 8,
         title: {
           display: true,
         },
