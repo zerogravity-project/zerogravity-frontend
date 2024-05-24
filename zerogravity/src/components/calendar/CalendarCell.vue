@@ -1,5 +1,5 @@
 <script setup>
-  import { computed, watch, ref } from 'vue'
+  import { computed, watch, ref, onMounted, nextTick } from 'vue'
   import EmotionAsset from '../emotion/EmotionAsset.vue'
   import { useEmotionStore } from '@/stores/emotion'
   import { storeToRefs } from 'pinia'
@@ -70,6 +70,12 @@
 
   watch(selectedMonth, () => {
     isChanged.value = true
+  })
+
+  onMounted(() => {
+    nextTick(()=>{
+      isChanged.value = true
+    })
   })
 </script>
 
