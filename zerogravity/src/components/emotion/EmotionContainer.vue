@@ -83,7 +83,7 @@
   })
 
   const isCompact = computed(() => {
-    return props.state !== 'detail'
+    return props.state !== 'detail' &&  props.state !== 'mobile'
   })
 </script>
 

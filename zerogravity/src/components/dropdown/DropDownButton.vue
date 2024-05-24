@@ -58,6 +58,9 @@
 
     if(recordStatus.value.emotionRecordState === 'main') {
       emotionRecord.value = todayMainEmotion.value
+      if(!todayMainEmotion.value){
+        emotionStore.resetEmotionRecordToSession()
+      }
       emotionStore.saveEmotionRecordToSession()
     }
   }

@@ -14,7 +14,7 @@
   const viewportHeight = ref('')
   const diaryText = ref('')
 
-  const reason = ref(['건강', '피트니스', '자기 돌봄', '취미', '정체성', '종교'])
+  const reason = ref([])
 
   // 모바일 사이즈 확인
   const getWindowSize = () => {
@@ -37,6 +37,7 @@
 
   watchEffect(() => {
     emotionStore.getEmotionRecordToSession()
+    reason.value = JSON.parse(emotionRecord.value.emotionReason)
   })
 
   // 버튼 클릭 시
