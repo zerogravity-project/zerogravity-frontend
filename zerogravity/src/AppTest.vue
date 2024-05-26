@@ -79,7 +79,7 @@
       @toggle-drawer="toggleDrawer"
       :class="{ 'border-bottom': backgroundColor !== '#e1e1e0a1' }"
     />
-    <main :class="{ 'no-drawer': !drawerProps }">
+    <main :class="{ 'full-height': !isNavigationVisible }">
       <DrawerContainer
         v-if="drawerProps"
         @toggle-drawer="toggleDrawer"
@@ -110,7 +110,7 @@ main {
   width: 100vw;
   height: calc(100vh - 60px);
 
-  &.no-drawer {
+  &.full-height {
     height: 100vh;
   }
 }

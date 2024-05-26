@@ -23,12 +23,16 @@
     emit('toggleDrawer')
   }
 
-  const isLoggedIn = ref(true)
+  const isLoggedIn = ref(false)
 
   const router = useRouter()
 
   const goHome = () => {
     router.push('/')
+  }
+
+  const goLogin = () => {
+    router.push('/login')
   }
 
   const goProfile = () => {
@@ -77,6 +81,7 @@
           class="nav-item"
         >
           <LinkButton
+            @click="goLogin"
             :text="'Login'"
             :default-color="'#ff2e00'"
             :active-color="'#ff2e00'"
@@ -96,6 +101,7 @@
       </ul>
       <div class="nav-btn">
         <ActionButton
+          v-if="props.variant === 'menu'"
           @click="showDrawer"
           class="menu-button"
           :variant="'sub'"
