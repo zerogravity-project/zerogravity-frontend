@@ -43,7 +43,7 @@
   })
 
   const backgroundColor = computed(() => {
-    const regex = /\/(spaceout|record)\//
+    const regex = /\/(spaceout|record|login)\/?$/
     if (route.path === '/') {
       return '#e1e1e0a1'
     } else if (regex.test(route.path)){
@@ -120,6 +120,4 @@ main {
     width: 100vw;
   }
 }
-
-@media (max-width: 567px) {}
 </style>
