@@ -38,7 +38,6 @@
   const goBack = () => {
     router.go(-1)
   }
-
 </script>
 
 <template>
@@ -96,6 +95,7 @@
       </ul>
       <div class="nav-btn">
         <ActionButton
+          v-if="props.variant === 'menu'"
           @click="showDrawer"
           class="menu-button"
           :variant="'sub'"
@@ -144,7 +144,7 @@
       display: none;
     }
 
-    .menu-button{
+    .menu-button {
       background-color: transparent;
     }
   }
@@ -160,7 +160,6 @@
       display: flex;
       justify-content: flex-start;
       padding: 6px 4px;
-      /* Adjust padding as needed */
       width: 100%;
     }
 
@@ -174,8 +173,8 @@
       justify-content: flex-start;
       align-items: center;
 
-      .nav-menu-btn {
-        display: none;
+      .menu-button {
+        display: none; /* backButton일 때 메뉴 버튼 숨기기 */
       }
 
       .back-button-content {
@@ -205,7 +204,6 @@
 @media (max-width: 834px) {
   .top-navigation {
     &.menu {
-
       .nav-menu-area {
         display: flex;
         justify-content: flex-end;

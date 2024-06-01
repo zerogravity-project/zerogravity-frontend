@@ -7,21 +7,36 @@ export const useEmotionStore = defineStore('emotion', () => {
   const useStore = useUserStore()
   const { userId } = storeToRefs(useStore)
 
-  const emotions = ref([])
-
   // 추가하기 위한 레코드
+  const emotions = ref([])
   const emotionRecords = ref([])
-  const emotionRecord = ref(
-    {
-      emotionRecordId: '',
-      userId: 0,
-      emotionReason: [],
-      emotionRecordType: '',
-      emotionRecordLevel: 0,
-      emotionRecordState: '',
-      diaryEntry: '',
-      createdTime: '',
-    })
+  const emotionWeeklyRecord = ref([])
+  const emotionRecord = ref({
+    emotionRecordId: '',
+    userId: 0,
+    emotionReason: [],
+    emotionRecordType: '',
+    emotionRecordLevel: 0,
+    emotionRecordState: '',
+    diaryEntry: '',
+    createdTime: '',
+  })
+
+  const getWeekOfMonth = (date) => {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+    const dayOfWeek = firstDayOfMonth.getDay()
+    const dayOfMonth = date.getDate()
+    const adjustedDayOfMonth = dayOfMonth + dayOfWeek
+    return Math.ceil(adjustedDayOfMonth / 7)
+  }
+
+  const getAdjustedWeekOfMonth = (date) => {
+    const startOfWeek = new Date(date)
+    startOfWeek.setDate(date.getDate() - date.getDay())
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
+    const firstDayOfWeek = firstDayOfMonth.getDay()
+    return Math.ceil((date.getDate() + firstDayOfWeek) / 7)
+  }
 
   // 오늘 날짜 데이터
   const todayDate = ref(new Date())
@@ -40,10 +55,11 @@ export const useEmotionStore = defineStore('emotion', () => {
   const selectedDateNum = computed(() => selectedDate.value.getDate())
   const selectedYear = ref(selectedDate.value.getFullYear())
   const selectedMonth = ref(selectedDate.value.getMonth())
-  const selectedWeek = ref(0)
+  const selectedWeek = ref(getAdjustedWeekOfMonth(selectedDate.value))
   const selectedDateText = computed(() => `${selectedYear.value}년 ${selectedMonth.value + 1}월 ${selectedDateNum.value}일`)
-  const selectedFormattedDate = computed(() => selectedDate.value.toISOString().split('T')[0]) // 2024-xx-xx
+  const selectedFormattedDate = computed(() => selectedDate.value.toISOString().split('T')[0])
 
+  const selectedWeeklyRecords = ref([])
   const selectedMonthRecords = ref([])
   const selectedEmotionRecords = ref([])
 
@@ -55,14 +71,44 @@ export const useEmotionStore = defineStore('emotion', () => {
     return selectedEmotionRecords.value.filter(emotion => emotion.emotionRecordState === 'moment') || null
   })
 
+  const selectedWeeklyMainEmotion = computed(() => {
+    return Array.isArray(selectedWeeklyRecords.value)
+      ? selectedWeeklyRecords.value.filter(emotion => emotion.emotionRecordState === 'main')
+      : null
+  })
+
+  const selectedWeeklyMomentEmotion = computed(() => {
+    return Array.isArray(selectedWeeklyRecords.value)
+      ? selectedWeeklyRecords.value.filter(emotion => emotion.emotionRecordState === 'moment')
+      : null
+  })
+
+  const getWeekDates = (date) => {
+    const startOfWeek = new Date(date)
+    startOfWeek.setDate(date.getDate() - (date.getDay() || 7))
+    const dates = []
+    for (let i = 0; i < 7; i++) {
+      const newDate = new Date(startOfWeek)
+      newDate.setDate(startOfWeek.getDate() + i)
+      dates.push(newDate)
+    }
+    return dates
+  }
+
+  const todayWeekDates = computed(() => getWeekDates(todayDate.value))
+  const selectedWeekDates = computed(() => getWeekDates(selectedDate.value))
   // 만약 달이 바뀐다면 다시 불러와야함
   watch(selectedMonth, async () => {
     selectedMonthRecords.value = await getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
   }, { immediate: true })
 
-  watch(selectedDate, () => {
+  watch(selectedDate, async () => {
     selectedEmotionRecords.value = selectedMonthRecords.value?.[selectedFormattedDate.value] || []
-    // console.log(selectedEmotionRecords.value)
+    selectedWeek.value = getAdjustedWeekOfMonth(selectedDate.value)
+
+    const period = 'weekly'
+    const searchDate = formatDateToCustomString(selectedDate.value)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userId.value, period, searchDate)
   })
 
   watchEffect(async () => {
@@ -83,10 +129,18 @@ export const useEmotionStore = defineStore('emotion', () => {
     const minutes = date.getMinutes().toString().padStart(2, '0')
     const seconds = date.getSeconds().toString().padStart(2, '0')
     const milliseconds = date.getMilliseconds().toString().padStart(3, '0')
-
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
   }
 
+  const formatDateToCustomString = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+  }
   /**
    * SessionStorage Controls
    */
@@ -102,8 +156,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   }
 
   const resetEmotionRecordToSession = () => {
-    emotionRecord.value =
-    {
+    emotionRecord.value = {
       emotionRecordId: '',
       userId: 0,
       emotionReason: [],
@@ -116,7 +169,6 @@ export const useEmotionStore = defineStore('emotion', () => {
 
     sessionStorage.removeItem('emotionRecord')
   }
-
   /**
    * 감정 데이터 관리
    */
@@ -137,12 +189,9 @@ export const useEmotionStore = defineStore('emotion', () => {
       sortedEmotionsByDate[key] = emotionsByDate[key]
     }
 
-    console.log(sortedEmotionsByDate)
-    // emotionRecords.value = sortedEmotionsByDate
     return sortedEmotionsByDate
   }
-
-  /**
+    /**
    * API Controls
    */
   // 사용자의 감정 전체 데이터 가져오기
@@ -161,11 +210,8 @@ export const useEmotionStore = defineStore('emotion', () => {
       return {}
     }
   }
-
   // 사용자의 감정 기록
   async function createEmotionRecord(emotionData) {
-    console.log('yes')
-    console.log(emotionData)
     try {
       const response = await axios.post('http://localhost:8080/api-zerogravity/emotions/records', emotionData)
       console.log('✅ Emotion Record Created:', response)
@@ -175,13 +221,11 @@ export const useEmotionStore = defineStore('emotion', () => {
       console.error('😱 Error creating emotion record:', error)
     }
   }
-
   // 사용자의 감정 업데이트
   async function updateEmotionRecord(emotionRecordId, emotionUpdateData) {
     try {
       const response = await axios.put(`http://localhost:8080/api-zerogravity/emotions/records/${emotionRecordId}`, emotionUpdateData)
       console.log('✅ Emotion Record Updated:', response)
-
       await refreshEmotionRecords()
     } catch (error) {
       console.error('😱 Error updating emotion record:', error)
@@ -192,6 +236,72 @@ export const useEmotionStore = defineStore('emotion', () => {
     // 선택된 월의 감정 기록을 다시 불러오기
     selectedMonthRecords.value = await getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
   }
+
+  async function getWeeklyEmotionRecord(userId, period, searchDate) {
+    try {
+      const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/count/${userId}`, {
+        params: { period, searchDate },
+      })
+      const allWeeklyEmotion = response.data
+      return Array.isArray(allWeeklyEmotion) ? allWeeklyEmotion : []
+    } catch (error) {
+      console.error('Error fetching chart:', error)
+      return []
+    }
+  }
+
+  const getPreviousWeek = async () => {
+    const newDate = new Date(selectedDate.value)
+    newDate.setDate(newDate.getDate() - 7)
+    newDate.setHours(12, 0, 0, 0)
+
+    const userIdValue = userId.value
+    const period = 'weekly'
+    const searchDate = formatDateToCustomString(newDate)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userIdValue, period, searchDate)
+
+    selectedDate.value = newDate
+    selectedWeek.value = getAdjustedWeekOfMonth(newDate)
+    updateMonthAndYear(newDate)
+  }
+
+  const getNextWeek = async () => {
+    const newDate = new Date(selectedDate.value)
+    newDate.setDate(newDate.getDate() + 7)
+    newDate.setHours(12, 0, 0, 0)
+
+    const userIdValue = userId.value
+    const period = 'weekly'
+    const searchDate = formatDateToCustomString(newDate)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userIdValue, period, searchDate)
+
+    selectedDate.value = newDate
+    selectedWeek.value = getAdjustedWeekOfMonth(newDate)
+    updateMonthAndYear(newDate)
+  }
+
+  const updateMonthAndYear = (date) => {
+    selectedYear.value = date.getFullYear()
+    selectedMonth.value = date.getMonth()
+  }
+
+  // filteredEmotion 추가
+  const filteredMainEmotions = computed(() => {
+    if (!selectedDate.value) {
+      return []
+    }
+
+    const filteredEmotions = selectedWeeklyMainEmotion.value.filter(emotion => {
+      const emotionDate = new Date(emotion.createdTime)
+      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getDate()
+    })
+
+    if (filteredEmotions.length === 0) {
+      return [{ createdTime: selectedDate.value.toISOString(), emotionRecordType: '', emotionRecordLevel: 0, emotionReason: '[]' }]
+    }
+
+    return filteredEmotions
+  })
 
   return {
     emotions,
@@ -209,15 +319,27 @@ export const useEmotionStore = defineStore('emotion', () => {
     selectedWeek,
     selectedDateText,
     selectedEmotionRecords,
+    selectedWeeklyRecords,
+    emotionWeeklyRecord,
     selectedMainEmotion,
     selectedMomentEmotions,
+    selectedWeeklyMainEmotion,
+    selectedWeeklyMomentEmotion,
     selectedMonthRecords,
+    selectedWeekDates,
+    todayWeekDates,
+    getWeekOfMonth,
     formatDateToTimestamp,
     resetEmotionRecordToSession,
     getEmotionRecords,
     createEmotionRecord,
     updateEmotionRecord,
-    saveEmotionRecordToSession,
     getEmotionRecordToSession,
+    saveEmotionRecordToSession,
+    getWeeklyEmotionRecord,
+    getPreviousWeek,
+    getNextWeek,
+    updateMonthAndYear,
+    filteredMainEmotions,
   }
 })

@@ -77,9 +77,13 @@
             borderWidth: 2.5,
             pointRadius: 4,
             pointHoverRadius: 4,
+            spanGaps: true, // 데이터가 없는 부분을 연결
           },
         ],
       }
+
+      const nonZeroData = props.datasets[0].data.filter(value => value !== 0)
+      const average = nonZeroData.reduce((a, b) => a + b, 0) / nonZeroData.length
 
       const chartOptions = {
         ...props.chartOptions,
@@ -119,13 +123,13 @@
               averageLine: {
                 type: 'line',
                 scaleID: 'y',
-                value: props.datasets[0].data.reduce((a, b) => a + b, 0) / props.datasets[0].data.length,
+                value: average,
                 borderColor: props.averageLineColor,
                 borderWidth: 2,
                 borderDash: [5, 5],
                 label: {
                   enabled: true,
-                  content: 'Average',
+                  content: '평균',
                   position: 'end',
                   backgroundColor: props.averageLineColor,
                   color: 'black',
@@ -166,13 +170,6 @@
 </template>
 
 <style lang="scss" scoped>
-.chart {
-  width: 100%;
-  height: 400px;
-}
-</style>
-
-<style scoped>
 .chart {
   width: 100%;
   height: 400px;

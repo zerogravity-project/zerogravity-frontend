@@ -6,12 +6,17 @@
   import DropDown from '@/components/dropdown/DropDown.vue'
   import { onMounted, ref } from 'vue'
   import { dailyChartStore } from '@/stores/chart'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
 
   const charts = ref([])
   const chartStore = dailyChartStore()
+  const userStore = useUserStore()
+
+  const { userId } = storeToRefs(userStore)
 
   const labels = ref([
-    '월', '화', '수', '목', '금', '토', '일',
+    '일', '월', '화', '수', '목', '금', '토',
   ])
 
   const barColor = '#FF3B3080'
@@ -26,13 +31,6 @@
       backgroundColor: barColor,
       borderColor: barColor,
       borderWidth: 1,
-    },
-    {
-      type: 'line',
-      data: Array(7).fill(null),
-      backgroundColor: lineColor,
-      borderColor: lineColor,
-      borderWidth: 2,
     },
   ])
 
@@ -52,72 +50,92 @@
   const getDayIndex = (dateString) => {
     const date = new Date(dateString)
     const day = date.getDay()
-    return day === 0 ? 6 : day - 1
+    return day
   }
 
-  const searchDate = ref(new Date().toISOString().split('T')[0] + ' 00:00:00')
+  const formatDateToCustomString = (date) => {
+    const year = String(date.getFullYear())
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    const seconds = String(date.getSeconds()).padStart(2, '0')
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+  }
+
+  const searchDate = ref(formatDateToCustomString(new Date()))
 
   const fetchData = async () => {
-    datasets.value[0].data = Array(7).fill(null)
-    datasets.value[1].data = Array(7).fill(null)
-    emotionDatasets.value[0].data = Array(7).fill(null)
-    countDatasets.value = []
+    try {
+      console.log('Fetching data with parameters:', {
+        userId: userId.value,
+        period: 'weekly',
+        searchDate: searchDate.value,
+      })
 
-    const userId = '1'
-    const period = 'weekly'
-    await chartStore.getAllCharts(userId, period, searchDate.value)
-    await chartStore.getAllCounts(userId, period, searchDate.value)
+      datasets.value[0].data = Array(7).fill(null)
+      emotionDatasets.value[0].data = Array(7).fill(null)
+      countDatasets.value = []
 
-    charts.value = chartStore.dailyCharts
-    const counts = chartStore.countCharts
+      const period = 'weekly'
+      await chartStore.getAllCharts(userId.value, period, searchDate.value)
+      await chartStore.getAllCounts(userId.value, period, searchDate.value)
 
-    const dailyAverages = Array(7).fill(null)
-    const emotionLevels = Array(7).fill(null)
-    const mainCounts = Array(7).fill(null)
-    const momentCounts = Array(7).fill().map(() => [])
+      charts.value = chartStore.dailyCharts
+      const counts = chartStore.countCharts
 
-    chartStore.dailyCharts.forEach(chart => {
-      const dayIndex = getDayIndex(chart.createdTime)
-      dailyAverages[dayIndex] = chart.dailyAverage
-      emotionLevels[dayIndex] = chart.dailyAverage
-    })
+      const dailyAverages = Array(7).fill(null)
+      const emotionLevels = Array(7).fill(null)
+      const mainCounts = Array(7).fill(null)
+      const momentCounts = Array(7).fill().map(() => [])
 
-    counts.forEach(count => {
-      const dayIndex = getDayIndex(count.createdTime)
-      if (count.emotionRecordState === 'main' && count.emotionRecordLevel > 0) {
-        mainCounts[dayIndex] = count.emotionRecordLevel
-      } else if (count.emotionRecordState === 'moment' && count.emotionRecordLevel > 0) {
-        momentCounts[dayIndex].push({ x: labels.value[dayIndex], y: count.emotionRecordLevel })
+      chartStore.dailyCharts.forEach(chart => {
+        const dayIndex = getDayIndex(chart.createdTime)
+        dailyAverages[dayIndex] = chart.dailyAverage
+        emotionLevels[dayIndex] = chart.dailyAverage
+      })
+
+      counts.forEach(count => {
+        const dayIndex = getDayIndex(count.createdTime)
+        if (count.emotionRecordState === 'main' && count.emotionRecordLevel > 0) {
+          mainCounts[dayIndex] = count.emotionRecordLevel
+        } else if (count.emotionRecordState === 'moment' && count.emotionRecordLevel > 0) {
+          momentCounts[dayIndex].push({ x: labels.value[dayIndex], y: count.emotionRecordLevel })
+        }
+      })
+
+      datasets.value[0].data = dailyAverages
+      emotionDatasets.value[0].data = emotionLevels
+
+      const mainData = mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null)
+      const momentData = momentCounts.flat().filter(item => item !== null)
+
+      const countDatasetsTemp = []
+      countDatasetsTemp.push({
+        type: 'scatter',
+        label: '오늘의 감정',
+        data: mainData.length > 0 ? mainData : [{ x: '', y: null }],
+        backgroundColor: '#FF3B30',
+        borderColor: '#FF3B30',
+        borderWidth: 1,
+      })
+
+      countDatasetsTemp.push({
+        type: 'scatter',
+        label: '순간의 감정',
+        data: momentData.length > 0 ? momentData : [{ x: '', y: null }],
+        backgroundColor: 'rgba(128, 128, 128, 0.6)',
+        borderColor: 'rgba(128, 128, 128, 0.6)',
+        borderWidth: 1,
+      })
+
+      countDatasets.value = countDatasetsTemp
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      if (error.response) {
+        console.error('Response data:', error.response.data)
       }
-    })
-
-    datasets.value[0].data = dailyAverages
-    datasets.value[1].data = dailyAverages
-    emotionDatasets.value[0].data = emotionLevels
-
-    const mainData = mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null)
-    const momentData = momentCounts.flat().filter(item => item !== null)
-
-    const countDatasetsTemp = []
-    countDatasetsTemp.push({
-      type: 'scatter',
-      label: '오늘의 감정',
-      data: mainData.length > 0 ? mainData : [{ x: '', y: null }],
-      backgroundColor: '#FF3B30',
-      borderColor: '#FF3B30',
-      borderWidth: 1,
-    })
-
-    countDatasetsTemp.push({
-      type: 'scatter',
-      label: '순간의 감정',
-      data: momentData.length > 0 ? momentData : [{ x: '', y: null }],
-      backgroundColor: 'rgba(128, 128, 128, 0.6)',
-      borderColor: 'rgba(128, 128, 128, 0.6)',
-      borderWidth: 1,
-    })
-
-    countDatasets.value = countDatasetsTemp
+    }
   }
 
   const formatDate = (date) => {
@@ -129,20 +147,20 @@
 
   const getWeekRange = (date) => {
     const day = date.getDay()
-    const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1)
-    const monday = new Date(date)
-    monday.setDate(diffToMonday)
-    const sunday = new Date(monday)
-    sunday.setDate(monday.getDate() + 6)
-    return { monday, sunday }
+    const diffToSunday = date.getDate() - day
+    const sunday = new Date(date)
+    sunday.setDate(diffToSunday)
+    const saturday = new Date(sunday)
+    saturday.setDate(sunday.getDate() + 6)
+    return { sunday, saturday }
   }
 
   const currentDate = ref(new Date())
   const updateWeekRange = () => {
-    const { monday, sunday } = getWeekRange(currentDate.value)
-    const formattedMonday = formatDate(monday)
+    const { sunday, saturday } = getWeekRange(currentDate.value)
     const formattedSunday = formatDate(sunday)
-    dateRange.value = `${formattedMonday} - ${formattedSunday}`
+    const formattedSaturday = formatDate(saturday)
+    dateRange.value = `${formattedSunday} - ${formattedSaturday}`
   }
 
   const dateRange = ref('')
@@ -150,7 +168,7 @@
 
   const changeWeek = async (direction) => {
     currentDate.value.setDate(currentDate.value.getDate() + direction * 7)
-    searchDate.value = currentDate.value.toISOString().split('T')[0] + ' 00:00:00'
+    searchDate.value = formatDateToCustomString(currentDate.value)
     updateWeekRange()
     await fetchData()
   }
@@ -248,12 +266,21 @@
             :variant="'sub'"
             :state="'secondary'"
             :icon="'chevron_left'"
+            :style="{
+              'border-top-right-radius': 0,
+              'border-bottom-right-radius': 0,
+              'border-right': 'none'
+            }"
             @click="() => changeWeek(-1)"
           />
           <ActionButton
             :variant="'sub'"
             :state="'secondary'"
             :icon="'chevron_right'"
+            :style="{
+              'border-top-left-radius': 0,
+              'border-bottom-left-radius': 0
+            }"
             @click="() => changeWeek(1)"
           />
           <ActionButton
