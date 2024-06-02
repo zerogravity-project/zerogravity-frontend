@@ -31,3 +31,8 @@ appTest.use(router)
 appTest.use(TroisJSVuePlugin)
 
 appTest.mount('#app')
+
+window.Kakao.init(import.meta.env.VITE_KAKAO_KEY)
+
+console.log(import.meta.env.VITE_KAKAO_KEY) // 테스트
+

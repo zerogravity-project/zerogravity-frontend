@@ -1,11 +1,16 @@
 <script setup>
+  import { computed, watch } from 'vue'
   import LogoSvg from '@/components/others/LogoSvg.vue'
   // import ContentText from '@/components/text/ContentText.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
 
+  console.log(Kakao)
   const onClick = () => {
-    console.log('login')
+    Kakao.Auth.authorize({
+      redirectUri: 'http://localhost:8080/login/oauth2/code/kakao',
+    })
   }
+
 </script>
 
 <template>

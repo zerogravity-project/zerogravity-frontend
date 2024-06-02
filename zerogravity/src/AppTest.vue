@@ -3,8 +3,13 @@
   import { RouterView, useRoute } from 'vue-router'
   import TopNavigation from './components/navigation/TopNavigation.vue'
   import DrawerContainer from './components/drawer/DrawerContainer.vue'
+  import { useUserStore } from './stores/user'
+  import { storeToRefs } from 'pinia'
 
   const route = useRoute()
+
+  const useStore = useUserStore()
+  // const { getLoginInfo } = storeToRefs(useStore)
 
   const viewportWidth = ref(window.innerWidth)
   const viewportHeight = ref(window.innerHeight)

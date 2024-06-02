@@ -1,18 +1,42 @@
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
 export const useUserStore = defineStore('user', () => {
+  const recordStatus = ref({ status: null, emotionRecordState: null })
   const userId = ref(1)
-  const recordStatus = ref({status: null, emotionRecordState: null})
+  const user = ref(null)
+  const isAuthenticated = ref(false)
+
+  /**
+   * User API Controls
+   */
+  const getProfile = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api-zerogravity/users/profile', { withCredentials: true })
+      console.log('✅ User Info Fetched')
+      user.value = response.data
+      isAuthenticated.value = true
+      console.log(user.value)
+    } catch (error) {
+      isAuthenticated.value = false
+      console.error('😱 Error fetching User Info:', error)
+    }
+  }
+
+  watchEffect(() => {
+    // console.log(document.cookie.includes('token'))
+    getProfile()
+  })
 
   /**
    * SessionStorage Controls
    */
   const resetRecordStatusToSession = () => {
-      recordStatus.value.status = null
-      recordStatus.value.emotionRecordState = null
+    recordStatus.value.status = null
+    recordStatus.value.emotionRecordState = null
 
-      sessionStorage.removeItem('recordStatus')
+    sessionStorage.removeItem('recordStatus')
   }
 
   const saveRecordStatusToSession = () => {
@@ -21,10 +45,19 @@ export const useUserStore = defineStore('user', () => {
 
   const getRecordStatusToSession = () => {
     const sessionData = sessionStorage.getItem('recordStatus')
-    if(sessionData) {
+    if (sessionData) {
       recordStatus.value = JSON.parse(sessionData)
     }
   }
 
-  return { userId, recordStatus, saveRecordStatusToSession, getRecordStatusToSession, resetRecordStatusToSession }
+  return {
+    recordStatus,
+    userId,
+    user,
+    isAuthenticated,
+    getProfile,
+    resetRecordStatusToSession,
+    saveRecordStatusToSession,
+    getRecordStatusToSession,
+  }
 })
