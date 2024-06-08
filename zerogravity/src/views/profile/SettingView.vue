@@ -1,86 +1,110 @@
 <script setup>
+  import { ref } from 'vue'
   import HeadlineText from '@/components/text/HeadlineText.vue'
+  import BaseModal from '@/components/modal/BaseModal.vue'
   import TextInput from '@/components/input/TextInput.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
+
+  const useStore = useUserStore()
+  const { userInfo } = storeToRefs(useStore)
+
+  const modalVisible = ref(false)
+
+  const showModal = () => {
+    modalVisible.value = true
+  }
+
+  const hideModal = () => {
+    modalVisible.value = false
+  }
+
+  const deleteAccount = () => {
+    useStore.deleteUser()
+  }
+
+  const logout = () => {
+    useStore.logout()
+  }
+
 </script>
 
 <template>
-  <div class="layout">
-    <section class="main-area">
-      <div class="main-title">
+  <section class="main-area">
+    <div class="main-title">
+      <HeadlineText
+        :size="'l'"
+        :text="'설정'"
+      />
+    </div>
+    <div class="personal-area">
+      <div class="personal-info">
         <HeadlineText
-          :size="'l'"
-          :text="'설정'"
-          :padding="[48, 0, 0, 0]"
+          class="title"
+          :size="'m'"
+          :text="'기본 정보'"
         />
-      </div>
-      <div class="personal-area">
-        <div class="personal-setting">
-          <HeadlineText
-            class="title"
-            :size="'s'"
-            :text="'개인 화면 설정'"
-            :padding="[32, 32, 0, 32]"
+        <div class="info-detail">
+          <TextInput
+            :model-value="'Kakao'"
+            :label="'로그인 방식'"
+            :readonly="true"
           />
-          <img
-            src="../../assets/images/background.png"
-            alt="Background Image"
-          >
-        </div>
-        <div class="personal-info">
-          <HeadlineText
-            class="title"
-            :size="'s'"
-            :text="'기본 정보'"
-            :padding="[32, 32, 0, 32]"
+          <TextInput
+            :model-value="userInfo && userInfo.nickname"
+            :label="'이름'"
+            :readonly="true"
           />
-          <div class="info-detail">
-            <TextInput :label="'이름'" />
-            <TextInput :label="'닉네임'" />
-            <TextInput :label="'생년월일'" />
-            <TextInput :label="'이메일'" />
-          </div>
         </div>
       </div>
-      <div class="button-area">
+    </div>
+    <div class="button-area">
+      <div class="button-container">
         <ActionButton
+          @click="showModal"
           class="buttons"
-          :variant="'round'"
-          :state="'primary'"
-          :color="'gray'"
+          :style="{ borderRadius: '100px' }"
+          :variant="'main'"
+          :state="'tertiary'"
           :text="'회원탈퇴'"
         />
         <ActionButton
+          @click="logout"
           class="buttons"
-          :variant="'round'"
-          :state="'primary'"
-          :color="'gray'"
+          :style="{ borderRadius: '100px' }"
+          :variant="'main'"
+          :state="'tertiary'"
           :text="'로그아웃'"
         />
       </div>
-    </section>
+    </div>
+  </section>
+  <div
+    class="modal-area"
+    :style="{display: modalVisible ? 'block' : 'none'}"
+  >
+    <div class="modal-container">
+      <BaseModal
+        @hide="hideModal"
+        @action="deleteAccount"
+        :title-text="'정말 탈퇴하시겠어요?'"
+        :sub-title-text="'고객님의 모든 정보와 활동 기록이 삭제됩니다.\n 삭제된 정보는 복구할 수 없으니 신중하게 결정해주세요.'"
+        :button-text="'회원탈퇴'"
+      />
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 
-.layout {
-  display: flex;
-  width: calc(100% - 18.75rem);
-  margin-left: 15px;
-  @media (max-width: 567px) {
-    width: 100vw;
-  }
-}
-
 .main-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   flex: 1;
   padding: 0 2rem;
-
+  gap: 24px;
 }
 
 .main-title {
@@ -88,8 +112,8 @@
   max-width: 50rem;
   display: flex;
   justify-content: left;
-  padding-left: 0.25rem;
-
+  padding-top: $padding-xxxl-rem;
+  padding-left: $padding-xxxs-rem;
 }
 
 .personal-area {
@@ -111,18 +135,15 @@
     .title {
       width: 100%;
       text-align: center;
+      padding: $padding-xxl-rem $padding-xxl-rem 0px;
       margin-bottom: 2rem;
     }
 
     .info-detail {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .info-detail>* {
-      width: 100%;
+      gap: 28px;
+      padding: $padding-xxs-rem $padding-xxl-rem;
     }
 
     img {
@@ -134,9 +155,61 @@
 
 .button-area {
   display: flex;
-  flex-direction: row;
+  width: 100%;
+  justify-content: end;
+
+  .button-container {
+    display: flex;
+    gap: 1rem;
+    padding: 0px 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-area {
+    padding: 0;
+  }
+
+  .main-title {
+    display: none;
+  }
+
+  .personal-area {
+    .personal-info {
+      border: none;
+      border-radius: 0px;
+      padding: 0 0 28px 0;
+
+      .title {
+        width: 100%;
+        text-align: center;
+        padding: $padding-xl-rem 20px 0px;
+        margin-bottom: $margin-xl-rem;
+      }
+
+      .info-detail {
+        gap: 20px;
+        padding: $padding-xxs-rem 20px;
+      }
+    }
+
+  }
+}
+
+.modal-area{
+  position: fixed;
+  top: 0;
+  background-color: $blackopacity50;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+}
+
+.modal-container{
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
+  width: 100%;
+  height: 100%;
 }
 </style>

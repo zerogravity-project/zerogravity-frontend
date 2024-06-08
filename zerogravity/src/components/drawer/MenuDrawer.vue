@@ -1,17 +1,30 @@
 <script setup>
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, watch,  onMounted, onUnmounted } from 'vue'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
   import DrawerNavigation from '@/components/drawer/common/DrawerNavigation.vue'
   import DrawerMenu from '@/components/drawer/common/DrawerMenu.vue'
+  import { useRoute } from 'vue-router'
   import router from '@/router'
 
+  const useStore = useUserStore()
+  const { userInfo } = storeToRefs(useStore)
+
+  const route = useRoute()
+  const currentPath = ref(route.path)
+
+  watch(() => route.path, (newPath) => {
+    currentPath.value = newPath
+  })
+
   const mainMenus = ref([
-    { path: 'profile/calendar', text: 'Calendar', icon: 'calendar_today' },
-    { path: 'profile/chart', text: 'Chart', icon: 'analytics' },
+    { path: '/profile/calendar', text: 'Calendar', icon: 'calendar_today' },
+    { path: '/profile/chart', text: 'Chart', icon: 'analytics' },
   ])
 
   const subMenus = ref([
-    { path: 'profile/setting', text: 'Setting', icon: 'settings' },
-    { path: '', text: 'Home', icon: 'home' },
+    { path: '/profile/setting', text: 'Setting', icon: 'settings' },
+    { path: '/', text: 'Home', icon: 'home' },
   ])
 
   const isHidingAvailable = ref(false)
@@ -24,6 +37,16 @@
     }
   }
 
+  const emit = defineEmits(['hideDrawer'])
+
+  const goToLink = (linkPath) => {
+    router.push(`${linkPath}`)
+
+    if(isHidingAvailable.value){
+      emit('hideDrawer')
+    }
+  }
+
   onMounted(() => {
     window.addEventListener('resize', updateHidingAvailablity)
     updateHidingAvailablity()
@@ -33,15 +56,6 @@
     window.removeEventListener('resize', updateHidingAvailablity)
   })
 
-  const emit = defineEmits(['hideDrawer'])
-
-  const goToLink = (linkPath) => {
-    router.push(`/${linkPath}`)
-
-    if(isHidingAvailable.value){
-      emit('hideDrawer')
-    }
-  }
 </script>
 
 <template>
@@ -51,9 +65,9 @@
     <div class="drawer-main-area">
       <DrawerNavigation
         class="drawer-navigation"
-        :title-text="'Daisy Pyo'"
-        :detail-text="'pyodayoung@gmail.com'"
+        :title-text="userInfo? userInfo.nickname : ''"
         :is-profile="true"
+        :profile-img="userInfo? userInfo.profileImage : null"
       />
       <div class="drawer-main-menu">
         <DrawerMenu
@@ -62,6 +76,7 @@
           :menu-text="menu.text"
           :icon-type="menu.icon"
           :link-path="menu.path"
+          :is-active="currentPath === menu.path"
           @go-to-link="goToLink"
         />
       </div>
@@ -73,6 +88,7 @@
         :menu-text="menu.text"
         :icon-type="menu.icon"
         :link-path="menu.path"
+        :is-active="currentPath === menu.path"
         @go-to-link="goToLink"
       />
     </div>
@@ -102,6 +118,7 @@
 
   .drawer-sub-menu {
     border-top: 1px solid $lightgray300;
+    padding-bottom: $padding-s-rem;
   }
 }
 </style>

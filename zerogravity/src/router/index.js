@@ -192,10 +192,22 @@ const router = createRouter({
   ],
 })
 
-// router.beforeEach((to, from, next) => {
-//   const userStore = useUserStore()
-//   const { user } = storeToRefs(userStore)
+// 로그인 판별
+router.beforeEach(async(to, from, next) => {
+  const userStore = useUserStore()
+  const { isAuthenticated } = storeToRefs(userStore)
 
-// })
+  if (to.path === '/' || to.path === '/login') {
+    return next()
+  }
+
+  await userStore.checkAuthentication()
+
+  if (!isAuthenticated.value) {
+    return next('/login')
+  }
+
+  next()
+})
 
 export default router

@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, defineProps, defineEmits, computed } from 'vue'
+  import { ref, defineProps, defineEmits } from 'vue'
   import { useUserStore } from '@/stores/user'
   import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
@@ -8,7 +8,7 @@
   import ActionButton from '../button/ActionButton.vue'
 
   const useStore = useUserStore()
-  const { user } = storeToRefs(useStore)
+  const { userInfo, isAuthenticated } = storeToRefs(useStore)
 
   const props = defineProps({
     variant: {
@@ -27,8 +27,6 @@
   const showDrawer = () => {
     emit('toggleDrawer')
   }
-
-  const isLoggedIn = computed(() => user.value !== null)
 
   const router = useRouter()
 
@@ -82,7 +80,7 @@
         v-if="props.variant === 'menu'"
       >
         <li
-          v-if="!isLoggedIn"
+          v-if="!isAuthenticated"
           class="nav-item"
         >
           <LinkButton
@@ -95,18 +93,18 @@
         </li>
         <li
           @click="goProfile"
-          v-if="isLoggedIn"
+          v-if="isAuthenticated"
           class="profile-img"
         >
           <img
-            src="@/assets/images/profile.png"
+            :src="userInfo && userInfo.thumbnailImage"
             alt="profile-img"
           >
         </li>
       </ul>
       <div class="nav-btn">
         <ActionButton
-          v-if="props.variant === 'menu' && isLoggedIn"
+          v-if="props.variant === 'menu' && isAuthenticated"
           @click="showDrawer"
           class="menu-button"
           :variant="'sub'"
@@ -256,6 +254,7 @@
   justify-content: center;
   align-items: center;
   padding-right: $padding-l-rem;
+  cursor: pointer;
 }
 
 .nav-item {

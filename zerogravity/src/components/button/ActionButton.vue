@@ -16,6 +16,14 @@
       type: String,
       default: '',
     },
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
+    textColor: {
+      type: String,
+      default: '',
+    },
     text: {
       type: String,
       default: '',
@@ -63,6 +71,7 @@
   <button
     @click="onClick"
     :class="[buttonClass, dynamicPadding]"
+    :style="{backgroundColor: props.backgroundColor, color: props.textColor}"
   >
     <svg
       v-if="props.variant === 'kakao'"
@@ -85,10 +94,12 @@
     <span
       v-if="props.icon"
       class="material-symbols-outlined"
+      :style="{color: props.textColor}"
     >{{ props.icon }}</span>
     <span
       v-if="props.text"
       class="text-area"
+      :style="{color: props.textColor}"
     >{{ props.text }}</span>
   </button>
 </template>
@@ -141,7 +152,7 @@ button {
   &.main {
     justify-content: center;
     width: 100%;
-    padding: $padding-btn-rem 0;
+    padding: $padding-btn-rem 36px;
     gap: 8px;
 
     &.primary {
@@ -151,7 +162,7 @@ button {
       background-color: $orange900;
 
       &:hover::before {
-        background-color: $blackopacity20;
+        background-color: $grayopacity30;
       }
 
       &:disabled {
@@ -168,9 +179,7 @@ button {
       background-color: transparent;
 
       &:hover {
-        border-color: $darkorange900;
-        color: $darkorange900;
-        background-color: transparent;
+        background-color: $orangeopacity10;
       }
 
       &:disabled {

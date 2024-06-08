@@ -1,5 +1,4 @@
 <script setup>
-  import { computed, watch } from 'vue'
   import LogoSvg from '@/components/others/LogoSvg.vue'
   // import ContentText from '@/components/text/ContentText.vue'
   import ActionButton from '@/components/button/ActionButton.vue'

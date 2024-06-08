@@ -48,13 +48,13 @@
   })
 
   const backgroundColor = computed(() => {
-    const regex = /\/(spaceout|record|login)\/?$/
+    const regex = /^\/(spaceout|record|login)(\/|\/.*)?$/
     if (route.path === '/') {
       return '#e1e1e0a1'
-    } else if (regex.test(route.path)){
+    } else if (regex.test(route.path)) {
       return '#f1f1f1'
     } else {
-      return 'transparent'
+      return '#f8f8f8'
     }
   })
 
