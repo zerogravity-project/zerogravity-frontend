@@ -108,7 +108,7 @@ export const useEmotionStore = defineStore('emotion', () => {
 
     const period = 'weekly'
     const searchDate = formatDateToCustomString(selectedDate.value)
-    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userId.value, period, searchDate)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(period, searchDate)
   })
 
   watchEffect(async () => {
@@ -237,11 +237,12 @@ export const useEmotionStore = defineStore('emotion', () => {
     selectedMonthRecords.value = await getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
   }
 
-  async function getWeeklyEmotionRecord(userId, period, searchDate) {
+  async function getWeeklyEmotionRecord(period, searchDate) {
     try {
-      const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/count/${userId}`, {
+      const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/count/${userId.value}`, {
         params: { period, searchDate },
       })
+      console.log('✅ Weekly Record Updated:', response)
       const allWeeklyEmotion = response.data
       return Array.isArray(allWeeklyEmotion) ? allWeeklyEmotion : []
     } catch (error) {
@@ -253,12 +254,11 @@ export const useEmotionStore = defineStore('emotion', () => {
   const getPreviousWeek = async () => {
     const newDate = new Date(selectedDate.value)
     newDate.setDate(newDate.getDate() - 7)
-    newDate.setHours(12, 0, 0, 0)
+    // newDate.setHours(12, 0, 0, 0)
 
-    const userIdValue = userId.value
     const period = 'weekly'
     const searchDate = formatDateToCustomString(newDate)
-    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userIdValue, period, searchDate)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(period, searchDate)
 
     selectedDate.value = newDate
     selectedWeek.value = getAdjustedWeekOfMonth(newDate)
@@ -268,12 +268,11 @@ export const useEmotionStore = defineStore('emotion', () => {
   const getNextWeek = async () => {
     const newDate = new Date(selectedDate.value)
     newDate.setDate(newDate.getDate() + 7)
-    newDate.setHours(12, 0, 0, 0)
+    // newDate.setHours(12, 0, 0, 0)
 
-    const userIdValue = userId.value
     const period = 'weekly'
     const searchDate = formatDateToCustomString(newDate)
-    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(userIdValue, period, searchDate)
+    selectedWeeklyRecords.value = await getWeeklyEmotionRecord(period, searchDate)
 
     selectedDate.value = newDate
     selectedWeek.value = getAdjustedWeekOfMonth(newDate)
@@ -285,7 +284,6 @@ export const useEmotionStore = defineStore('emotion', () => {
     selectedMonth.value = date.getMonth()
   }
 
-  // filteredEmotion 추가
   const filteredMainEmotions = computed(() => {
     if (!selectedDate.value) {
       return []

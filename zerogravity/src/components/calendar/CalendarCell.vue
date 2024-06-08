@@ -18,12 +18,12 @@
       default: false,
     },
     mainState: {
-      type: String,
-      default: '',
+      type: Boolean,
+      default: false,
     },
     momentState: {
-      type: String,
-      default: '',
+      type: Boolean,
+      default: false,
     },
     emotion: {
       type: String,

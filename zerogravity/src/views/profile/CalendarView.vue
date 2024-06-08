@@ -12,7 +12,7 @@
 
   const emotionStore = useEmotionStore()
   const { selectedDate, selectedMonth, selectedYear, todayDate,
-          selectedWeek, selectedWeeklyMainEmotion, selectedWeeklyMomentEmotion } = storeToRefs(emotionStore)
+          selectedWeek, selectedWeeklyMainEmotion, selectedWeeklyMomentEmotion, emotionRecords } = storeToRefs(emotionStore)
 
   /**
    * 초기 화면 설정
@@ -38,7 +38,6 @@
   /**
    * Drawer Toggle
    */
-
   const isShowDetail = ref(false)
   const isDrawerHidden = ref(true)
 
@@ -46,6 +45,8 @@
     if (date) {
       date.setHours(12, 0, 0, 0) // 시간을 오후 12시 0분 0초로 설정
       selectedDate.value = date
+      selectedMonth.value = date.getMonth()
+      selectedYear.value = date.getFullYear()
       isShowDetail.value = true
       isDrawerHidden.value = false
     } else {
@@ -102,9 +103,29 @@
     todayDate.value = new Date()
   })
 
+  const fetchWeeklyEmotionData = () => {
+    const formatDateToCustomString = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    }
+    const newDate = new Date(selectedDate.value)
+    emotionStore.getWeeklyEmotionRecord('weekly', formatDateToCustomString(newDate))
+  }
+
+  const fetchMonthlyEmotionData = () => {
+    emotionStore.getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
+  }
+
   watchEffect(() => {
-    if (!isMobile.value) {
-      emotionStore.getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
+    if (isMobile.value) {
+      fetchWeeklyEmotionData()
+    } else {
+      fetchMonthlyEmotionData()
     }
   })
 
@@ -115,6 +136,16 @@
   const getNextWeek = async () => {
     await emotionStore.getNextWeek()
   }
+
+  /**
+   * 주차 계산 로직
+   */
+  const calculateCurrentWeek = (date) => {
+    const startDate = new Date(date.getFullYear(), 0, 1)
+    const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000))
+    return Math.ceil(days / 7)
+  }
+
   /**
    * 드롭다운
    */
@@ -126,9 +157,10 @@
     isDropdown.value = !isDropdown.value
   }
 
-  // 추가한 부분
   const currentWeekText = computed(() => {
-    return `${selectedMonth.value + 1}월 ${selectedWeek.value}주차`
+    return isMobile.value
+      ? `${selectedMonth.value + 1}월 ${selectedDate.value.getDate()}일`
+      : `${selectedYear.value}년 ${selectedMonth.value + 1}월`
   })
 
   const filteredMainEmotions = computed(() => {
@@ -138,7 +170,7 @@
 
     const filteredEmotions = selectedWeeklyMainEmotion.value.filter(emotion => {
       const emotionDate = new Date(emotion.createdTime)
-      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getDate()
+      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
     })
 
     if (filteredEmotions.length === 0) {
@@ -151,19 +183,32 @@
   const filteredMomentEmotions = computed(() => {
     return selectedWeeklyMomentEmotion.value.filter(emotion => {
       const emotionDate = new Date(emotion.createdTime)
-      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getDate()
+      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
     })
   })
 
-  onMounted(() => {
+  const calendarEmotions = computed(() => {
+    return isMobile.value ? selectedWeeklyMainEmotion.value : emotionRecords.value
+  })
+
+  onMounted(async () => {
     todayDate.value = new Date()
-    selectedDate.value = todayDate.value
+    if (!selectedDate.value) {
+      selectedDate.value = todayDate.value
+    }
+    selectedWeek.value = calculateCurrentWeek(selectedDate.value)
     window.addEventListener('resize', getSectionSize)
 
     if (container.value && section.value) {
       nextTick(() => {
         getSectionSize()
       })
+    }
+
+    if (isMobile.value) {
+      fetchWeeklyEmotionData()
+    } else {
+      fetchMonthlyEmotionData()
     }
   })
 
@@ -276,6 +321,7 @@
           @show-detail="toggleDetail"
           :width="calendarWidth"
           :height="calendarHeight"
+          :emotions="calendarEmotions"
         />
         <div class="link-button-container">
           <LinkButton

@@ -84,6 +84,9 @@
       charts.value = chartStore.dailyCharts
       const counts = chartStore.countCharts
 
+      console.log('Fetched dailyCharts:', charts.value)
+      console.log('Fetched countCharts:', counts)
+
       const dailyAverages = Array(7).fill(null)
       const emotionLevels = Array(7).fill(null)
       const mainCounts = Array(7).fill(null)
@@ -106,6 +109,11 @@
 
       datasets.value[0].data = dailyAverages
       emotionDatasets.value[0].data = emotionLevels
+
+      console.log('Updated dailyAverages:', dailyAverages)
+      console.log('Updated emotionLevels:', emotionLevels)
+      console.log('Updated mainCounts:', mainCounts)
+      console.log('Updated momentCounts:', momentCounts)
 
       const mainData = mainCounts.map((count, index) => count !== null ? { x: labels.value[index], y: count } : null).filter(item => item !== null)
       const momentData = momentCounts.flat().filter(item => item !== null)
