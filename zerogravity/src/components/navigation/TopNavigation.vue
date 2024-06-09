@@ -1,9 +1,14 @@
 <script setup>
   import { ref, defineProps, defineEmits } from 'vue'
+  import { useUserStore } from '@/stores/user'
+  import { storeToRefs } from 'pinia'
   import { useRouter } from 'vue-router'
   import LogoSvg from '../others/LogoSvg.vue'
   import LinkButton from '../button/LinkButton.vue'
   import ActionButton from '../button/ActionButton.vue'
+
+  const useStore = useUserStore()
+  const { userInfo, isAuthenticated } = storeToRefs(useStore)
 
   const props = defineProps({
     variant: {
@@ -23,12 +28,14 @@
     emit('toggleDrawer')
   }
 
-  const isLoggedIn = ref(true)
-
   const router = useRouter()
 
   const goHome = () => {
     router.push('/')
+  }
+
+  const goLogin = () => {
+    router.push('/login')
   }
 
   const goProfile = () => {
@@ -72,10 +79,11 @@
         v-if="props.variant === 'menu'"
       >
         <li
-          v-if="!isLoggedIn"
+          v-if="!isAuthenticated"
           class="nav-item"
         >
           <LinkButton
+            @click="goLogin"
             :text="'Login'"
             :default-color="'#ff2e00'"
             :active-color="'#ff2e00'"
@@ -84,18 +92,19 @@
         </li>
         <li
           @click="goProfile"
-          v-if="isLoggedIn"
+          v-if="isAuthenticated"
           class="profile-img"
         >
           <img
-            src="@/assets/images/profile.png"
+            :src="userInfo && userInfo.thumbnailImage"
             alt="profile-img"
           >
         </li>
       </ul>
       <div class="nav-btn">
         <ActionButton
-          v-if="props.variant === 'menu'"
+          v-if="props.variant === 'menu' && isAuthenticated"
+
           @click="showDrawer"
           class="menu-button"
           :variant="'sub'"
@@ -215,7 +224,12 @@
       }
 
       .nav-sub-menu {
-        display: none;
+        .nav-item{
+          padding: 0px;
+        }
+        .profile-img{
+          display: none;
+        }
       }
 
       .nav-btn {
@@ -238,6 +252,7 @@
   justify-content: center;
   align-items: center;
   padding-right: $padding-l-rem;
+  cursor: pointer;
 }
 
 .nav-item {

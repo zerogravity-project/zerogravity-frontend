@@ -100,6 +100,5 @@ main {
   bottom: 0;
   width: 100%;
   padding-bottom: 60px;
-  background-color: #f1f1f1;
 }
 </style>

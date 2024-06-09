@@ -124,6 +124,7 @@
       <ContentText
         class="text-container"
         :text="selectedMainEmotion ? selectedMainEmotion.diaryEntry : ''"
+        :default-padding="true"
       />
 
       <!-- Moment Emotion -->

@@ -12,6 +12,7 @@
       type: String,
       required: true,
     },
+    isActive: Boolean,
   })
 
   const emit = defineEmits(['goToLink'])
@@ -25,7 +26,7 @@
   <div class="drawer-menu-container">
     <a
       @click="onClick"
-      class="drawer-menu"
+      :class="['drawer-menu', { 'active': isActive }]"
     >
       <span
         v-if="props.iconType"
@@ -60,7 +61,7 @@
     }
 
     &:hover,
-    &:active {
+    &.active {
       background-color: $orangeopacity10;
       color: $orange900;
     }

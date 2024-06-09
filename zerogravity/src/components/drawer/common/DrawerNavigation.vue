@@ -15,6 +15,10 @@
       default: '',
     },
     isProfile: Boolean,
+    profileImg: {
+      type: String,
+      default: null,
+    },
   })
 
   const isOnlyTitle = computed(()=>{
@@ -26,7 +30,7 @@
   <div :class="['drawer-nav-area', {'profile': props.isProfile}]">
     <img
       v-if="props.isProfile"
-      src="../../../assets/images/profile.png"
+      :src="props.profileImg? props.profileImg : '../../../assets/images/profile.png'"
       alt=""
     >
     <div class="drawer-nav-container">
