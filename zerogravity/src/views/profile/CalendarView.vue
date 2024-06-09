@@ -11,31 +11,8 @@
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
 
   const emotionStore = useEmotionStore()
-  const { selectedDate, selectedMonth, selectedYear, todayDate } = storeToRefs(emotionStore)
-
-  // 선택한 날짜
-  // const selectedDate = ref(null)
-  // provide('selectedDate', selectedDate)
-
-  // const selectedYear = ref(0)
-  // const selectedMonth = ref(0)
-  // const currentWeek = ref(0)
-  // const currentDate = ref(null)
-
-  // const getWeekOfMonth = () => {
-  //   const firstDayOfMonth = new Date(selectedYear.value, selectedMonth.value, 1)
-  //   const firstDayOfWeek = firstDayOfMonth.getDay()
-
-  //   const daysInFirstWeek = 7 - firstDayOfWeek
-
-  //   const dayOfMonth = currentDate.value.getDate()
-
-  //   const weekNumber = dayOfMonth > daysInFirstWeek
-  //     ? 1 + Math.ceil((dayOfMonth - daysInFirstWeek) / 7)
-  //     : 1
-
-  //   currentWeek.value = weekNumber
-  // }
+  const { selectedDate, selectedMonth, selectedYear, todayDate,
+          selectedWeek, selectedWeeklyMainEmotion, selectedWeeklyMomentEmotion, emotionRecords } = storeToRefs(emotionStore)
 
   /**
    * 초기 화면 설정
@@ -68,6 +45,8 @@
     if (date) {
       date.setHours(12, 0, 0, 0) // 시간을 오후 12시 0분 0초로 설정
       selectedDate.value = date
+      selectedMonth.value = date.getMonth()
+      selectedYear.value = date.getFullYear()
       isShowDetail.value = true
       isDrawerHidden.value = false
     } else {
@@ -112,12 +91,9 @@
   }
 
   const getTodayMonth = () => {
-    if (!isTablet.value) {
-      selectedMonth.value = todayDate.value.getMonth()
-      selectedYear.value = todayDate.value.getFullYear()
-    } else {
-      return
-    }
+    selectedMonth.value = todayDate.value.getMonth()
+    selectedYear.value = todayDate.value.getFullYear()
+    selectedDate.value = todayDate.value
   }
 
   /**
@@ -127,9 +103,48 @@
     todayDate.value = new Date()
   })
 
-  // watchEffect(async () => {
-  //   emotionStore.getEmotionRecords(parseInt(selectedYear.value, 10), parseInt(selectedMonth.value, 10) + 1)
-  // })
+  const fetchWeeklyEmotionData = () => {
+    const formatDateToCustomString = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+    }
+    const newDate = new Date(selectedDate.value)
+    emotionStore.getWeeklyEmotionRecord('weekly', formatDateToCustomString(newDate))
+  }
+
+  const fetchMonthlyEmotionData = () => {
+    emotionStore.getEmotionRecords(selectedYear.value, selectedMonth.value + 1)
+  }
+
+  watchEffect(() => {
+    if (isMobile.value) {
+      fetchWeeklyEmotionData()
+    } else {
+      fetchMonthlyEmotionData()
+    }
+  })
+
+  const getPreviousWeek = async () => {
+    await emotionStore.getPreviousWeek()
+  }
+
+  const getNextWeek = async () => {
+    await emotionStore.getNextWeek()
+  }
+
+  /**
+   * 주차 계산 로직
+   */
+  const calculateCurrentWeek = (date) => {
+    const startDate = new Date(date.getFullYear(), 0, 1)
+    const days = Math.floor((date - startDate) / (24 * 60 * 60 * 1000))
+    return Math.ceil(days / 7)
+  }
 
   /**
    * 드롭다운
@@ -142,16 +157,58 @@
     isDropdown.value = !isDropdown.value
   }
 
-  onMounted(() => {
-    todayDate.value = new Date()
-    selectedDate.value = todayDate.value
+  const currentWeekText = computed(() => {
+    return isMobile.value
+      ? `${selectedMonth.value + 1}월 ${selectedDate.value.getDate()}일`
+      : `${selectedYear.value}년 ${selectedMonth.value + 1}월`
+  })
 
+  const filteredMainEmotions = computed(() => {
+    if (!selectedDate.value) {
+      return []
+    }
+
+    const filteredEmotions = selectedWeeklyMainEmotion.value.filter(emotion => {
+      const emotionDate = new Date(emotion.createdTime)
+      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
+    })
+
+    if (filteredEmotions.length === 0) {
+      return [{ createdTime: selectedDate.value.toISOString(), emotionRecordType: '', emotionRecordLevel: 0, emotionReason: '[]' }]
+    }
+
+    return filteredEmotions
+  })
+
+  const filteredMomentEmotions = computed(() => {
+    return selectedWeeklyMomentEmotion.value.filter(emotion => {
+      const emotionDate = new Date(emotion.createdTime)
+      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
+    })
+  })
+
+  const calendarEmotions = computed(() => {
+    return isMobile.value ? selectedWeeklyMainEmotion.value : emotionRecords.value
+  })
+
+  onMounted(async () => {
+    todayDate.value = new Date()
+    if (!selectedDate.value) {
+      selectedDate.value = todayDate.value
+    }
+    selectedWeek.value = calculateCurrentWeek(selectedDate.value)
     window.addEventListener('resize', getSectionSize)
 
     if (container.value && section.value) {
       nextTick(() => {
         getSectionSize()
       })
+    }
+
+    if (isMobile.value) {
+      fetchWeeklyEmotionData()
+    } else {
+      fetchMonthlyEmotionData()
     }
   })
 
@@ -170,13 +227,37 @@
       <header class="calendar-header">
         <HeadlineText
           v-if="isMobile"
-          :text="currentWeek"
+          :text="currentWeekText"
           :size="'l'"
         />
-
         <div class="calendar-button-area">
           <div class="pagination-buttons">
             <ActionButton
+              v-if="isMobile"
+              @click="getPreviousWeek"
+              :style="{
+                'border-top-right-radius': 0,
+                'border-bottom-right-radius': 0,
+                'border-right': 'none'
+              }"
+              :variant="'sub'"
+              :state="'secondary'"
+              :icon="'chevron_left'"
+            />
+            <ActionButton
+              v-if="isMobile"
+              @click="getNextWeek"
+              :style="{
+                'border-top-left-radius': 0,
+                'border-bottom-left-radius': 0
+              }"
+              class="right-button"
+              :variant="'sub'"
+              :state="'secondary'"
+              :icon="'chevron_right'"
+            />
+            <ActionButton
+              v-if="!isMobile"
               @click="getPreviousMonth"
               :style="{
                 'border-top-right-radius': 0,
@@ -188,6 +269,7 @@
               :icon="'chevron_left'"
             />
             <ActionButton
+              v-if="!isMobile"
               @click="getNextMonth"
               :style="{
                 'border-top-left-radius': 0,
@@ -239,48 +321,64 @@
           @show-detail="toggleDetail"
           :width="calendarWidth"
           :height="calendarHeight"
+          :emotions="calendarEmotions"
         />
+        <div class="link-button-container">
+          <LinkButton
+            v-if="isMobile"
+            :text="'더보기'"
+            :default-color="'#FF2E00'"
+            :link-path="'detail'"
+          />
+        </div>
         <div
           v-if="isMobile"
           class="emotion-info-area"
         >
-          <div class="link-button-container">
-            <LinkButton
-              :text="'더보기'"
-              :default-color="'#FF2E00'"
-              :link-path="'/'"
-            />
-          </div>
           <div class="main-emotion-area">
             <EmotionContainer
-              :size="'s'"
-              :style="'compact'"
-              :dir="'vertical'"
-              :emotion="'Emotion'"
-              :chips-style="'badge'"
-            />
-          </div>
-          <div
-            class="moment-emotion-area"
-            :style="{ maxHeight: momentAreaMaxHeight }"
-          >
-            <EmotionContainer
-              v-for="(emotion, index) in emotionList"
+              v-for="(emotion, index) in filteredMainEmotions"
               :key="index"
               :size="'s'"
-              :state="'compact'"
-              :dir="'horizontal'"
-              :emotion="emotion"
+              :emotion="emotion ? emotion.emotionRecordType : ''"
+              :level="emotion ? emotion.emotionRecordLevel : 0"
               :chips-state="'badge'"
-              :reason-list="['hello', 'yes', 'no', 'ok']"
+              :reason-list="emotion ? JSON.parse(emotion.emotionReason) : []"
+              :time="emotion.createdTime"
             />
+            <ActionButton
+              :variant="'main'"
+              :state="'tertiary'"
+              :text="'오늘의 감정 업데이트'"
+            />
+            <div class="moment-emotion-area">
+              <div class="moment-emotion-title">
+                <HeadlineText
+                  :text="'순간의 감정'"
+                />
+              </div>
+              <div class="moment-emotion-info">
+                <EmotionContainer
+                  v-for="(emotion, index) in filteredMomentEmotions"
+                  :key="index"
+                  :size="'s'"
+                  :state="'compact'"
+                  :dir="'horizontal'"
+                  :emotion="emotion ? emotion.emotionRecordType : ''"
+                  :level="emotion ? emotion.emotionRecordLevel : 0"
+                  :chips-state="'badge'"
+                  :reason-list="emotion ? JSON.parse(emotion.emotionReason) : []"
+                  :time="emotion.createdTime"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
   <DrawerContainer
-    v-if="isTablet ? true : isShowDetail"
+    v-if="isTablet && !isMobile ? true : isShowDetail && !isMobile"
     @toggle-drawer="toggleDetail"
     :style="{ height: isTablet ? `${viewportHeight - navHeight}px` : '', top: isTablet ? `${navHeight}px` : '' }"
     :variant="'emotion'"
@@ -363,10 +461,49 @@
   height: 100%;
 }
 
+.emotion-info-area {
+  padding: 0px;
+  border-radius: $border-radius-xs-rem;
+  margin-top: 0px;
+}
+
+.main-emotion-area {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  .button-area {
+    margin-bottom: 25px;
+  }
+}
+
+.moment-emotion-title {
+  display: flex;
+  margin: 24px 20px 16px 20px;
+}
+.moment-emotion-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+
+  @media (max-height: 740px) {
+    height: 200px;
+    overflow: auto;
+  }
+  @media (max-height: 667px) {
+    height: 130px;
+    overflow: auto;
+  }
+}
+
+.date-header {
+  font-size: $title-font-size-s;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
 @media (max-width: 576px) {
   .calendar-view {
     width: 100%;
-    background-color: transparent;
     padding: 0;
   }
 
@@ -375,7 +512,7 @@
     padding: 24px $mobile-margin-base-rem;
     flex-direction: column;
     height: 100%;
-    background-color: $white900;
+    background-color: $lightgray-background;
     border: none;
     border-radius: 0px;
   }
@@ -385,7 +522,6 @@
     justify-content: end;
     padding-top: $padding-m-rem;
   }
-}
 
-// @media
+}
 </style>

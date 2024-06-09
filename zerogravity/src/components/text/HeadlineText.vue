@@ -40,6 +40,7 @@
       disabledBorderColor: button.disabledBorderColor || '',
       disabledTextColor: button.disabledTextColor || '',
       linkPath: button.linkPath || '',
+      onClick: button.onClick || (() => {}),
     }))
   })
 
@@ -56,8 +57,13 @@
 
   const router = useRouter()
 
-  const onClick = (path) => {
-    router.push(`/${path}`)
+  const onClick = (path, callback) => {
+    if (path) {
+      console.log(`Navigating to: /${path}`)
+      router.push(`/${path}`)
+    } else if (callback) {
+      callback()
+    }
   }
 </script>
 
@@ -84,7 +90,7 @@
           :disabled-background-color="button.disabledBackgroundColor"
           :disabled-border-color="button.disabledBorderColor"
           :disabled-text-color="button.disabledTextColor"
-          @click="onClick(button.linkPath)"
+          @click="onClick(button.linkPath, button.onClick)"
         />
       </div>
       <div class="links">
@@ -108,6 +114,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 }
 
 .headline {

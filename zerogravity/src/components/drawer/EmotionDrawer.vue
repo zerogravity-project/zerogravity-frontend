@@ -12,7 +12,8 @@
   const userStore = useUserStore()
   const { recordStatus } = storeToRefs(userStore)
   const emotionStore = useEmotionStore()
-  const { selectedDate, selectedDateText, selectedMainEmotion, selectedMomentEmotions, emotionRecord } = storeToRefs(emotionStore)
+  const { selectedDate, selectedDateText, selectedMainEmotion, selectedMomentEmotions, emotionRecord,
+  } = storeToRefs(emotionStore)
 
   const divNode = ref(null)
   const momentAreaMaxHeight = ref('')

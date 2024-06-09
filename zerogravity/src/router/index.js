@@ -8,6 +8,7 @@ import EmotionView from '@/views/record/EmotionView.vue'
 import ReasonView from '@/views/record/ReasonView.vue'
 import DiaryView from '@/views/record/DiaryView.vue'
 import CalendarView from '@/views/profile/CalendarView.vue'
+import DetailView from '@/views/profile/DetailView.vue'
 import ChartView from '@/views/profile/ChartView.vue'
 import SettingView from '@/views/profile/SettingView.vue'
 import CustomizeView from '@/views/profile/setting/CustomizeView.vue'
@@ -166,6 +167,11 @@ const router = createRouter({
           name: 'Calendar',
           component: CalendarView,
           beforeEnter: [perRouteGuardForLoggin, resetStatusAndEmotion],
+        },
+        {
+          path: 'detail',
+          name: 'Detail',
+          component: DetailView,
         },
         {
           path: 'chart',
