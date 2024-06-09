@@ -16,6 +16,14 @@
       type: String,
       default: '',
     },
+    backgroundColor: {
+      type: String,
+      default: '',
+    },
+    textColor: {
+      type: String,
+      default: '',
+    },
     text: {
       type: String,
       default: '',
@@ -63,14 +71,35 @@
   <button
     @click="onClick"
     :class="[buttonClass, dynamicPadding]"
+    :style="{backgroundColor: props.backgroundColor, color: props.textColor}"
   >
+    <svg
+      v-if="props.variant === 'kakao'"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M11.55 3.47119C7.029 3.47119 3 6.50982 3 10.2581C3 12.5885 4.5585 14.6441 6.9315 15.8661L5.933 19.4264C5.8445 19.7416 6.2135 19.9923
+         6.4965 19.8096L10.8735 16.9901C11.2425 17.0246 11.618 17.045 11.55 17.045C16.9705 17.045 20.55 14.0058 20.55 10.2581C20.55 6.50982
+          16.9705 3.47119 11.55 3.47119Z"
+        fill="black"
+        fill-opacity="0.902"
+      />
+    </svg>
     <span
       v-if="props.icon"
       class="material-symbols-outlined"
+      :style="{color: props.textColor}"
     >{{ props.icon }}</span>
     <span
       v-if="props.text"
       class="text-area"
+      :style="{color: props.textColor}"
     >{{ props.text }}</span>
   </button>
 </template>
@@ -105,9 +134,11 @@ button {
 }
 
 button {
+
   &.main,
   &.sub,
   &.round {
+
     .material-symbols-outlined,
     .text-area {
       z-index: 3;
@@ -121,7 +152,7 @@ button {
   &.main {
     justify-content: center;
     width: 100%;
-    padding: $padding-btn-rem 0;
+    padding: $padding-btn-rem 36px;
     gap: 8px;
 
     &.primary {
@@ -131,7 +162,7 @@ button {
       background-color: $orange900;
 
       &:hover::before {
-        background-color: $blackopacity20;
+        background-color: $grayopacity30;
       }
 
       &:disabled {
@@ -148,9 +179,7 @@ button {
       background-color: transparent;
 
       &:hover {
-        border-color: $darkorange900;
-        color: $darkorange900;
-        background-color: transparent;
+        background-color: $orangeopacity10;
       }
 
       &:disabled {
@@ -266,6 +295,24 @@ button {
         border-color: $grayopacity30;
         color: $grayopacity30;
       }
+    }
+  }
+
+  /* 카카오 로그인 버튼은 카카오 디자인 가이드를 따른다. */
+  &.kakao {
+    justify-content: center;
+    width: 100%;
+    padding: $padding-btn-rem 0;
+    gap: 8px;
+    color: #00000085;
+    border: none;
+    border-radius: 6px;
+    background-color: #fee500;
+    font-size: 15px;
+    height: 45px;
+
+    &:hover::before {
+      background-color: #00000010;
     }
   }
 }

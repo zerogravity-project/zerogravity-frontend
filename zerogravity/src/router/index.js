@@ -38,7 +38,7 @@ const checkBeforeRecordEmotion = async (to, from, next) => {
 
   // 만약 유저가 명상을 완료했거나 감정 기록을 했다면
   if (recordStatus.value.status === 'newEmotionRecord' || recordStatus.value.status === 'emotionChecked'
-  || recordStatus.value.status === 'reasonChecked' || recordStatus.value.status === 'updateMainRecord') {
+    || recordStatus.value.status === 'reasonChecked' || recordStatus.value.status === 'updateMainRecord') {
     // if(recordStatus.value.status === 'reasonChecked'){
     //   if (confirm('저장하신 내용이 사라집니다!')) {
     //     recordStatus.value.status = 'emotionChecked'
@@ -190,6 +190,24 @@ const router = createRouter({
       ],
     },
   ],
+})
+
+// 로그인 판별
+router.beforeEach(async(to, from, next) => {
+  const userStore = useUserStore()
+  const { isAuthenticated } = storeToRefs(userStore)
+
+  if (to.path === '/' || to.path === '/login') {
+    return next()
+  }
+
+  await userStore.checkAuthentication()
+
+  if (!isAuthenticated.value) {
+    return next('/login')
+  }
+
+  next()
 })
 
 export default router

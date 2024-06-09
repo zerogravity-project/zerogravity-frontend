@@ -3,8 +3,13 @@
   import { RouterView, useRoute } from 'vue-router'
   import TopNavigation from './components/navigation/TopNavigation.vue'
   import DrawerContainer from './components/drawer/DrawerContainer.vue'
+  import { useUserStore } from './stores/user'
+  import { storeToRefs } from 'pinia'
 
   const route = useRoute()
+
+  const useStore = useUserStore()
+  // const { getLoginInfo } = storeToRefs(useStore)
 
   const viewportWidth = ref(window.innerWidth)
   const viewportHeight = ref(window.innerHeight)
@@ -43,13 +48,13 @@
   })
 
   const backgroundColor = computed(() => {
-    const regex = /\/(spaceout|record)\//
+    const regex = /^\/(spaceout|record|login)(\/|\/.*)?$/
     if (route.path === '/') {
       return '#e1e1e0a1'
-    } else if (regex.test(route.path)){
+    } else if (regex.test(route.path)) {
       return '#f1f1f1'
     } else {
-      return 'transparent'
+      return '#f8f8f8'
     }
   })
 
@@ -79,7 +84,7 @@
       @toggle-drawer="toggleDrawer"
       :class="{ 'border-bottom': backgroundColor !== '#e1e1e0a1' }"
     />
-    <main :class="{ 'no-drawer': !drawerProps }">
+    <main :class="{ 'full-height': !isNavigationVisible }">
       <DrawerContainer
         v-if="drawerProps"
         @toggle-drawer="toggleDrawer"
@@ -110,7 +115,7 @@ main {
   width: 100vw;
   height: calc(100vh - 60px);
 
-  &.no-drawer {
+  &.full-height {
     height: 100vh;
   }
 }
@@ -120,6 +125,4 @@ main {
     width: 100vw;
   }
 }
-
-@media (max-width: 567px) {}
 </style>
