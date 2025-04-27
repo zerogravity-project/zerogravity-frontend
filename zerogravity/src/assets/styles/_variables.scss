@@ -1,0 +1,146 @@
+/* colors */
+$black900: #222222;
+
+$white900: #ffffff;
+
+$gray700: #4e5968;
+
+$lightgray300: #d3d3d3;
+$lightgray200: #e1e1e1;
+$lightgray100: #f8f8f8;
+
+$red900: #ff3b30;
+$orange900: #ff2e00;
+
+$darkorange900: #c42300;
+
+$lightgray-background: #f8f8f8;
+$gray-background: #dbdddc;
+
+
+/* colors: opacity */
+$blackopacity50: rgba(0, 0, 0, 0.5);
+$blackopacity20: rgba(34, 34, 34, 0.2);
+
+$whiteopacity50: rgba(255, 255, 255, 0.5);
+$whiteopacity30: rgba(255, 255, 255, 0.3);
+
+$grayopacity50: rgba(78, 89, 104, 0.5);
+$grayopacity30: rgba(78, 89, 104, 0.3);
+$grayopacity10: rgba(78, 89, 104, 0.1);
+
+$redopacity50: rgba(255, 59, 48, 0.5);
+$redopacity10: rgba(255, 59, 48, 0.1);
+
+$orangeopacity10: rgba(255, 46, 0, 0.1);
+
+
+/* font size */
+// px
+$title-font-size-xxl: 48px;
+$title-font-size-xl: 36px;
+$title-font-size-l: 28px;
+$title-font-size-m: 24px;
+$title-font-size-s: 22px;
+$title-font-size-xs: 18px;
+$title-font-size-mobile: 17px;
+
+$text-font-size-m: 15px;
+$text-font-size-s: 13px;
+$text-font-size-xs: 12px;
+
+$btn-font-size-m: 16px;
+$btn-font-size-s: 14px;
+
+// rem
+$title-font-size-xxl-rem: 3rem;
+$title-font-size-xl-rem: 2.25rem;
+$title-font-size-l-rem: 1.75rem;
+$title-font-size-m-rem: 1.5rem;
+$title-font-size-s-rem: 1.375rem;
+$title-font-size-xs-rem: 1.125rem;
+$title-font-size-mobile-rem: 1.0625rem;
+
+$text-font-size-m-rem: 0.9375rem;
+$text-font-size-s-rem: 0.8125rem;
+$text-font-size-xs-rem: 0.75rem;
+
+$btn-font-size-m-rem: 1rem;
+$btn-font-size-s-rem: 0.875rem;
+
+
+/* margin & padding */
+// px
+$padding-xxxs: 4px;
+$padding-xxs: 6px;
+$padding-xs: 8px;
+$padding-s: 12px;
+$padding-m: 16px;
+$padding-l: 18px;
+$padding-xl: 24px;
+$padding-xxl: 36px;
+$padding-xxxl: 48px;
+
+$padding-btn: 14px;
+
+$margin-xxxs: 4px;
+$margin-xxs: 6px;
+$margin-xs: 8px;
+$margin-s: 12px;
+$margin-m: 16px;
+$margin-l: 18px;
+$margin-xl: 24px;
+$margin-xxl: 36px;
+$margin-xxxl: 48px;
+
+$mobile-base-margin: 20px;
+
+// rem
+$padding-xxxs-rem: 0.25rem;
+$padding-xxs-rem: 0.375rem;
+$padding-xs-rem: 0.5rem;
+$padding-s-rem: 0.75rem;
+$padding-m-rem: 1rem;
+$padding-l-rem: 1.125rem;
+$padding-xl-rem: 1.5rem;
+$padding-xxl-rem: 2.25rem;
+$padding-xxxl-rem: 3rem;
+
+$padding-btn-rem: 0.9rem;
+
+$margin-xxxs-rem: 0.25rem;
+$margin-xxs-rem: 0.375rem;
+$margin-xs-rem: 0.5rem;
+$margin-s-rem: 0.75rem;
+$margin-m-rem: 1rem;
+$margin-l-rem: 1.125rem;
+$margin-xl-rem: 1.5rem;
+$margin-xxl-rem: 2.25rem;
+$margin-xxxl-rem: 3rem;
+
+$mobile-margin-base-rem: 1.25rem;
+
+
+/* width & height */
+// px
+$side-bar-base-width: 256px;
+$top-nav-base-height: 60px;
+
+// rem
+$side-bar-base-width-rem: 16rem;
+$top-nav-base-height-rem: 3.75rem;
+
+/* boarder-radius */
+// px
+$border-radius-full: 100px;
+$border-radius-l: 16px;
+$border-radius-m: 12px;
+$border-radius-s: 8px;
+$border-radius-xs: 4px;
+
+// rem
+$border-radius-full-rem: 7rem;
+$border-radius-l-rem: 1rem;
+$border-radius-m-rem: 0.75rem;
+$border-radius-s-rem: 0.5rem;
+$border-radius-xs-rem: 0.25rem;
