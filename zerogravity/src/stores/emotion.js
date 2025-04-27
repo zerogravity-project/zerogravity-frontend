@@ -191,13 +191,13 @@ export const useEmotionStore = defineStore('emotion', () => {
 
     return sortedEmotionsByDate
   }
-    /**
-   * API Controls
-   */
+  /**
+ * API Controls
+ */
   // 사용자의 감정 전체 데이터 가져오기
   async function getEmotionRecords(year, month) {
     try {
-      const response = await axios.get(`http://localhost:8080/api-zerogravity/emotions/records/${userId.value}`, {
+      const response = await axios.get(`http://api.zerogv.com/api-zerogravity/emotions/records/${userId.value}`, {
         params: { year, month },
       })
       console.log('✅ Emotion Records Fetched: ', emotionRecords.value)
@@ -213,7 +213,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   // 사용자의 감정 기록
   async function createEmotionRecord(emotionData) {
     try {
-      const response = await axios.post('http://localhost:8080/api-zerogravity/emotions/records', emotionData)
+      const response = await axios.post('http://api.zerogv.com/api-zerogravity/emotions/records', emotionData)
       console.log('✅ Emotion Record Created:', response)
 
       await refreshEmotionRecords()
@@ -224,7 +224,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   // 사용자의 감정 업데이트
   async function updateEmotionRecord(emotionRecordId, emotionUpdateData) {
     try {
-      const response = await axios.put(`http://localhost:8080/api-zerogravity/emotions/records/${emotionRecordId}`, emotionUpdateData)
+      const response = await axios.put(`http://api.zerogv.com/api-zerogravity/emotions/records/${emotionRecordId}`, emotionUpdateData)
       console.log('✅ Emotion Record Updated:', response)
       await refreshEmotionRecords()
     } catch (error) {
@@ -239,7 +239,7 @@ export const useEmotionStore = defineStore('emotion', () => {
 
   async function getWeeklyEmotionRecord(period, searchDate) {
     try {
-      const response = await axios.get(`http://localhost:8080/api-zerogravity/chart/count/${userId.value}`, {
+      const response = await axios.get(`http://api.zerogv.com/api-zerogravity/chart/count/${userId.value}`, {
         params: { period, searchDate },
       })
       console.log('✅ Weekly Record Updated:', response)

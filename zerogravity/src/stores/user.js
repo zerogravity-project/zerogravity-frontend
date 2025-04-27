@@ -14,7 +14,7 @@ export const useUserStore = defineStore('user', () => {
    */
   const getUserInfo = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api-zerogravity/users/me', { withCredentials: true })
+      const response = await axios.get('http://api.zerogv.com/api-zerogravity/users/me', { withCredentials: true })
       // 로그인 안한 상태
       if (response.status === 204) {
         console.log('🔓 No content: User not authenticated.')
@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', () => {
 
   const logout = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api-zerogravity/users/logout', null, { withCredentials: true })
+      const response = await axios.post('http://api.zerogv.com/api-zerogravity/users/logout', null, { withCredentials: true })
       if (response.status === 204) {
         await checkAuthentication()
         router.push('/')
@@ -52,8 +52,8 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const deleteUser = async () => {
-    try{
-      const response = await axios.delete('http://localhost:8080/api-zerogravity/users/me', { withCredentials: true })
+    try {
+      const response = await axios.delete('http://api.zerogv.com/api-zerogravity/users/me', { withCredentials: true })
       if (response.status === 204) {
         // 로그아웃 처리
         await logout()
@@ -63,7 +63,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  watchEffect(()=>{
+  watchEffect(() => {
     checkAuthentication()
   })
 
