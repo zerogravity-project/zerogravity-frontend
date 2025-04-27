@@ -5,7 +5,7 @@ import router from '@/router'
 
 export const useUserStore = defineStore('user', () => {
   const recordStatus = ref({ status: null, emotionRecordState: null })
-  const userId = ref(1)
+  const userId = ref(3501570759)
   const userInfo = ref(null)
   const isAuthenticated = ref(false)
 
@@ -52,7 +52,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const deleteUser = async () => {
-    try{
+    try {
       const response = await axios.delete('http://localhost:8080/api-zerogravity/users/me', { withCredentials: true })
       if (response.status === 204) {
         // 로그아웃 처리
@@ -63,7 +63,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  watchEffect(()=>{
+  watchEffect(() => {
     checkAuthentication()
   })
 

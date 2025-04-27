@@ -47,7 +47,7 @@
   const emotionStore = useEmotionStore()
   const { selectedDate, selectedMonth } = storeToRefs(emotionStore)
 
-  const adjustment = 48
+  const adjustment = 64
 
   const numericDate = computed(() => {
     return props.date ? props.date.getDate() : ''
