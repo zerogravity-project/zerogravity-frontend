@@ -6,7 +6,7 @@
   console.log(Kakao)
   const onClick = () => {
     Kakao.Auth.authorize({
-      redirectUri: 'http://localhost:8080/login/oauth2/code/kakao',
+      redirectUri: 'http://api.zerogv.com/login/oauth2/code/kakao',
     })
   }
 
