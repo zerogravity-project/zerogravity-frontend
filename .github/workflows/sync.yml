@@ -1,18 +1,46 @@
-name: Trigger Fork Sync
+name: Sync Fork Workflow
 
 on:
   push:
     branches:
       - main
       - develop
+  repository_dispatch:
+    types: [sync-from-upstream]
 
 jobs:
-  notify-fork:
+  trigger-fork:
+    if: github.repository == 'zerogravity-project/zerogravity-frontend' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Call fork repo dispatch event
+      - name: Trigger fork sync via repository_dispatch
         run: |
           curl -X POST https://api.github.com/repos/minukHwang/zerogravity-frontend/dispatches \
             -H "Accept: application/vnd.github.everest-preview+json" \
             -H "Authorization: token ${{ secrets.FORK_PAT }}" \
             -d '{"event_type": "sync-from-upstream", "client_payload": {"branch": "${{ github.ref_name }}"}}'
+
+  sync-with-upstream:
+    if: github.repository == 'minukHwang/zerogravity-frontend' && github.event_name == 'repository_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.client_payload.branch }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Add upstream & fetch
+        run: |
+          git remote add upstream https://github.com/zerogravity-project/zerogravity-frontend.git
+          git fetch upstream
+
+      - name: Reset to upstream
+        run: |
+          git reset --hard upstream/${{ github.event.client_payload.branch }}
+          git push origin ${{ github.event.client_payload.branch }} --force
