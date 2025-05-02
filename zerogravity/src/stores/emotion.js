@@ -1,19 +1,14 @@
 import { ref, computed, watch, watchEffect } from 'vue'
-import { defineStore, storeToRefs } from 'pinia'
-import { useUserStore } from './user'
-import axios from 'axios'
+import { defineStore } from 'pinia'
+import axios from '@/plugins/axios'
 
 export const useEmotionStore = defineStore('emotion', () => {
-  const useStore = useUserStore()
-  const { userId } = storeToRefs(useStore)
-
   // 추가하기 위한 레코드
   const emotions = ref([])
   const emotionRecords = ref([])
   const emotionWeeklyRecord = ref([])
   const emotionRecord = ref({
     emotionRecordId: '',
-    userId: 0,
     emotionReason: [],
     emotionRecordType: '',
     emotionRecordLevel: 0,
@@ -129,7 +124,7 @@ export const useEmotionStore = defineStore('emotion', () => {
     const minutes = date.getMinutes().toString().padStart(2, '0')
     const seconds = date.getSeconds().toString().padStart(2, '0')
     const milliseconds = date.getMilliseconds().toString().padStart(3, '0')
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}Z`
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`
   }
 
   const formatDateToCustomString = (date) => {
@@ -197,7 +192,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   // 사용자의 감정 전체 데이터 가져오기
   async function getEmotionRecords(year, month) {
     try {
-      const response = await axios.get(`http://api.zerogv.com/api-zerogravity/emotions/records/${userId.value}`, {
+      const response = await axios.get('/emotions/records', {
         params: { year, month },
       })
       console.log('✅ Emotion Records Fetched: ', emotionRecords.value)
@@ -213,7 +208,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   // 사용자의 감정 기록
   async function createEmotionRecord(emotionData) {
     try {
-      const response = await axios.post('http://api.zerogv.com/api-zerogravity/emotions/records', emotionData)
+      const response = await axios.post('/emotions/records', emotionData)
       console.log('✅ Emotion Record Created:', response)
 
       await refreshEmotionRecords()
@@ -224,7 +219,7 @@ export const useEmotionStore = defineStore('emotion', () => {
   // 사용자의 감정 업데이트
   async function updateEmotionRecord(emotionRecordId, emotionUpdateData) {
     try {
-      const response = await axios.put(`http://api.zerogv.com/api-zerogravity/emotions/records/${emotionRecordId}`, emotionUpdateData)
+      const response = await axios.put(`/emotions/records/${emotionRecordId}`, emotionUpdateData)
       console.log('✅ Emotion Record Updated:', response)
       await refreshEmotionRecords()
     } catch (error) {
@@ -239,7 +234,7 @@ export const useEmotionStore = defineStore('emotion', () => {
 
   async function getWeeklyEmotionRecord(period, searchDate) {
     try {
-      const response = await axios.get(`http://api.zerogv.com/api-zerogravity/chart/count/${userId.value}`, {
+      const response = await axios.get('/chart/count', {
         params: { period, searchDate },
       })
       console.log('✅ Weekly Record Updated:', response)
@@ -291,7 +286,8 @@ export const useEmotionStore = defineStore('emotion', () => {
 
     const filteredEmotions = selectedWeeklyMainEmotion.value.filter(emotion => {
       const emotionDate = new Date(emotion.createdTime)
-      return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getDate()
+      return emotionDate.getMonth() === selectedDate.value.getMonth() &&
+        emotionDate.getDate() === selectedDate.value.getDate()
     })
 
     if (filteredEmotions.length === 0) {

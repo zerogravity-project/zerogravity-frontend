@@ -6,14 +6,9 @@
   import DropDown from '@/components/dropdown/DropDown.vue'
   import { onMounted, ref } from 'vue'
   import { dailyChartStore } from '@/stores/chart'
-  import { useUserStore } from '@/stores/user'
-  import { storeToRefs } from 'pinia'
 
   const charts = ref([])
   const chartStore = dailyChartStore()
-  const userStore = useUserStore()
-
-  const { userId } = storeToRefs(userStore)
 
   const labels = ref([
     '일', '월', '화', '수', '목', '금', '토',
@@ -68,7 +63,6 @@
   const fetchData = async () => {
     try {
       console.log('Fetching data with parameters:', {
-        userId: userId.value,
         period: 'weekly',
         searchDate: searchDate.value,
       })
@@ -78,8 +72,8 @@
       countDatasets.value = []
 
       const period = 'weekly'
-      await chartStore.getAllCharts(userId.value, period, searchDate.value)
-      await chartStore.getAllCounts(userId.value, period, searchDate.value)
+      await chartStore.getAllCharts(period, searchDate.value)
+      await chartStore.getAllCounts(period, searchDate.value)
 
       charts.value = chartStore.dailyCharts
       const counts = chartStore.countCharts
@@ -350,6 +344,7 @@
     width: calc(100vw - 18.75rem);
     position: relative;
   }
+
   .main-title {
     width: 100%;
     max-width: 50rem;
@@ -358,6 +353,7 @@
     flex-direction: column;
     padding-left: 0.25rem;
   }
+
   .button-area {
     display: flex;
     flex-direction: row;
@@ -370,19 +366,23 @@
     position: relative;
     z-index: 20;
   }
+
   .date {
     display: flex;
   }
+
   .buttons {
     display: flex;
     flex-direction: row;
   }
+
   .dropdown {
     position: absolute;
     top: 100%;
     right: 0;
     z-index: 10;
   }
+
   .chart-area {
     width: 100%;
     max-width: 50rem;
@@ -397,6 +397,7 @@
     margin: 1rem 1rem 0.2rem 1rem;
     background-color: $white900;
   }
+
   @media (max-width: 567px) {
     .layout {
       max-width: 100vw;
