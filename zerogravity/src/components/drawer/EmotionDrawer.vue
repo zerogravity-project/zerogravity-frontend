@@ -12,8 +12,7 @@
   const userStore = useUserStore()
   const { recordStatus } = storeToRefs(userStore)
   const emotionStore = useEmotionStore()
-  const { selectedDate, selectedDateText, selectedMainEmotion, selectedMomentEmotions, emotionRecord,
-  } = storeToRefs(emotionStore)
+  const { selectedDate, selectedDateText, selectedMainEmotion, selectedMomentEmotions, emotionRecord } = storeToRefs(emotionStore)
 
   const divNode = ref(null)
   const momentAreaMaxHeight = ref('')
@@ -34,7 +33,13 @@
     recordStatus.value.status = 'newEmotionRecord'
     recordStatus.value.emotionRecordState = 'moment'
     userStore.saveRecordStatusToSession()
-    const date = emotionStore.formatDateToTimestamp(selectedDate.value)
+
+    // 선택된 날짜의 연,월,일과 현재 시간의 시,분,초를 조합
+    const now = new Date()
+    const selectedDateObj = new Date(selectedDate.value)
+    selectedDateObj.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds())
+
+    const date = emotionStore.formatDateToTimestamp(selectedDateObj)
     emotionRecord.value.createdTime = date
     emotionStore.saveEmotionRecordToSession()
     router.push('/record/emotion')
@@ -81,9 +86,7 @@
 </script>
 
 <template>
-  <div
-    class="emotion-drawer"
-  >
+  <div class="emotion-drawer">
     <div ref="divNode">
       <!-- Navigation -->
       <DrawerNavigation
@@ -97,9 +100,9 @@
         @add-main-emotion="addMainEmotion"
         @update-main-emotion="updateMainEmotion"
         :title-text="'Main Emotion'"
-        :button-text="isMainUpdate ? '추가하기' : '수정하기' "
+        :button-text="isMainUpdate ? '추가하기' : '수정하기'"
         :style="'gray'"
-        :type="isMainUpdate?'main-add' : 'main-update'"
+        :type="isMainUpdate ? 'main-add' : 'main-update'"
       />
       <div class="main-emotion-area">
         <EmotionContainer
@@ -117,7 +120,7 @@
       <DrawerHeader
         @update-diary="updateDiary"
         :title-text="'Daily Note'"
-        :button-text="isDiaryUpdate ? '' : '수정하기' "
+        :button-text="isDiaryUpdate ? '' : '수정하기'"
         :style="'gray'"
         :type="'diary'"
       />
@@ -139,7 +142,7 @@
 
     <div
       class="moment-emotion-area"
-      :style="{maxHeight: momentAreaMaxHeight}"
+      :style="{ maxHeight: momentAreaMaxHeight }"
     >
       <EmotionContainer
         v-for="(emotion, index) in selectedMomentEmotions"
@@ -158,21 +161,21 @@
 </template>
 
 <style lang="scss" scoped>
-
 .emotion-drawer {
   width: 100%;
   height: 100%;
   background: $white900;
 }
 
-.emotion-container.detail.s{
+.emotion-container.detail.s {
   padding-bottom: 0;
 }
-.main-emotion-area{
+
+.main-emotion-area {
   padding: $padding-xxl-rem;
 }
 
-.text-container{
+.text-container {
   padding-top: $padding-xl-rem;
   padding-bottom: $padding-xl-rem;
 }
@@ -181,5 +184,4 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
-
 </style>
