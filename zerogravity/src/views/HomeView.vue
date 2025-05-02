@@ -12,7 +12,18 @@
     isLoaded.value = !isLoaded.value
   }
 
+  const checkLogin = () => {
+    const accessToken = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('accessToken='))
+    return !!accessToken
+  }
+
   const startSpaceout = () => {
+    if (!checkLogin()) {
+      router.push('/login')
+      return
+    }
     router.push('/spaceout/start')
   }
 </script>
