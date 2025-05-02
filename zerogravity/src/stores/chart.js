@@ -1,17 +1,12 @@
 import { ref } from 'vue'
-import { defineStore, storeToRefs } from 'pinia'
-import axios from 'axios'
-import { useUserStore } from './user'
+import { defineStore } from 'pinia'
+import axios from '@/plugins/axios'
 
 export const dailyChartStore = defineStore('chart', () => {
-    const useStore = useUserStore()
-    const { userId } = storeToRefs(useStore)
-
     const dailyCharts = ref([])
     const countCharts = ref([])
     const dailyChart = ref({
         dailyChartId: null,
-        userId: null,
         dailySum: null,
         dailyCount: null,
         dailyAverage: null,
@@ -19,7 +14,6 @@ export const dailyChartStore = defineStore('chart', () => {
     })
     const countChart = ref({
         emotionRecordId: null,
-        userId: null,
         emotionReason: null,
         emotionRecordType: null,
         emotionRecordLevel: null,
@@ -27,19 +21,9 @@ export const dailyChartStore = defineStore('chart', () => {
         diaryEntry: null,
     })
 
-    const formatDateToCustomString = (date) => {
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const hours = String(date.getHours()).padStart(2, '0')
-        const minutes = String(date.getMinutes()).padStart(2, '0')
-        const seconds = String(date.getSeconds()).padStart(2, '0')
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
-    }
-
-    async function getAllCharts(userId, period, searchDate) {
+    async function getAllCharts(period, searchDate) {
         try {
-            const response = await axios.get(`http://api.zerogv.com/api-zerogravity/chart/level/${userId}`, {
+            const response = await axios.get('/chart/level', {
                 params: { period, searchDate },
             })
             dailyCharts.value = response.data
@@ -48,9 +32,9 @@ export const dailyChartStore = defineStore('chart', () => {
         }
     }
 
-    async function getAllCounts(userId, period, searchDate) {
+    async function getAllCounts(period, searchDate) {
         try {
-            const response = await axios.get(`http://api.zerogv.com/api-zerogravity/chart/count/${userId}`, {
+            const response = await axios.get('/chart/count', {
                 params: { period, searchDate },
             })
             countCharts.value = response.data

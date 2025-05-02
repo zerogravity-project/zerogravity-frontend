@@ -11,8 +11,16 @@
   import EmotionContainer from '@/components/emotion/EmotionContainer.vue'
 
   const emotionStore = useEmotionStore()
-  const { selectedDate, selectedMonth, selectedYear, todayDate,
-          selectedWeek, selectedWeeklyMainEmotion, selectedWeeklyMomentEmotion, emotionRecords } = storeToRefs(emotionStore)
+  const {
+    selectedDate,
+    selectedMonth,
+    selectedYear,
+    todayDate,
+    selectedWeek,
+    selectedWeeklyMainEmotion,
+    selectedWeeklyMomentEmotion,
+    emotionRecords,
+  } = storeToRefs(emotionStore)
 
   /**
    * 초기 화면 설정
@@ -150,17 +158,17 @@
    * 드롭다운
    */
   const isDropdown = ref(false)
-  const dropdownMenu = [{ name: '오늘의 감정 추가', link: '/record/emotion', emotionRecordState: 'main' },
-                        { name: '순간의 감정 추가', link: '/record/emotion', emotionRecordState: 'moment' }]
+  const dropdownMenu = [
+    { name: '오늘의 감정 추가', link: '/record/emotion', emotionRecordState: 'main' },
+    { name: '순간의 감정 추가', link: '/record/emotion', emotionRecordState: 'moment' },
+  ]
 
   const onClick = () => {
     isDropdown.value = !isDropdown.value
   }
 
   const currentWeekText = computed(() => {
-    return isMobile.value
-      ? `${selectedMonth.value + 1}월 ${selectedDate.value.getDate()}일`
-      : `${selectedYear.value}년 ${selectedMonth.value + 1}월`
+    return isMobile.value ? `${selectedMonth.value + 1}월 ${selectedDate.value.getDate()}일` : `${selectedYear.value}년 ${selectedMonth.value + 1}월`
   })
 
   const filteredMainEmotions = computed(() => {
@@ -168,7 +176,7 @@
       return []
     }
 
-    const filteredEmotions = selectedWeeklyMainEmotion.value.filter(emotion => {
+    const filteredEmotions = selectedWeeklyMainEmotion.value.filter((emotion) => {
       const emotionDate = new Date(emotion.createdTime)
       return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
     })
@@ -181,7 +189,7 @@
   })
 
   const filteredMomentEmotions = computed(() => {
-    return selectedWeeklyMomentEmotion.value.filter(emotion => {
+    return selectedWeeklyMomentEmotion.value.filter((emotion) => {
       const emotionDate = new Date(emotion.createdTime)
       return emotionDate.getUTCMonth() === selectedDate.value.getMonth() && emotionDate.getUTCDate() === selectedDate.value.getUTCDate()
     })
@@ -238,7 +246,7 @@
               :style="{
                 'border-top-right-radius': 0,
                 'border-bottom-right-radius': 0,
-                'border-right': 'none'
+                'border-right': 'none',
               }"
               :variant="'sub'"
               :state="'secondary'"
@@ -249,7 +257,7 @@
               @click="getNextWeek"
               :style="{
                 'border-top-left-radius': 0,
-                'border-bottom-left-radius': 0
+                'border-bottom-left-radius': 0,
               }"
               class="right-button"
               :variant="'sub'"
@@ -262,7 +270,7 @@
               :style="{
                 'border-top-right-radius': 0,
                 'border-bottom-right-radius': 0,
-                'border-right': 'none'
+                'border-right': 'none',
               }"
               :variant="'sub'"
               :state="'secondary'"
@@ -273,7 +281,7 @@
               @click="getNextMonth"
               :style="{
                 'border-top-left-radius': 0,
-                'border-bottom-left-radius': 0
+                'border-bottom-left-radius': 0,
               }"
               class="right-button"
               :variant="'sub'"
@@ -353,9 +361,7 @@
             />
             <div class="moment-emotion-area">
               <div class="moment-emotion-title">
-                <HeadlineText
-                  :text="'순간의 감정'"
-                />
+                <HeadlineText :text="'순간의 감정'" />
               </div>
               <div class="moment-emotion-info">
                 <EmotionContainer
@@ -471,6 +477,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
   .button-area {
     margin-bottom: 25px;
   }
@@ -480,6 +487,7 @@
   display: flex;
   margin: 24px 20px 16px 20px;
 }
+
 .moment-emotion-info {
   display: flex;
   flex-direction: column;
@@ -489,6 +497,7 @@
     height: 200px;
     overflow: auto;
   }
+
   @media (max-height: 667px) {
     height: 130px;
     overflow: auto;
@@ -522,6 +531,5 @@
     justify-content: end;
     padding-top: $padding-m-rem;
   }
-
 }
 </style>
