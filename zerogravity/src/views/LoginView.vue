@@ -3,10 +3,15 @@
   // import ContentText from '@/components/text/ContentText.vue'
   import ActionButton from '@/components/button/ActionButton.vue'
 
-  console.log(Kakao)
   const onClick = () => {
+    // 1. 현재 경로 가져오기
+    const currentPath = window.location.origin
+
+    // 2. 쿼리로 encode
+    const encodedUrl = encodeURIComponent(currentPath)
+
     Kakao.Auth.authorize({
-      redirectUri: `${import.meta.env.VITE_API_BASE_URL}/login/oauth2/code/kakao`,
+      redirectUri: `${import.meta.env.VITE_API_BASE_URL}/login/oauth2/code/kakao?redirect=${encodedUrl}`,
     })
   }
 
