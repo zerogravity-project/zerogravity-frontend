@@ -15,15 +15,17 @@
   const checkLogin = () => {
     const accessToken = document.cookie
       .split('; ')
-      .find(row => row.startsWith('accessToken='))
+      .find(row => row.startsWith('token='))
+
+    console.log(accessToken)
     return !!accessToken
   }
 
   const startSpaceout = () => {
-    if (!checkLogin()) {
-      router.push('/login')
-      return
-    }
+    // if (!checkLogin()) {
+    //   router.push('/login')
+    //   return
+    // }
     router.push('/spaceout/start')
   }
 </script>
