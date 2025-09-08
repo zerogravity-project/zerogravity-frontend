@@ -8,6 +8,14 @@ coverage
 .env.development
 .env.production
 
+# pnpm
+pnpm-lock.yaml
+
+# Sub-project specific
+zerogravity-react/node_modules
+zerogravity-react/.next
+zerogravity-react/dist
+
 /cypress/videos/
 /cypress/screenshots/
 

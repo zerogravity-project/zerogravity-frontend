@@ -1,0 +1,3 @@
+[submodule "zerogravity-react"]
+	path = zerogravity-react
+	url = https://github.com/zerogravity-project/zerogravity-react.git
